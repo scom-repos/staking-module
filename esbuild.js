@@ -29,12 +29,12 @@ const GlobalBuildModuleList = [
     moduleName: '@staking/staking-ui'
   },
   {
-    sourceFilePath: 'src/crosschain-utils/index.tsx',
+    sourceFilePath: 'src/crosschain-utils/index.ts',
     distFilePath: './dist/crosschain-utils/index.js',
     moduleName: '@staking/crosschain-utils'
   },
   {
-    sourceFilePath: 'src/global/index.tsx',
+    sourceFilePath: 'src/global/index.ts',
     distFilePath: './dist/global/index.js',
     moduleName: '@staking/global'
   },
@@ -44,12 +44,12 @@ const GlobalBuildModuleList = [
     moduleName: '@staking/result'
   },
   {
-    sourceFilePath: 'src/staking-utils/index.tsx',
+    sourceFilePath: 'src/staking-utils/index.ts',
     distFilePath: './dist/staking-utils/index.js',
     moduleName: '@staking/staking-utils'
   },
   {
-    sourceFilePath: 'src/store/index.tsx',
+    sourceFilePath: 'src/store/index.ts',
     distFilePath: './dist/store/index.js',
     moduleName: '@staking/store'
   },
@@ -63,6 +63,7 @@ const GlobalModuleESBuildConfig = {
     '@ijstech/eth-wallet',
     '@openswap/sdk',
     '@staking/main',
+    
   ]
 }
 
