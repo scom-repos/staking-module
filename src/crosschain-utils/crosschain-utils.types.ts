@@ -1,5 +1,5 @@
 import { BigNumber } from "@ijstech/eth-wallet";
-import { ITokenObject } from "../global";
+import { ITokenObject } from "@staking/global";
 
 export interface IBridgeVaultBond {
   vaultTrollRegistry: string;

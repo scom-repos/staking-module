@@ -1,6 +1,6 @@
 import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement } from '@ijstech/components';
-import { formatNumber, formatDate, registerSendTxEvents, INetwork, TokenMapType } from './global';
-import { getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected } from './store';
+import { formatNumber, formatDate, registerSendTxEvents, INetwork, TokenMapType } from '@staking/global';
+import { getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected } from '@staking/store';
 import {
   getStakingTotalLocked,
   getLPObject,
@@ -10,7 +10,7 @@ import {
   getVaultRewardCurrentAPR,
   withdrawToken,
   claimToken,
-} from './staking-utils';
+} from '@staking/staking-utils';
 import {
   StakingType,
   getLockedTokenObject,
@@ -21,7 +21,7 @@ import Assets from '@staking/assets';
 import moment from 'moment';
 import { BigNumber } from '@ijstech/eth-wallet';
 import './staking.css';
-import { Result } from './result';
+import { Result } from '@staking/result';
 
 export interface StakingElement extends ControlElement {
   campaigns?: any;

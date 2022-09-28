@@ -6,7 +6,7 @@ import {
   TokenMapType,
   getERC20Amount,
   INetwork,
-} from '../global';
+} from '@staking/global';
 
 import Assets from '@staking/assets';
 import { Contracts } from '@openswap/sdk';

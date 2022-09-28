@@ -13,8 +13,8 @@ import {
   Container
 } from '@ijstech/components';
 import styleClass from './index.css';
-import { SITE_ENV, EventId } from '@staking/staking-ui/global';
-import { getChainId, getDefaultChainId, getNetworkInfo, getSiteSupportedNetworks, isWalletConnected, setCurrentChainId, setDataFromSCConfig, setSiteEnv } from '@staking/staking-ui/store';
+import { SITE_ENV, EventId } from '@staking/global';
+import { getChainId, getDefaultChainId, getNetworkInfo, getSiteSupportedNetworks, isWalletConnected, setCurrentChainId, setDataFromSCConfig, setSiteEnv } from '@staking/store';
 export { Nav } from './nav';
 Styles.Theme.applyTheme(Styles.Theme.darkTheme);
 @customModule

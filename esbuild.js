@@ -28,6 +28,31 @@ const GlobalBuildModuleList = [
     distFilePath: './dist/staking-ui/index.js',
     moduleName: '@staking/staking-ui'
   },
+  {
+    sourceFilePath: 'src/crosschain-utils/index.tsx',
+    distFilePath: './dist/crosschain-utils/index.js',
+    moduleName: '@staking/crosschain-utils'
+  },
+  {
+    sourceFilePath: 'src/global/index.tsx',
+    distFilePath: './dist/global/index.js',
+    moduleName: '@staking/global'
+  },
+  {
+    sourceFilePath: 'src/result/index.tsx',
+    distFilePath: './dist/result/index.js',
+    moduleName: '@staking/result'
+  },
+  {
+    sourceFilePath: 'src/staking-utils/index.tsx',
+    distFilePath: './dist/staking-utils/index.js',
+    moduleName: '@staking/staking-utils'
+  },
+  {
+    sourceFilePath: 'src/store/index.tsx',
+    distFilePath: './dist/store/index.js',
+    moduleName: '@staking/store'
+  },
 ]
 
 const GlobalModuleESBuildConfig = {
@@ -37,8 +62,6 @@ const GlobalModuleESBuildConfig = {
     '@ijstech/components',
     '@ijstech/eth-wallet',
     '@openswap/sdk',
-    '@openswap/troll-nft-sdk',
-    '@ijstech/cross-chain-bridge',
     '@staking/main',
   ]
 }
@@ -105,8 +128,6 @@ async function buildLocalModule() {
       '@ijstech/components', 
       '@ijstech/eth-wallet', 
       '@openswap/sdk',
-      '@openswap/troll-nft-sdk',
-      '@ijstech/cross-chain-bridge',
       '@staking/main',
     ],
     outdir: 'dist/staking',

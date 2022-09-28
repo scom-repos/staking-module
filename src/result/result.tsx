@@ -1,6 +1,6 @@
 import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
 import { getWallet, getNetworkExplorerName, viewOnExplorerByTxHash } from '../store';
-import { parseContractError } from '../global';
+import { parseContractError } from '@staking/global';
 import styleClass from './result.css';
 import Assets from '@staking/assets';
 

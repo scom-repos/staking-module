@@ -1,4 +1,4 @@
-import { getTokenMap, getTokenIconPath, DefaultTokens } from './store';
+import { getTokenMap, getTokenIconPath, DefaultTokens } from '@staking/store';
 
 enum StakingType {
   ERC20_Token,

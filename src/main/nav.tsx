@@ -22,7 +22,7 @@ import {
   IMenuItem
 } from '@ijstech/components';
 import { Wallet, WalletPlugin, WalletPluginConfig } from "@ijstech/eth-wallet";
-import { INetwork, EventId, formatNumber, SITE_ENV } from '@staking/staking-ui/global';
+import { INetwork, EventId, formatNumber, SITE_ENV } from '@staking/global';
 import { 
   walletList, 
   connectWallet, 
@@ -34,10 +34,10 @@ import {
   getNetworkInfo,
   getSiteSupportedNetworks,
   getNetworkExplorerName
-} from '@staking/staking-ui/store';
+} from '@staking/store';
 import styleClass from './nav.css';
 import Assets from '@staking/assets';
-import { ChainNativeTokenByChainId, setTokenMap, getSiteEnv } from '@staking/staking-ui/store';
+import { ChainNativeTokenByChainId, setTokenMap, getSiteEnv } from '@staking/store';
 
 const Theme = Styles.Theme.ThemeVars;
 let href = '';

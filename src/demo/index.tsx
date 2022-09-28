@@ -2,9 +2,10 @@ import { customModule, Module, Styles, Panel, application, IEventBus, Container 
 import { BigNumber } from '@ijstech/eth-wallet';
 // import { isWalletConnected } from '@staking/store';
 import Assets from '@staking/assets';
-import { Staking, StakingCampaignInfo, StakingType } from '@staking/staking-ui';
-import { getAllCampaignsInfo } from '@staking/staking-ui/staking-utils';
-import { getInfuraId, getNetworkInfo, getNetworkMap, getTokenMap, setInfuraId } from '@staking/staking-ui/store';
+import { Staking } from '@staking/staking-ui';
+import { getAllCampaignsInfo } from '@staking/staking-utils';
+import {StakingCampaignInfo, StakingType} from '@staking/global' 
+import { getInfuraId, getNetworkInfo, getNetworkMap, getTokenMap, setInfuraId } from '@staking/store';
 import './staking.css';
 const Theme = Styles.Theme.ThemeVars;
 Styles.Theme.applyTheme(Styles.Theme.darkTheme);
