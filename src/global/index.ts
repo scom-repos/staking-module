@@ -117,5 +117,6 @@ export {
     StakingType,
     RewardOption,
     StakingCampaignOption,
-    StakingCampaignInfo
+    StakingCampaignInfo,
+    PageBlock,
 } from './interfaces';

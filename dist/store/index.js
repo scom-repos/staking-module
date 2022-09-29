@@ -6141,13 +6141,10 @@ __export(exports, {
   CrossChainAddressMap: () => CrossChainAddressMap,
   DefaultERC20Tokens: () => DefaultERC20Tokens,
   DefaultTokens: () => DefaultTokens,
-  FarmingCampaignInfoByChainId: () => FarmingCampaignInfoByChainId,
-  FlipCampaignInfoByChainId: () => FlipCampaignInfoByChainId,
-  GuaranteedBuyBackCampaignInfo: () => GuaranteedBuyBackCampaignInfo,
+  InfuraId: () => InfuraId,
   Market: () => Market,
-  MilestoneInfoByChainId: () => MilestoneInfoByChainId,
   MockOracleMap: () => MockOracleMap,
-  NFT_TYPE: () => NFT_TYPE,
+  Networks: () => Networks,
   ProviderConfigMap: () => ProviderConfigMap,
   ToUSDPriceFeedAddressesMap: () => ToUSDPriceFeedAddressesMap,
   TrollManagementActionType: () => TrollManagementActionType,
@@ -6160,35 +6157,25 @@ __export(exports, {
   VaultType: () => VaultType,
   WETHByChainId: () => WETHByChainId,
   addUserTokens: () => addUserTokens,
-  attributesDistribution: () => attributesDistribution,
   availableMarketsByChainId: () => availableMarketsByChainId,
   baseRoute: () => baseRoute,
   connectWallet: () => connectWallet,
   crossChainNativeTokenList: () => crossChainNativeTokenList,
-  dummyAddressList: () => dummyAddressList,
   getAddresses: () => getAddresses,
   getAvailableMarkets: () => getAvailableMarkets,
   getBridgeVaultVersion: () => getBridgeVaultVersion,
-  getBuyBackStatus: () => getBuyBackStatus,
   getChainId: () => getChainId,
   getChainNativeToken: () => getChainNativeToken,
   getCurrentChainId: () => getCurrentChainId,
   getDefaultChainId: () => getDefaultChainId,
   getErc20: () => getErc20,
   getFilteredNetworks: () => getFilteredNetworks,
-  getGroupQueueActionsStatus: () => getGroupQueueActionsStatus,
-  getGroupQueueOfferStatus: () => getGroupQueueOfferStatus,
   getInfuraId: () => getInfuraId,
   getMatchNetworks: () => getMatchNetworks,
-  getMaxPrice: () => getMaxPrice,
-  getMinPrice: () => getMinPrice,
   getNetworkExplorerName: () => getNetworkExplorerName,
   getNetworkImg: () => getNetworkImg,
   getNetworkInfo: () => getNetworkInfo,
-  getNetworkMap: () => getNetworkMap,
   getOpenSwapToken: () => getOpenSwapToken,
-  getPriorityQueueActionsStatus: () => getPriorityQueueActionsStatus,
-  getRangeQueueActionsStatus: () => getRangeQueueActionsStatus,
   getSiteEnv: () => getSiteEnv,
   getSiteSupportedNetworks: () => getSiteSupportedNetworks,
   getSlippageTolerance: () => getSlippageTolerance,
@@ -6202,7 +6189,6 @@ __export(exports, {
   getTokenObject: () => getTokenObject,
   getTokensDataList: () => getTokensDataList,
   getTransactionDeadline: () => getTransactionDeadline,
-  getTrollActionsMapStatus: () => getTrollActionsMapStatus,
   getUserTokens: () => getUserTokens,
   getWETH: () => getWETH,
   getWallet: () => getWallet,
@@ -6215,34 +6201,21 @@ __export(exports, {
   isWalletConnected: () => isWalletConnected,
   logoutWallet: () => logoutWallet,
   nullAddress: () => nullAddress,
-  oaxNFTInfo: () => oaxNFTInfo,
   projectNativeToken: () => projectNativeToken,
   projectNativeTokenSymbol: () => projectNativeTokenSymbol,
-  rewardAddress: () => rewardAddress,
-  setBuyBackStatus: () => setBuyBackStatus,
   setCurrentChainId: () => setCurrentChainId,
   setDataFromSCConfig: () => setDataFromSCConfig,
-  setGroupQueueActionsStatus: () => setGroupQueueActionsStatus,
-  setGroupQueueOfferStatus: () => setGroupQueueOfferStatus,
-  setInfuraId: () => setInfuraId,
-  setMaxPrice: () => setMaxPrice,
-  setMinPrice: () => setMinPrice,
-  setPriorityQueueActionsStatus: () => setPriorityQueueActionsStatus,
-  setRangeQueueActionsStatus: () => setRangeQueueActionsStatus,
   setSiteEnv: () => setSiteEnv,
   setSlippageTolerance: () => setSlippageTolerance,
   setTokenBalances: () => setTokenBalances,
   setTokenMap: () => setTokenMap,
   setTransactionDeadline: () => setTransactionDeadline,
-  setTrollActionsMapStatus: () => setTrollActionsMapStatus,
   setUserTokens: () => setUserTokens,
   state: () => state,
   switchNetwork: () => switchNetwork,
   toggleExpertMode: () => toggleExpertMode,
   tokenPriceAMMReference: () => tokenPriceAMMReference,
   tokenSymbol: () => tokenSymbol,
-  trollAPIUrl: () => trollAPIUrl,
-  trollCampInfoMap: () => trollCampInfoMap,
   truncateAddress: () => truncateAddress,
   updateAllTokenBalances: () => updateAllTokenBalances,
   viewOnExplorerByAddress: () => viewOnExplorerByAddress,
@@ -6250,9 +6223,74 @@ __export(exports, {
   walletList: () => walletList
 });
 var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var import_global2 = __toModule(require("@staking/global"));
+var import_assets2 = __toModule(require("@staking/assets"));
+var import_sdk2 = __toModule(require("@openswap/sdk"));
+
+// src/store/wallet.ts
+var import_components = __toModule(require("@ijstech/components"));
+
+// src/store/walletList.ts
+var import_eth_wallet = __toModule(require("@ijstech/eth-wallet"));
+var walletList = [
+  {
+    name: import_eth_wallet.WalletPlugin.MetaMask,
+    displayName: "MetaMask",
+    iconFile: "metamask.png"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.BitKeepWallet,
+    displayName: "BitKeep Wallet",
+    iconFile: "BitKeep.png"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.ONTOWallet,
+    displayName: "ONTO Wallet",
+    iconFile: "ONTOWallet.jpg"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.Coin98,
+    displayName: "Coin98 Wallet",
+    iconFile: "Coin98.svg"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.TrustWallet,
+    displayName: "Trust Wallet",
+    iconFile: "trustwallet.svg"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.BinanceChainWallet,
+    displayName: "Binance Chain Wallet",
+    iconFile: "binance-chain-wallet.svg"
+  },
+  {
+    name: import_eth_wallet.WalletPlugin.WalletConnect,
+    displayName: "WalletConnect",
+    iconFile: "walletconnect.svg"
+  }
+];
+var getWalletOptions = () => {
+  let networkList = getSiteSupportedNetworks();
+  const rpcs = {};
+  for (const network of networkList) {
+    let rpc = network.rpc;
+    if (rpc)
+      rpcs[network.chainId] = rpc;
+  }
+  return {
+    [import_eth_wallet.WalletPlugin.WalletConnect]: {
+      infuraId: getInfuraId(),
+      bridge: "https://bridge.walletconnect.org",
+      rpc: rpcs
+    }
+  };
+};
+
+// src/store/wallet.ts
+var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
 
 // src/global/approvalModel/index.ts
-var import_eth_wallet = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet2 = __toModule(require("@ijstech/eth-wallet"));
 var ApprovalStatus;
 (function(ApprovalStatus2) {
   ApprovalStatus2[ApprovalStatus2["TO_BE_APPROVED"] = 0] = "TO_BE_APPROVED";
@@ -6261,22 +6299,18 @@ var ApprovalStatus;
 })(ApprovalStatus || (ApprovalStatus = {}));
 
 // src/global/utils/helper.ts
-var import_eth_wallet2 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet3 = __toModule(require("@ijstech/eth-wallet"));
 var import_moment = __toModule(require_moment());
 var SITE_ENV;
-(function(SITE_ENV2) {
-  SITE_ENV2["DEV"] = "dev";
-  SITE_ENV2["TESTNET"] = "testnet";
-  SITE_ENV2["MAINNET"] = "mainnet";
+(function(SITE_ENV3) {
+  SITE_ENV3["DEV"] = "dev";
+  SITE_ENV3["TESTNET"] = "testnet";
+  SITE_ENV3["MAINNET"] = "mainnet";
 })(SITE_ENV || (SITE_ENV = {}));
 
 // src/global/utils/common.ts
-var import_eth_wallet3 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
 var import_sdk = __toModule(require("@openswap/sdk"));
-async function getERC20Amount(wallet, token, decimals) {
-  let erc20 = new import_eth_wallet3.Erc20(wallet, token, decimals);
-  return await erc20.balance;
-}
 
 // src/global/interfaces/staking.ts
 var StakingType;
@@ -6316,71 +6350,7 @@ var EventId;
   EventId2["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
-// src/store/index.ts
-var import_assets2 = __toModule(require("@staking/assets"));
-var import_sdk2 = __toModule(require("@openswap/sdk"));
-
 // src/store/wallet.ts
-var import_components = __toModule(require("@ijstech/components"));
-
-// src/store/walletList.ts
-var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
-var walletList = [
-  {
-    name: import_eth_wallet4.WalletPlugin.MetaMask,
-    displayName: "MetaMask",
-    iconFile: "metamask.png"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.BitKeepWallet,
-    displayName: "BitKeep Wallet",
-    iconFile: "BitKeep.png"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.ONTOWallet,
-    displayName: "ONTO Wallet",
-    iconFile: "ONTOWallet.jpg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.Coin98,
-    displayName: "Coin98 Wallet",
-    iconFile: "Coin98.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.TrustWallet,
-    displayName: "Trust Wallet",
-    iconFile: "trustwallet.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.BinanceChainWallet,
-    displayName: "Binance Chain Wallet",
-    iconFile: "binance-chain-wallet.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.WalletConnect,
-    displayName: "WalletConnect",
-    iconFile: "walletconnect.svg"
-  }
-];
-var getWalletOptions = () => {
-  let networkList = getSiteSupportedNetworks();
-  const rpcs = {};
-  for (const network of networkList) {
-    let rpc = network.rpc;
-    if (rpc)
-      rpcs[network.chainId] = rpc;
-  }
-  return {
-    [import_eth_wallet4.WalletPlugin.WalletConnect]: {
-      infuraId: getInfuraId(),
-      bridge: "https://bridge.walletconnect.org",
-      rpc: rpcs
-    }
-  };
-};
-
-// src/store/wallet.ts
-var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
 function isWalletConnected() {
   const wallet = import_eth_wallet5.Wallet.getInstance();
   return wallet.isConnected;
@@ -7156,219 +7126,15 @@ var availableMarketsByChainId = {
 };
 
 // src/store/data/staking.ts
+var LockTokenType;
+(function(LockTokenType2) {
+  LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
+  LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
+  LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
+})(LockTokenType || (LockTokenType = {}));
 var USDPeggedTokenAddressMap = {
   56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
-};
-
-// src/store/data/nft.ts
-var NFT_TYPE;
-(function(NFT_TYPE2) {
-  NFT_TYPE2["OSWAP"] = "oswap";
-  NFT_TYPE2["OAX"] = "oax";
-})(NFT_TYPE || (NFT_TYPE = {}));
-var trollAPIUrl = {
-  56: "https://data.openswap.xyz/nft/v1",
-  97: "https://bsc-test-data.openswap.xyz/nft/v1",
-  31337: "https://amino.openswap.xyz/nft/v1",
-  43113: "https://bsc-test-data.openswap.xyz/nft/v1"
-};
-var rewardAddress = {
-  56: "0x37c8207975D5B04cc6c2C2570d91425985cF61Df",
-  97: "0x265F91CdFC308275504120E32B6A2B09B066df1a"
-};
-var attributesDistribution = {
-  generalTroll: {
-    base: 10,
-    digits: [3, 3, 3, 3, 3, 3, 3],
-    probability: [
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.5, 0.25, 0.15, 0.09, 0.01]
-    ],
-    rarityIndex: 6
-  },
-  oax: {
-    base: 8,
-    digits: [3, 3, 3, 3, 3],
-    probability: [
-      [0.6, 0.4],
-      [0.7, 0.3],
-      [0.7, 0.2, 0.1],
-      [0.8, 0.2],
-      [0.4, 0.4, 0.2]
-    ],
-    rarityIndex: null,
-    rarityMatrix: [2e-3, 51e-4, 0.01, 0.03, 0.1]
-  }
-};
-var trollCampInfoMap = {
-  56: [
-    {
-      tier: "hungry",
-      contract: "0x1254132567549292388cd699Cb78B47d3101c8A9",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x2d74990f55faeA086A83B9fE176FD36a34bA617b",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0x3E8fb94D9dD7A8f9b2ccF0B4CCdC768628890eeB",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  97: [
-    {
-      tier: "hungry",
-      contract: "0x946985e7C43Ed2fc7985e89a49A251D52d824122",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x157538c2d508CDb1A6cf48B8336E4e56350A97C8",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0xB9425ddFB534CA87B73613283F4fB0073B63F31D",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  31337: [
-    {
-      tier: "hungry",
-      contract: "0xA887958C66bec5da6a884936c050FeB32D67F4d3",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x26c5B9cE4ca0792f98ef4B6D9b7a71Af11aA033b",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0x8882aF970E7856127E4f1afa88CF401A22F4d1D1",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  43113: [
-    {
-      tier: "hungry",
-      contract: "0x390118aa8bde8c63f159a0d032dbdc8bed83ef42",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x4e616ae82324b519c7d338450e7048024390be32",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0xc11c7b25e97b85657be6c8c9f057214cf793b536",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ]
-};
-var oaxNFTInfo = {
-  56: [],
-  97: [
-    {
-      contract: "0x47Ee972499dD103fa2Fb101b49a385d8024C1BA9",
-      apr: 10,
-      attributes: attributesDistribution.oax
-    }
-  ]
-};
-
-// src/store/data/flip.ts
-var FlipCampaignInfoByChainId = {
-  56: {
-    contractAddress: "0x7eB8a5079AeF1cE3cBC9Bc9f0F1EF0F0E4D03c00",
-    tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-    tagline: "Flip OSWAP to AVAX",
-    secondTagline: "Help us expand OSWAP presence on AVAX!",
-    description: "We are offering a weekly flip for <b>OSWAP</b> holders who would like to move their tokens from <b>BSC</b> to <b>AVAX</b>. Lock your tokens into the contract and your tokens will be flipped over to <b>AVAX</b> on the flipping date specified below. Note that you will receive <b>OSWAP</b> tokens on <b>AVAX</b> with the same address you used to lock the tokens.",
-    confirmMessage: "Your OSWAP tokens will be flipped to Avalanche Mainnet on <b>Thursday</b>. You <b>WILL NOT</b> be able to withdraw these tokens once you proceed.",
-    targetAmount: 7e5,
-    targetDate: 16492896e5,
-    rewardAmount: 5
-  },
-  97: {
-    contractAddress: "0x13538c92fF1Fa286eb2c42a4512258E081AAD9de",
-    tokenAddress: "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-    tagline: "Flip OSWAP to AVAX",
-    secondTagline: "Help us expand OSWAP presence on AVAX!",
-    description: "We are offering a weekly flip for <b>OSWAP</b> holders who would like to move their tokens from <b>BSC</b> to <b>AVAX</b>. Lock your tokens into the contract and your tokens will be flipped over to <b>AVAX</b> on the flipping date specified below. Note that you will receive <b>OSWAP</b> tokens on <b>AVAX</b> with the same address you used to lock the tokens.",
-    confirmMessage: "Your OSWAP tokens will be flipped to Avalanche Fuji Testnet on <b>Thursday</b>. You <b>WILL NOT</b> be able to withdraw these tokens once you proceed.",
-    targetAmount: 7e5,
-    targetDate: 16492896e5,
-    rewardAmount: 5
-  },
-  43113: {
-    contractAddress: "0x6f4678238e308f78b114ac9a80c9059B28E001a3",
-    tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-    tagline: "Flip OSWAP to BSC Testnet",
-    secondTagline: "Help us expand OSWAP presence on BSC!",
-    description: "We are offering a weekly flip for <b>OSWAP</b> holders who would like to move their tokens from <b>AVAX</b> to <b>BSC</b>. Lock your tokens into the contract and your tokens will be flipped over to <b>BSC</b> on the flipping date specified below. Note that you will receive <b>OSWAP</b> tokens on <b>BSC</b> with the same address you used to lock the tokens.",
-    confirmMessage: "Your OSWAP tokens will be flipped to BSC Testnet on <b>Thursday</b>. You <b>WILL NOT</b> be able to withdraw these tokens once you proceed.",
-    targetAmount: 7e5,
-    targetDate: 16492896e5,
-    rewardAmount: 5
-  },
-  43114: {
-    contractAddress: "0xb1Cb1EC68dF60E098Cda4e8aF6760033188101E2",
-    tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-    tagline: "Flip OSWAP to BSC",
-    secondTagline: "Help us expand OSWAP presence on BSC!",
-    description: "We are offering a weekly flip for <b>OSWAP</b> holders who would like to move their tokens from <b>AVAX</b> to <b>BSC</b>. Lock your tokens into the contract and your tokens will be flipped over to <b>BSC</b> on the flipping date specified below. Note that you will receive <b>OSWAP</b> tokens on <b>BSC</b> with the same address you used to lock the tokens.",
-    confirmMessage: "Your OSWAP tokens will be flipped to BSC Mainnet on <b>Thursday</b>. You <b>WILL NOT</b> be able to withdraw these tokens once you proceed.",
-    targetAmount: 7e5,
-    targetDate: 16492896e5,
-    rewardAmount: 5
-  }
 };
 
 // src/store/data/claim.ts
@@ -7634,160 +7400,144 @@ var TrollManagementActionType;
   TrollManagementActionType2[TrollManagementActionType2["UnstakeBond"] = 3] = "UnstakeBond";
 })(TrollManagementActionType || (TrollManagementActionType = {}));
 
-// src/store/data/farm.ts
-var FarmingCampaignInfoByChainId = {
-  56: ["0xEf9d1be34B19DBCa4Fd5Df909EAFA38FA8478440"],
-  97: ["0x1bB926bF76e37388657282c2b5aA56a402cD7363"]
-};
-
-// src/store/data/group-queue.ts
-var GuaranteedBuyBackCampaignInfo = {
-  56: [
-    {
-      projectName: "Impossible IDO Buyback - Ouro Finance (IDIA)",
-      providerAddress: "0x04a2684a46934504a62bdf9947af166f01bf14f8",
-      pairAddress: "0x9f1418f82B2927AcED3154d9e838fe5202952CAE",
-      offerIndex: 2,
-      description: "This is the Buyback of OGS token with a buyback price at 50% of the IDO Price.",
-      projectUrl: "https://ouro.finance/",
-      tokenIn: "0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-      tokenOut: "0x416947e6Fc78F158fd9B775fA846B72d768879c2",
-      idoPrice: 0.0136,
-      idoAmount: 8738029,
-      idoDate: 16414992e5,
-      idoUrl: "https://app.impossible.finance/launchpad/project/OGS",
-      committedAmount: 17006.78207,
-      offeringType: "IDO",
-      marketPriceRef: "0xe6A97E7B5EB2FA72A8B4BeDaaf4CdE85E015DAbf"
-    },
-    {
-      projectName: "Impossible IDO Buyback - Ouro Finance",
-      providerAddress: "0x04a2684a46934504a62bdf9947af166f01bf14f8",
-      pairAddress: "0x785970CeEec60666b3E34671996604f4d59040dF",
-      offerIndex: 4,
-      description: "This is the Buyback of OGS token with a buyback price at 50% of the IDO Price.",
-      projectUrl: "https://ouro.finance/",
-      tokenIn: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-      tokenOut: "0x416947e6Fc78F158fd9B775fA846B72d768879c2",
-      idoPrice: 0.025,
-      idoAmount: 29558444,
-      idoDate: 16414992e5,
-      idoUrl: "https://app.impossible.finance/launchpad/project/OGS",
-      committedAmount: 155488,
-      offeringType: "IDO",
-      marketPriceRef: "0xe6A97E7B5EB2FA72A8B4BeDaaf4CdE85E015DAbf"
-    }
-  ],
-  97: [
-    {
-      projectName: "OSwap IDO Buyback #1",
-      providerAddress: "0xD2Ed0a2B019Ea79E917f897F68d3f8e295FB8019",
-      pairAddress: "0x14CdA7e08E4A2c4648E0bFaa3A0693fD7FAFeeF9",
-      offerIndex: 6,
-      description: "This is the second IDO Buyback of OSWAP with a buyback price at <b>20%</b> of the IDO Price. <b>90%</b> of the IDO Amount will be covered on a <b>prorated basis</b>.",
-      projectUrl: "https://doc.openswap.xyz/",
-      tokenIn: "0xde9334c157968320f26e449331d6544b89bbd00f",
-      tokenOut: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-      idoPrice: 0.04,
-      idoAmount: 125e3,
-      idoDate: 16303392e5,
-      idoUrl: "https://invest.impossible.finance/project/IDO1/OSWAP_UNLIMITED?tab=closed",
-      committedAmount: 900,
-      offeringType: "IDO",
-      marketPriceRef: "0xb0094FfE387da1739FB95bAbCAF01B105FD0D887"
-    },
-    {
-      projectName: "Impossible IDO Buyback - Ouro Finance",
-      providerAddress: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3",
-      pairAddress: "0x14CdA7e08E4A2c4648E0bFaa3A0693fD7FAFeeF9",
-      offerIndex: 8,
-      description: "This is the Buyback of OGS token with a buyback price at 50% of the IDO Price.",
-      projectUrl: "https://ouro.finance",
-      tokenIn: "0xde9334c157968320f26e449331d6544b89bbd00f",
-      tokenOut: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-      idoPrice: 0.0136,
-      idoAmount: 1e4,
-      idoDate: 16303392e5,
-      idoUrl: "https://app.impossible.finance/launchpad/project/OGS",
-      committedAmount: 1e4,
-      offeringType: "IDO",
-      marketPriceRef: ""
-    }
-  ]
-};
-var MilestoneInfoByChainId = {
-  56: [
-    {
-      campaignName: "IDIA",
-      projectName: "IDIA Booster Queue Offering",
-      providerAddress: "0x18DD9e6F8EA9cCaC88635209A6cf68648895a70b",
-      description: "Impossible Finanace luanches Booster Queue on OpenSwap to offer a private sale of $25,000 worth mIDIA to investor. The bqIDIA1 token is redeemable to IDIA tokens 1 year after the sale and it is backed up by a 95% Buyback of the offer price.",
-      tokenForSale: "28488",
-      purchase: {
-        pairAddress: "0x17e7Ad6EAE34E13F4015F9BDfaeE44274c3F1CD4",
-        offerIndex: 1,
-        tokenIn: "0x46c5BC0656301c3DFb8EF8fc44CfBF89ef121348",
-        tokenOut: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-      },
-      redeem: {
-        pairAddress: "0xDAc37424B823A5D13995A7296984e4B3f96acC3C",
-        offerIndex: 1,
-        tokenIn: "0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-        tokenOut: "0x46c5BC0656301c3DFb8EF8fc44CfBF89ef121348"
-      },
-      buyback: {
-        pairAddress: "0x17e7Ad6EAE34E13F4015F9BDfaeE44274c3F1CD4",
-        offerIndex: 2,
-        tokenIn: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-        tokenOut: "0x46c5BC0656301c3DFb8EF8fc44CfBF89ef121348"
-      }
-    }
-  ],
-  97: [
-    {
-      campaignName: "CrossChain Bridge",
-      projectName: "OpenSwap Demo 1",
-      providerAddress: "0x069E76f6FF91000BEf420D78590B6C1309349ec9",
-      description: "OpenSwap key Booster - CrossChain Bridge is going to luanch in late March. Buy booster tokens at a discounted price in advance to earn more!",
-      tokenForSale: "20000",
-      purchase: {
-        pairAddress: "0xE8b5ca89d9a43901087A30319a14De83B5b3Ccd8",
-        offerIndex: 4,
-        tokenIn: "0xc2c76387eb1cd15f2f55d2463b5aad6fca062eb1",
-        tokenOut: "0xde9334c157968320f26e449331d6544b89bbd00f"
-      },
-      redeem: {
-        pairAddress: "0x9cF8a74fC451c02ef2d0Faa2f466Ac6b3629687f",
-        offerIndex: 5,
-        tokenIn: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-        tokenOut: "0xc2c76387eb1cd15f2f55d2463b5aad6fca062eb1"
-      },
-      buyback: {
-        pairAddress: "0xE8b5ca89d9a43901087A30319a14De83B5b3Ccd8",
-        offerIndex: 2,
-        tokenIn: "0xde9334c157968320f26e449331d6544b89bbd00f",
-        tokenOut: "0xc2c76387eb1cd15f2f55d2463b5aad6fca062eb1"
-      }
-    }
-  ]
-};
-
-// src/store/data/dummy.ts
-var dummyAddressList = [
-  "0xFa8e00000001234567899876543210000000Fa8e",
-  "0xFa8e11111111234567899876543211111111Fa8e",
-  "0xFa8e22222221234567899876543212222222Fa8e",
-  "0xFa8e33333331234567899876543213333333Fa8e",
-  "0xFa8e44444441234567899876543214444444Fa8e",
-  "0xFa8e55555551234567899876543215555555Fa8e",
-  "0xFa8e66666661234567899876543216666666Fa8e",
-  "0xFa8e77777771234567899876543217777777Fa8e",
-  "0xFa8e88888881234567899876543218888888Fa8e",
-  "0xFa8e99999991234567899876543219999999Fa8e"
+// src/store/data/networks.ts
+var InfuraId = "adc596bf88b648e2a8902bc9093930c5";
+var Networks = [
+  {
+    "name": "Ethereum",
+    "chainId": 1,
+    "img": "img/network/ethereumNetwork.svg",
+    "rpc": `https://mainnet.infura.io/v3/${InfuraId}`,
+    "explorerName": "Etherscan",
+    "explorerTxUrl": "https://etherscan.io/tx/",
+    "explorerAddressUrl": "https://etherscan.io/address/"
+  },
+  {
+    "name": "Cronos Mainnet",
+    "chainId": 25,
+    "img": "img/network/cronosMainnet.svg",
+    "isDisabled": true
+  },
+  {
+    "name": "Kovan Test Network",
+    "chainId": 42,
+    "img": "img/network/ethereumNetwork.svg",
+    "rpc": `https://kovan.infura.io/v3/${InfuraId}`,
+    "isCrossChainSupported": true,
+    "explorerName": "Etherscan",
+    "explorerTxUrl": "https://kovan.etherscan.io/tx/",
+    "explorerAddressUrl": "https://kovan.etherscan.io/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Binance Smart Chain",
+    "chainId": 56,
+    "img": "img/network/bscMainnet.svg",
+    "rpc": "https://bsc-dataseed.binance.org/",
+    "isMainChain": true,
+    "isCrossChainSupported": true,
+    "explorerName": "BSCScan",
+    "explorerTxUrl": "https://bscscan.com/tx/",
+    "explorerAddressUrl": "https://bscscan.com/address/"
+  },
+  {
+    "name": "Polygon",
+    "chainId": 137,
+    "img": "img/network/polygon.svg",
+    "explorerName": "PolygonScan",
+    "explorerTxUrl": "https://polygonscan.com/tx/",
+    "explorerAddressUrl": "https://polygonscan.com/address/"
+  },
+  {
+    "name": "Fantom Opera",
+    "chainId": 250,
+    "img": "img/network/fantom-ftm-logo.svg",
+    "rpc": "https://rpc.ftm.tools/",
+    "explorerName": "FTMScan",
+    "explorerTxUrl": "https://ftmscan.com/tx/",
+    "explorerAddressUrl": "https://ftmscan.com/address/"
+  },
+  {
+    "name": "BSC Testnet",
+    "chainId": 97,
+    "img": "img/network/bscMainnet.svg",
+    "rpc": "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    "isCrossChainSupported": true,
+    "explorerName": "BSCScan",
+    "explorerTxUrl": "https://testnet.bscscan.com/tx/",
+    "explorerAddressUrl": "https://testnet.bscscan.com/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Cronos Mainnet",
+    "chainId": 338,
+    "img": "img/network/cronosMainnet.svg",
+    "isDisabled": true
+  },
+  {
+    "name": "Amino Testnet",
+    "chainId": 31337,
+    "img": "img/network/animoTestnet.svg",
+    "isDisabled": true,
+    "isTestnet": true
+  },
+  {
+    "name": "Mumbai",
+    "chainId": 80001,
+    "img": "img/network/polygon.svg",
+    "rpc": "https://matic-mumbai.chainstacklabs.com",
+    "isCrossChainSupported": true,
+    "explorerName": "PolygonScan",
+    "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
+    "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Avalanche FUJI C-Chain",
+    "chainId": 43113,
+    "img": "img/network/avax.svg",
+    "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+    "isCrossChainSupported": true,
+    "isMainChain": true,
+    "explorerName": "SnowTrace",
+    "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
+    "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Avalanche Mainnet C-Chain",
+    "chainId": 43114,
+    "img": "img/network/avax.svg",
+    "rpc": "https://api.avax.network/ext/bc/C/rpc",
+    "isCrossChainSupported": true,
+    "explorerName": "SnowTrace",
+    "explorerTxUrl": "https://snowtrace.io/tx/",
+    "explorerAddressUrl": "https://snowtrace.io/address/"
+  },
+  {
+    "name": "Fantom Testnet",
+    "chainId": 4002,
+    "img": "img/network/fantom-ftm-logo.svg",
+    "rpc": "https://rpc.testnet.fantom.network/",
+    "explorerName": "FTMScan",
+    "explorerTxUrl": "https://testnet.ftmscan.com/tx/",
+    "explorerAddressUrl": "https://testnet.ftmscan.com/address/",
+    "isDisabled": true,
+    "isTestnet": true
+  },
+  {
+    "name": "AminoX Testnet",
+    "chainId": 13370,
+    "img": "img/network/aminoXTestnet.svg",
+    "isDisabled": true,
+    "explorerName": "AminoX Explorer",
+    "explorerTxUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/tx/",
+    "explorerAddressUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/address/",
+    "isTestnet": true
+  }
 ];
 
 // src/store/index.ts
-var import_components2 = __toModule(require("@ijstech/components"));
 var nullAddress = "0x0000000000000000000000000000000000000000";
 var TOKENS = "oswap_user_tokens_";
 var getUserTokens = (chainId) => {
@@ -7819,10 +7569,10 @@ var addUserTokens = (token) => {
   localStorage[TOKENS + chainId] = JSON.stringify(tokens);
 };
 var setSiteEnv = (value) => {
-  if (Object.values(SITE_ENV).includes(value)) {
+  if (Object.values(import_global2.SITE_ENV).includes(value)) {
     state.siteEnv = value;
   } else {
-    state.siteEnv = SITE_ENV.TESTNET;
+    state.siteEnv = import_global2.SITE_ENV.TESTNET;
   }
 };
 var getSiteEnv = () => {
@@ -7898,7 +7648,7 @@ async function updateAllTokenBalances() {
   promises.push(...tokenList.map(async (token, index) => {
     try {
       if (token.address) {
-        let balance = (await getERC20Amount(wallet, token.address, token.decimals)).toFixed();
+        let balance = (await (0, import_global2.getERC20Amount)(wallet, token.address, token.decimals)).toFixed();
         allTokenBalancesMap[token.address.toLowerCase()] = balance;
       } else {
         let balance = (await getWallet().balance).toFixed();
@@ -7929,39 +7679,31 @@ var setTokenBalances = async (value) => {
   state.tokenBalances = value ? value : await updateAllTokenBalances();
 };
 var state = {
-  siteEnv: SITE_ENV.TESTNET,
+  siteEnv: import_global2.SITE_ENV.TESTNET,
   currentChainId: 0,
   isExpertMode: false,
   slippageTolerance: 0.5,
   transactionDeadline: 30,
   tokenBalances: {},
   tokenMap: {},
-  trollActionsMapStatus: {},
-  minPrice: null,
-  maxPrice: null,
-  priorityQueueActionsStatus: {},
-  rangeQueueActionsStatus: {},
-  groupQueueActionsStatus: {},
-  groupQueueOfferStatus: {},
-  buybackStatus: {},
   userTokens: {},
   infuraId: "",
   networkMap: {}
 };
-var setDataFromSCConfig = (options) => {
-  if (options.infuraId) {
-    setInfuraId(options.infuraId);
+var setDataFromSCConfig = (networkList, infuraId) => {
+  if (infuraId) {
+    setInfuraId(infuraId);
   }
-  if (options.networkList) {
-    setNetworkList(options.networkList, options.infuraId);
+  if (networkList) {
+    setNetworkList(networkList);
   }
 };
 var getDefaultChainId = () => {
   switch (getSiteEnv()) {
-    case SITE_ENV.TESTNET:
+    case import_global2.SITE_ENV.TESTNET:
       return 97;
-    case SITE_ENV.DEV:
-    case SITE_ENV.MAINNET:
+    case import_global2.SITE_ENV.DEV:
+    case import_global2.SITE_ENV.MAINNET:
     default:
       return 56;
   }
@@ -7972,19 +7714,12 @@ var setInfuraId = (infuraId) => {
 var getInfuraId = () => {
   return state.infuraId;
 };
-var setNetworkList = (networkList, infuraId) => {
-  state.networkMap = {};
-  for (let network of networkList) {
-    if (infuraId && network.rpc) {
-      network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
-    }
-    const networkMap = __spreadValues({}, state.networkMap);
-    networkMap[network.chainId] = network;
-    state.networkMap = __spreadValues({}, networkMap);
+var setNetworkList = (networkList) => {
+  let networkFullList = Object.keys(networkList);
+  for (const key of networkFullList) {
+    let network = networkList[Number(key)];
+    state.networkMap[network.chainId] = network;
   }
-};
-var getNetworkMap = () => {
-  return state.networkMap;
 };
 var getNetworkInfo = (chainId) => {
   return state.networkMap[chainId];
@@ -8020,10 +7755,10 @@ var getSiteSupportedNetworks = () => {
   let networkFullList = Object.values(state.networkMap);
   let list = networkFullList.filter((network) => !getNetworkInfo(network.chainId).isDisabled);
   const siteEnv = getSiteEnv();
-  if (siteEnv === SITE_ENV.TESTNET) {
+  if (siteEnv === import_global2.SITE_ENV.TESTNET) {
     return list.filter((network) => network.isTestnet);
   }
-  if (siteEnv === SITE_ENV.DEV) {
+  if (siteEnv === import_global2.SITE_ENV.DEV) {
     return list;
   }
   return list.filter((network) => !network.isTestnet);
@@ -8159,59 +7894,6 @@ var tokenSymbol = (address) => {
     tokenObject = tokenMap[address];
   }
   return tokenObject ? tokenObject.symbol : "";
-};
-var setTrollActionsMapStatus = (actionKey, status) => {
-  state.trollActionsMapStatus[actionKey] = status;
-};
-var getTrollActionsMapStatus = (actionKey) => {
-  return state.trollActionsMapStatus[actionKey] || false;
-};
-var setMinPrice = (value) => {
-  state.minPrice = value;
-};
-var getMinPrice = () => {
-  return state.minPrice;
-};
-var setMaxPrice = (value) => {
-  state.maxPrice = value;
-};
-var getMaxPrice = () => {
-  return state.maxPrice;
-};
-var setPriorityQueueActionsStatus = (key, value, keyTab) => {
-  state.priorityQueueActionsStatus[key] = value;
-  import_components2.application.EventBus.dispatch(EventId.EmitButtonStatus, { name: "Priority Queue", keyTab, key, value });
-};
-var getPriorityQueueActionsStatus = (key) => {
-  return state.priorityQueueActionsStatus[key] || false;
-};
-var setRangeQueueActionsStatus = (key, value, keyTab) => {
-  state.rangeQueueActionsStatus[key] = value;
-  import_components2.application.EventBus.dispatch(EventId.EmitButtonStatus, { name: "Range Queue", keyTab, key, value });
-};
-var getRangeQueueActionsStatus = (key) => {
-  return state.rangeQueueActionsStatus[key] || false;
-};
-var setGroupQueueActionsStatus = (key, value, keyTab) => {
-  state.groupQueueActionsStatus[key] = value;
-  import_components2.application.EventBus.dispatch(EventId.EmitButtonStatus, { name: "Group Queue", keyTab, key, value });
-};
-var getGroupQueueActionsStatus = (key) => {
-  return state.groupQueueActionsStatus[key] || false;
-};
-var setGroupQueueOfferStatus = (key, value, text) => {
-  state.groupQueueOfferStatus[key] = { value, text };
-  import_components2.application.EventBus.dispatch(EventId.EmitButtonStatus, { name: "Group Queue Offer", key, value, text });
-};
-var getGroupQueueOfferStatus = (key) => {
-  return state.groupQueueOfferStatus[key] || { value: false, text: "Swap" };
-};
-var setBuyBackStatus = (key, value, text) => {
-  state.buybackStatus[key] = { value, text };
-  import_components2.application.EventBus.dispatch(EventId.EmitButtonStatus, { name: "BuyBack", key, value, text });
-};
-var getBuyBackStatus = (key) => {
-  return state.buybackStatus[key];
 };
 var setUserTokens = (token, chainId) => {
   if (!state.userTokens[chainId]) {

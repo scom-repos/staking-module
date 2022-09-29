@@ -12,7 +12,7 @@
 <body>
   <script>
     async function init() {
-      let module = await application.newModule('./main/index.js', {{scconfig}})
+      let module = await application.newModule('./demo/index.js', {{scconfig}})
       document.body.append(module)
     };
     init();

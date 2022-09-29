@@ -3,4 +3,6 @@ export {
   RewardOption,
   StakingCampaignOption,
   StakingCampaignInfo
-} from './staking'
+} from './staking';
+
+export { PageBlock } from './pageBlock';

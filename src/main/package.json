@@ -1,7 +1,0 @@
-{
-    "name": "@staking/main",
-    "version": "0.1.0",    
-    "dependencies": {
-        "@openswap/sdk": "*"
-    }
-}

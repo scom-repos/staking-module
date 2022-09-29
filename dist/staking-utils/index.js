@@ -21361,10 +21361,10 @@ var ERC20ApprovalModel = class {
 var import_eth_wallet2 = __toModule(require("@ijstech/eth-wallet"));
 var import_moment = __toModule(require_moment());
 var SITE_ENV;
-(function(SITE_ENV2) {
-  SITE_ENV2["DEV"] = "dev";
-  SITE_ENV2["TESTNET"] = "testnet";
-  SITE_ENV2["MAINNET"] = "mainnet";
+(function(SITE_ENV3) {
+  SITE_ENV3["DEV"] = "dev";
+  SITE_ENV3["TESTNET"] = "testnet";
+  SITE_ENV3["MAINNET"] = "mainnet";
 })(SITE_ENV || (SITE_ENV = {}));
 
 // src/global/utils/common.ts
@@ -21451,6 +21451,7 @@ var EventId;
 
 // src/store/index.ts
 var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var import_global2 = __toModule(require("@staking/global"));
 var import_assets2 = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
 
@@ -21787,161 +21788,15 @@ var ProviderConfigMap = {
 };
 
 // src/store/data/staking.ts
+var LockTokenType;
+(function(LockTokenType2) {
+  LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
+  LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
+  LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
+})(LockTokenType || (LockTokenType = {}));
 var USDPeggedTokenAddressMap = {
   56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
-};
-
-// src/store/data/nft.ts
-var NFT_TYPE;
-(function(NFT_TYPE2) {
-  NFT_TYPE2["OSWAP"] = "oswap";
-  NFT_TYPE2["OAX"] = "oax";
-})(NFT_TYPE || (NFT_TYPE = {}));
-var attributesDistribution = {
-  generalTroll: {
-    base: 10,
-    digits: [3, 3, 3, 3, 3, 3, 3],
-    probability: [
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-      [0.5, 0.25, 0.15, 0.09, 0.01]
-    ],
-    rarityIndex: 6
-  },
-  oax: {
-    base: 8,
-    digits: [3, 3, 3, 3, 3],
-    probability: [
-      [0.6, 0.4],
-      [0.7, 0.3],
-      [0.7, 0.2, 0.1],
-      [0.8, 0.2],
-      [0.4, 0.4, 0.2]
-    ],
-    rarityIndex: null,
-    rarityMatrix: [2e-3, 51e-4, 0.01, 0.03, 0.1]
-  }
-};
-var trollCampInfoMap = {
-  56: [
-    {
-      tier: "hungry",
-      contract: "0x1254132567549292388cd699Cb78B47d3101c8A9",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x2d74990f55faeA086A83B9fE176FD36a34bA617b",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0x3E8fb94D9dD7A8f9b2ccF0B4CCdC768628890eeB",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  97: [
-    {
-      tier: "hungry",
-      contract: "0x946985e7C43Ed2fc7985e89a49A251D52d824122",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x157538c2d508CDb1A6cf48B8336E4e56350A97C8",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0xB9425ddFB534CA87B73613283F4fB0073B63F31D",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  31337: [
-    {
-      tier: "hungry",
-      contract: "0xA887958C66bec5da6a884936c050FeB32D67F4d3",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x26c5B9cE4ca0792f98ef4B6D9b7a71Af11aA033b",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0x8882aF970E7856127E4f1afa88CF401A22F4d1D1",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ],
-  43113: [
-    {
-      tier: "hungry",
-      contract: "0x390118aa8bde8c63f159a0d032dbdc8bed83ef42",
-      rewards: 5,
-      apr: 2,
-      flashSales: "Periodic",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "happy",
-      contract: "0x4e616ae82324b519c7d338450e7048024390be32",
-      rewards: 15,
-      apr: 4,
-      flashSales: "Priority",
-      attributes: attributesDistribution.generalTroll
-    },
-    {
-      tier: "hunny",
-      contract: "0xc11c7b25e97b85657be6c8c9f057214cf793b536",
-      rewards: 40,
-      apr: 6,
-      flashSales: "Guaranteed",
-      attributes: attributesDistribution.generalTroll
-    }
-  ]
-};
-var oaxNFTInfo = {
-  56: [],
-  97: [
-    {
-      contract: "0x47Ee972499dD103fa2Fb101b49a385d8024C1BA9",
-      apr: 10,
-      attributes: attributesDistribution.oax
-    }
-  ]
 };
 
 // src/store/data/cross-chain.ts
@@ -22092,8 +21947,144 @@ var TrollManagementActionType;
   TrollManagementActionType2[TrollManagementActionType2["UnstakeBond"] = 3] = "UnstakeBond";
 })(TrollManagementActionType || (TrollManagementActionType = {}));
 
+// src/store/data/networks.ts
+var InfuraId = "adc596bf88b648e2a8902bc9093930c5";
+var Networks = [
+  {
+    "name": "Ethereum",
+    "chainId": 1,
+    "img": "img/network/ethereumNetwork.svg",
+    "rpc": `https://mainnet.infura.io/v3/${InfuraId}`,
+    "explorerName": "Etherscan",
+    "explorerTxUrl": "https://etherscan.io/tx/",
+    "explorerAddressUrl": "https://etherscan.io/address/"
+  },
+  {
+    "name": "Cronos Mainnet",
+    "chainId": 25,
+    "img": "img/network/cronosMainnet.svg",
+    "isDisabled": true
+  },
+  {
+    "name": "Kovan Test Network",
+    "chainId": 42,
+    "img": "img/network/ethereumNetwork.svg",
+    "rpc": `https://kovan.infura.io/v3/${InfuraId}`,
+    "isCrossChainSupported": true,
+    "explorerName": "Etherscan",
+    "explorerTxUrl": "https://kovan.etherscan.io/tx/",
+    "explorerAddressUrl": "https://kovan.etherscan.io/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Binance Smart Chain",
+    "chainId": 56,
+    "img": "img/network/bscMainnet.svg",
+    "rpc": "https://bsc-dataseed.binance.org/",
+    "isMainChain": true,
+    "isCrossChainSupported": true,
+    "explorerName": "BSCScan",
+    "explorerTxUrl": "https://bscscan.com/tx/",
+    "explorerAddressUrl": "https://bscscan.com/address/"
+  },
+  {
+    "name": "Polygon",
+    "chainId": 137,
+    "img": "img/network/polygon.svg",
+    "explorerName": "PolygonScan",
+    "explorerTxUrl": "https://polygonscan.com/tx/",
+    "explorerAddressUrl": "https://polygonscan.com/address/"
+  },
+  {
+    "name": "Fantom Opera",
+    "chainId": 250,
+    "img": "img/network/fantom-ftm-logo.svg",
+    "rpc": "https://rpc.ftm.tools/",
+    "explorerName": "FTMScan",
+    "explorerTxUrl": "https://ftmscan.com/tx/",
+    "explorerAddressUrl": "https://ftmscan.com/address/"
+  },
+  {
+    "name": "BSC Testnet",
+    "chainId": 97,
+    "img": "img/network/bscMainnet.svg",
+    "rpc": "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    "isCrossChainSupported": true,
+    "explorerName": "BSCScan",
+    "explorerTxUrl": "https://testnet.bscscan.com/tx/",
+    "explorerAddressUrl": "https://testnet.bscscan.com/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Cronos Mainnet",
+    "chainId": 338,
+    "img": "img/network/cronosMainnet.svg",
+    "isDisabled": true
+  },
+  {
+    "name": "Amino Testnet",
+    "chainId": 31337,
+    "img": "img/network/animoTestnet.svg",
+    "isDisabled": true,
+    "isTestnet": true
+  },
+  {
+    "name": "Mumbai",
+    "chainId": 80001,
+    "img": "img/network/polygon.svg",
+    "rpc": "https://matic-mumbai.chainstacklabs.com",
+    "isCrossChainSupported": true,
+    "explorerName": "PolygonScan",
+    "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
+    "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Avalanche FUJI C-Chain",
+    "chainId": 43113,
+    "img": "img/network/avax.svg",
+    "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+    "isCrossChainSupported": true,
+    "isMainChain": true,
+    "explorerName": "SnowTrace",
+    "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
+    "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
+    "isTestnet": true
+  },
+  {
+    "name": "Avalanche Mainnet C-Chain",
+    "chainId": 43114,
+    "img": "img/network/avax.svg",
+    "rpc": "https://api.avax.network/ext/bc/C/rpc",
+    "isCrossChainSupported": true,
+    "explorerName": "SnowTrace",
+    "explorerTxUrl": "https://snowtrace.io/tx/",
+    "explorerAddressUrl": "https://snowtrace.io/address/"
+  },
+  {
+    "name": "Fantom Testnet",
+    "chainId": 4002,
+    "img": "img/network/fantom-ftm-logo.svg",
+    "rpc": "https://rpc.testnet.fantom.network/",
+    "explorerName": "FTMScan",
+    "explorerTxUrl": "https://testnet.ftmscan.com/tx/",
+    "explorerAddressUrl": "https://testnet.ftmscan.com/address/",
+    "isDisabled": true,
+    "isTestnet": true
+  },
+  {
+    "name": "AminoX Testnet",
+    "chainId": 13370,
+    "img": "img/network/aminoXTestnet.svg",
+    "isDisabled": true,
+    "explorerName": "AminoX Explorer",
+    "explorerTxUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/tx/",
+    "explorerAddressUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/address/",
+    "isTestnet": true
+  }
+];
+
 // src/store/index.ts
-var import_components2 = __toModule(require("@ijstech/components"));
 var TOKENS = "oswap_user_tokens_";
 var getUserTokens = (chainId) => {
   let tokens = localStorage[TOKENS + chainId];
@@ -22112,21 +22103,13 @@ function getChainId() {
   return import_eth_wallet6.Wallet.getInstance().chainId;
 }
 var state = {
-  siteEnv: SITE_ENV.TESTNET,
+  siteEnv: import_global2.SITE_ENV.TESTNET,
   currentChainId: 0,
   isExpertMode: false,
   slippageTolerance: 0.5,
   transactionDeadline: 30,
   tokenBalances: {},
   tokenMap: {},
-  trollActionsMapStatus: {},
-  minPrice: null,
-  maxPrice: null,
-  priorityQueueActionsStatus: {},
-  rangeQueueActionsStatus: {},
-  groupQueueActionsStatus: {},
-  groupQueueOfferStatus: {},
-  buybackStatus: {},
   userTokens: {},
   infuraId: "",
   networkMap: {}
@@ -22228,12 +22211,12 @@ var getTokenPrice = async (token) => {
 };
 var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTime) => {
   try {
-    let rewardAddress2 = option.rewardAddress;
+    let rewardAddress = option.rewardAddress;
     let isCommonStartDate = option.isCommonStartDate;
     let reward = "0";
     let claimSoFar = "0";
     let claimable = "0";
-    if (!rewardAddress2) {
+    if (!rewardAddress) {
       return {
         reward,
         claimSoFar,
@@ -22244,9 +22227,9 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
     let wallet = import_eth_wallet7.Wallet.getInstance();
     let rewardsContract;
     if (isCommonStartDate) {
-      rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet, rewardAddress2);
+      rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet, rewardAddress);
     } else {
-      rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet, rewardAddress2);
+      rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet, rewardAddress);
     }
     try {
       let rewardWei = await rewardsContract.reward();
@@ -22599,21 +22582,33 @@ var getVaultRewardCurrentAPR = async (rewardOption, vaultObject, lockedDays) => 
   APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
   return APR;
 };
-var withdrawToken = async (contractAddress) => {
+var withdrawToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
-  let wallet = import_eth_wallet7.Wallet.getInstance();
-  let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
-  let receipt = await timeIsMoney.withdraw(true);
-  return receipt;
+  try {
+    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
+    let receipt = await timeIsMoney.withdraw(true);
+    return receipt;
+  } catch (error) {
+    if (callback) {
+      callback(error);
+    }
+  }
 };
-var claimToken = async (contractAddress) => {
+var claimToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
-  let wallet = import_eth_wallet7.Wallet.getInstance();
-  let rewards = new import_time_is_money_sdk.Contracts.Rewards(wallet, contractAddress);
-  let receipt = await rewards.claim();
-  return receipt;
+  try {
+    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let rewards = new import_time_is_money_sdk.Contracts.Rewards(wallet, contractAddress);
+    let receipt = await rewards.claim();
+    return receipt;
+  } catch (error) {
+    if (callback) {
+      callback(error);
+    }
+  }
 };
 var lockToken = async (token, amount, contractAddress) => {
   if (!token)

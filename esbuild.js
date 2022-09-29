@@ -14,34 +14,14 @@ const GlobalBuildModuleList = [
     moduleName: '@staking/assets'
   },
   {
-    sourceFilePath: 'src/main/index.tsx',
-    distFilePath: './dist/main/index.js',
-    moduleName: '@staking/main'
-  },
-  {
-    sourceFilePath: 'src/demo/index.tsx',
-    distFilePath: './dist/demo/index.js',
-    moduleName: '@staking/demo'
-  },
-  {
-    sourceFilePath: 'src/staking-ui/index.tsx',
-    distFilePath: './dist/staking-ui/index.js',
-    moduleName: '@staking/staking-ui'
-  },
-  {
-    sourceFilePath: 'src/crosschain-utils/index.ts',
-    distFilePath: './dist/crosschain-utils/index.js',
-    moduleName: '@staking/crosschain-utils'
+    sourceFilePath: 'src/staking/index.tsx',
+    distFilePath: './dist/staking/index.js',
+    moduleName: '@staking/staking'
   },
   {
     sourceFilePath: 'src/global/index.ts',
     distFilePath: './dist/global/index.js',
     moduleName: '@staking/global'
-  },
-  {
-    sourceFilePath: 'src/result/index.tsx',
-    distFilePath: './dist/result/index.js',
-    moduleName: '@staking/result'
   },
   {
     sourceFilePath: 'src/staking-utils/index.ts',
@@ -53,6 +33,12 @@ const GlobalBuildModuleList = [
     distFilePath: './dist/store/index.js',
     moduleName: '@staking/store'
   },
+  // demo
+  {
+    sourceFilePath: 'src/demo/index.tsx',
+    distFilePath: './dist/demo/index.js',
+    moduleName: '@staking/demo'
+  },
 ]
 
 const GlobalModuleESBuildConfig = {
@@ -62,8 +48,8 @@ const GlobalModuleESBuildConfig = {
     '@ijstech/components',
     '@ijstech/eth-wallet',
     '@openswap/sdk',
-    '@staking/main',
-    
+    '@staking/global',
+    '@staking/store',
   ]
 }
 
@@ -122,14 +108,16 @@ async function buildGlobalModule() {
 async function buildLocalModule() {
   require('esbuild').build({
     entryPoints: [
-      'src/demo/index.tsx',
+      // demo
+      'src/demo/index.tsx'
     ],
     external: [
       '@staking/assets',
       '@ijstech/components', 
       '@ijstech/eth-wallet', 
       '@openswap/sdk',
-      '@staking/main',
+      '@staking/global',
+      '@staking/store',
     ],
     outdir: 'dist/staking',
     bundle: true,

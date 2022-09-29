@@ -503,20 +503,32 @@ const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, loc
   return APR; 
 }
 
-const withdrawToken = async (contractAddress: string) => {
+const withdrawToken = async (contractAddress: string, callback?: any) => {
   if (!contractAddress) return;
-  let wallet = Wallet.getInstance();
-  let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, contractAddress);
-  let receipt = await timeIsMoney.withdraw(true);
-  return receipt;
+  try {
+    let wallet = Wallet.getInstance();
+    let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, contractAddress);
+    let receipt = await timeIsMoney.withdraw(true);
+    return receipt;
+  } catch (error) {
+    if (callback) {
+      callback(error);
+    }
+  }
 }
 
-const claimToken = async (contractAddress: string) => {
+const claimToken = async (contractAddress: string, callback?: any) => {
   if (!contractAddress) return;
-  let wallet = Wallet.getInstance();
-  let rewards = new TimeIsMoneyContracts.Rewards(wallet, contractAddress);
-  let receipt = await rewards.claim();
-  return receipt;
+  try {
+    let wallet = Wallet.getInstance();
+    let rewards = new TimeIsMoneyContracts.Rewards(wallet, contractAddress);
+    let receipt = await rewards.claim();
+    return receipt;
+  } catch (error) {
+    if (callback) {
+      callback(error);
+    }
+  }
 }
 
 const lockToken = async (token: ITokenObject, amount: string, contractAddress: string) => {
