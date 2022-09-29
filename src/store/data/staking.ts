@@ -31,6 +31,7 @@ interface Staking {
 }
 
 interface Reward {
+  //contract
   address?:string,
   rewardTokenAddress:string,
   multiplier: number, //lockAmount * multiplier = rewardAmount
