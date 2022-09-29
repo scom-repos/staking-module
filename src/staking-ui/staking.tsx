@@ -1,5 +1,5 @@
 import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement } from '@ijstech/components';
-import { formatNumber, formatDate, registerSendTxEvents, INetwork, TokenMapType } from '@staking/global';
+import { formatNumber, formatDate, registerSendTxEvents, INetwork, TokenMapType, StakingCampaignInfo } from '@staking/global';
 import { getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected } from '@staking/store';
 import {
   getStakingTotalLocked,
@@ -24,7 +24,7 @@ import './staking.css';
 import { Result } from '@staking/result';
 
 export interface StakingElement extends ControlElement {
-  campaigns?: any;
+  campaigns?: StakingCampaignInfo[];
   lpTokenURL?: string;
   manageStakeURL?: string;
   tokenIcon: string;
@@ -201,10 +201,18 @@ export class Staking extends Module {
 
   private renderCampaigns = async (count: number) => {
     this.removeTimer();
-    this.noCampaignSection = await Panel.create();
     this.tokenMap = getTokenMap();
     const chainId = getChainId();
     const network = this.networkMap[chainId];
+    if (!this.noCampaignSection) {
+      this.noCampaignSection = await Panel.create();
+      this.noCampaignSection.appendChild(
+        <i-panel class="no-campaign">
+          <i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
+          <i-label caption="No Campaigns" />
+        </i-panel>
+      );
+    }
     this.noCampaignSection.visible = false;
     if (this.campaigns && !this.campaigns.length) {
       this.stakingPanel.clearInnerHTML();

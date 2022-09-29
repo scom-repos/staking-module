@@ -23103,10 +23103,19 @@
       };
       this.renderCampaigns = async (count) => {
         this.removeTimer();
-        this.noCampaignSection = await import_components4.Panel.create();
         this.tokenMap = getTokenMap();
         const chainId = getChainId();
         const network = this.networkMap[chainId];
+        if (!this.noCampaignSection) {
+          this.noCampaignSection = await import_components4.Panel.create();
+          this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+            class: "no-campaign"
+          }, /* @__PURE__ */ this.$render("i-image", {
+            url: import_assets3.default.fullPath("img/staking/TrollTrooper.svg")
+          }), /* @__PURE__ */ this.$render("i-label", {
+            caption: "No Campaigns"
+          })));
+        }
         this.noCampaignSection.visible = false;
         if (this.campaigns && !this.campaigns.length) {
           this.stakingPanel.clearInnerHTML();
@@ -25050,27 +25059,46 @@
       super(parent, options);
       this.campaigns = [];
       this.registerEvent = () => {
+        this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
+        this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
+        this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
       };
       this.onWalletConnect = async (connected) => {
         this.onSetupPage(connected);
       };
       this.onChainChange = () => {
+        this.onSetupPage(isWalletConnected());
       };
       this.onSetupPage = async (connected, hideLoading) => {
         if (!hideLoading) {
           this.headerPanel.visible = false;
           this.loadingElm.visible = true;
         }
-        this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
-        if (!this.stakingUI) {
-          this.stakingUI = await Staking.create({
-            tokenIcon: "img/swap/openswap.png",
-            networkMap: getNetworkMap(),
-            tokenMap: getTokenMap()
-          });
+        if (!isWalletConnected()) {
+          this.stakingElm.clearInnerHTML();
+          this.stakingElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+            width: "100%",
+            margin: { top: 100 },
+            verticalAlignment: "center",
+            horizontalAlignment: "center"
+          }, /* @__PURE__ */ this.$render("i-label", {
+            caption: "Please connect with your wallet!"
+          })));
+          this.headerPanel.visible = false;
+          this.loadingElm.visible = false;
+          return;
+        } else {
+          if (!this.stakingUI) {
+            this.stakingUI = await Staking.create({
+              tokenIcon: "img/swap/openswap.png",
+              networkMap: getNetworkMap(),
+              tokenMap: getTokenMap()
+            });
+          }
           this.stakingElm.clearInnerHTML();
           this.stakingElm.appendChild(this.stakingUI);
         }
+        this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
         this.stakingUI.campaigns = this.campaigns;
         await this.stakingUI.renderUI();
         if (!hideLoading) {

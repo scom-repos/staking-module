@@ -1,11 +1,10 @@
 import { customModule, Module, Styles, Panel, application, IEventBus, Container } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-// import { isWalletConnected } from '@staking/store';
 import Assets from '@staking/assets';
 import { Staking } from '@staking/staking-ui';
 import { getAllCampaignsInfo } from '@staking/staking-utils';
-import {StakingCampaignInfo, StakingType} from '@staking/global' 
-import { getInfuraId, getNetworkInfo, getNetworkMap, getTokenMap, setInfuraId } from '@staking/store';
+import {EventId, StakingCampaignInfo, StakingType} from '@staking/global';
+import { getNetworkMap, getTokenMap, isWalletConnected } from '@staking/store';
 import './staking.css';
 const Theme = Styles.Theme.ThemeVars;
 Styles.Theme.applyTheme(Styles.Theme.darkTheme);
@@ -1121,9 +1120,9 @@ export class StakingEarn extends Module {
   }
 
   private registerEvent = () => {
-    // this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
-    // this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
-    // this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
+    this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
+    this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
+    this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
   }
 
   private onWalletConnect = async (connected: boolean) => {
@@ -1131,7 +1130,7 @@ export class StakingEarn extends Module {
   }
 
   private onChainChange = () => {
-    // this.onSetupPage(isWalletConnected());
+    this.onSetupPage(isWalletConnected());
   }
 
   private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
@@ -1139,16 +1138,24 @@ export class StakingEarn extends Module {
       this.headerPanel.visible = false;
       this.loadingElm.visible = true;
     }
-    this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
-    if (!this.stakingUI) {
-      this.stakingUI = await Staking.create({
-        tokenIcon: 'img/swap/openswap.png',
-        networkMap: getNetworkMap(),
-        tokenMap: getTokenMap()
-      });
+    if (!isWalletConnected()) {
+      this.stakingElm.clearInnerHTML();
+      this.stakingElm.appendChild(<i-hstack width="100%" margin={{ top: 100 }} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
+      this.headerPanel.visible = false;
+      this.loadingElm.visible = false;
+      return;
+    } else {
+      if (!this.stakingUI) {
+        this.stakingUI = await Staking.create({
+          tokenIcon: 'img/swap/openswap.png',
+          networkMap: getNetworkMap(),
+          tokenMap: getTokenMap()
+        });
+      }
       this.stakingElm.clearInnerHTML();
       this.stakingElm.appendChild(this.stakingUI);
     }
+    this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
     this.stakingUI.campaigns = this.campaigns;
     await this.stakingUI.renderUI();
     if (!hideLoading) {

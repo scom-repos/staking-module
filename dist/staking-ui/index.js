@@ -22900,10 +22900,19 @@ var Staking = class extends import_components4.Module {
     };
     this.renderCampaigns = async (count) => {
       this.removeTimer();
-      this.noCampaignSection = await import_components4.Panel.create();
       this.tokenMap = getTokenMap();
       const chainId = getChainId();
       const network = this.networkMap[chainId];
+      if (!this.noCampaignSection) {
+        this.noCampaignSection = await import_components4.Panel.create();
+        this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+          class: "no-campaign"
+        }, /* @__PURE__ */ this.$render("i-image", {
+          url: import_assets3.default.fullPath("img/staking/TrollTrooper.svg")
+        }), /* @__PURE__ */ this.$render("i-label", {
+          caption: "No Campaigns"
+        })));
+      }
       this.noCampaignSection.visible = false;
       if (this.campaigns && !this.campaigns.length) {
         this.stakingPanel.clearInnerHTML();
