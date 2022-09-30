@@ -17,11 +17,6 @@ export {
 } from './staking';
 
 export {
-  IClaimBasicInfo,
-  investorClaimInfoByChainId
-} from './claim'
-
-export {
   baseRoute,
   crossChainNativeTokenList,
   getBridgeVaultVersion,

@@ -48,10 +48,6 @@ export {
   //staking
   USDPeggedTokenAddressMap,
   
-  //claim
-  IClaimBasicInfo,
-  investorClaimInfoByChainId,
-  
   //cross-chain
   baseRoute,
   crossChainNativeTokenList,

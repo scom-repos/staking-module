@@ -21264,7 +21264,7 @@ __export(exports, {
 
 // src/staking-utils/API.ts
 var import_moment2 = __toModule(require_moment());
-var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet8 = __toModule(require("@ijstech/eth-wallet"));
 var import_time_is_money_sdk = __toModule(require_lib());
 var import_sdk3 = __toModule(require("@openswap/sdk"));
 var import_chainlink_sdk = __toModule(require_lib2());
@@ -21450,7 +21450,7 @@ var EventId;
 })(EventId || (EventId = {}));
 
 // src/store/index.ts
-var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
 var import_global2 = __toModule(require("@staking/global"));
 var import_assets2 = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
@@ -21788,12 +21788,64 @@ var ProviderConfigMap = {
 };
 
 // src/store/data/staking.ts
+var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
 var LockTokenType;
 (function(LockTokenType2) {
   LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
   LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
   LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
 })(LockTokenType || (LockTokenType = {}));
+var StakingCampaignByChainId = {
+  56: [
+    {
+      customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
+      customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
+      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      stakings: [
+        {
+          address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
+          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+          minLockTime: new import_eth_wallet6.BigNumber("1209600"),
+          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
+            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+            multiplier: new import_eth_wallet6.BigNumber("0.03"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        },
+        {
+          address: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
+          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+          minLockTime: new import_eth_wallet6.BigNumber("2592000"),
+          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
+            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+            multiplier: new import_eth_wallet6.BigNumber("0.1"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        }
+      ]
+    }
+  ]
+};
 var USDPeggedTokenAddressMap = {
   56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
@@ -22100,7 +22152,7 @@ var getUserTokens = (chainId) => {
   return tokens.length ? tokens : null;
 };
 function getChainId() {
-  return import_eth_wallet6.Wallet.getInstance().chainId;
+  return import_eth_wallet7.Wallet.getInstance().chainId;
 }
 var state = {
   siteEnv: import_global2.SITE_ENV.TESTNET,
@@ -22153,7 +22205,7 @@ var getTokenMap = () => {
 
 // src/staking-utils/API.ts
 var getTokenPrice = async (token) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let chainId = wallet.chainId;
   let tokenPrice;
   let tokenPriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
@@ -22177,21 +22229,21 @@ var getTokenPrice = async (token) => {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token0PriceFeedAddress);
       let token0LatestRoundData = await aggregator.latestRoundData();
       let token0PriceFeedDecimals = await aggregator.decimals();
-      let token0USDPrice = new import_eth_wallet7.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
-      if (new import_eth_wallet7.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
-        tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
+      let token0USDPrice = new import_eth_wallet8.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
+      if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
+        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
       } else {
-        tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
+        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
       }
     } else {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
       let token1LatestRoundData = await aggregator.latestRoundData();
       let token1PriceFeedDecimals = await aggregator.decimals();
-      let token1USDPrice = new import_eth_wallet7.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
-      if (new import_eth_wallet7.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
-        tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
+      let token1USDPrice = new import_eth_wallet8.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
+      if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
+        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
       } else {
-        tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
+        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
       }
     }
   } else {
@@ -22199,12 +22251,12 @@ var getTokenPrice = async (token) => {
       let token1Price = await getTokenPrice(token1);
       if (!token1Price)
         return null;
-      tokenPrice = new import_eth_wallet7.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
+      tokenPrice = new import_eth_wallet8.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
     } else {
       let token0Price = await getTokenPrice(token0);
       if (!token0Price)
         return null;
-      tokenPrice = new import_eth_wallet7.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
+      tokenPrice = new import_eth_wallet8.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
     }
   }
   return tokenPrice;
@@ -22224,7 +22276,7 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
         multiplier: option.rate
       };
     }
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let rewardsContract;
     if (isCommonStartDate) {
       rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet, rewardAddress);
@@ -22235,9 +22287,9 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
       let rewardWei = await rewardsContract.reward();
       let unclaimedWei = await rewardsContract.unclaimed();
       let claimSoFarWei = await rewardsContract.claimSoFar(providerAddress);
-      reward = import_eth_wallet7.Utils.fromDecimals(rewardWei).toFixed();
-      claimSoFar = import_eth_wallet7.Utils.fromDecimals(claimSoFarWei).toFixed();
-      claimable = import_eth_wallet7.Utils.fromDecimals(unclaimedWei).toFixed();
+      reward = import_eth_wallet8.Utils.fromDecimals(rewardWei).toFixed();
+      claimSoFar = import_eth_wallet8.Utils.fromDecimals(claimSoFarWei).toFixed();
+      claimable = import_eth_wallet8.Utils.fromDecimals(unclaimedWei).toFixed();
     } catch (err) {
     }
     let vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
@@ -22250,7 +22302,7 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
     }
     let vestingEnd = (0, import_moment2.default)(vestingStart).add(vestingPeriod, "seconds");
     let multiplierWei = await rewardsContract.multiplier();
-    let multiplier = import_eth_wallet7.Utils.fromDecimals(multiplierWei).toFixed();
+    let multiplier = import_eth_wallet8.Utils.fromDecimals(multiplierWei).toFixed();
     return {
       vestingPeriod,
       vestingStart,
@@ -22267,7 +22319,7 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
 };
 var getStakingOptionExtendedInfoByAddress = async (option) => {
   try {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let stakingAddress = option.stakingAddress;
     let rewardOptions = option.rewardOptions;
     let decimalsOffset = option.decimalsOffset || 0;
@@ -22277,13 +22329,13 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
     let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
     let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
     let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-    let totalCredit = import_eth_wallet7.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
-    let lockAmount = import_eth_wallet7.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
+    let totalCredit = import_eth_wallet8.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
+    let lockAmount = import_eth_wallet8.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
     let stakeQty = withdrawn ? "0" : lockAmount;
     let mode = "";
-    if (new import_eth_wallet7.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
+    if (new import_eth_wallet8.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
       mode = "Claim";
-    } else if (new import_eth_wallet7.BigNumber(stakeQty).isZero()) {
+    } else if (new import_eth_wallet8.BigNumber(stakeQty).isZero()) {
       mode = "Stake";
     } else {
       mode = "Unlock";
@@ -22300,9 +22352,9 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
     let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
     let perAddressCapWei = await timeIsMoney.perAddressCap();
     let lockedTime = releaseTime.minus(minimumLockTime);
-    let maxTotalLock = import_eth_wallet7.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
-    let totalLocked = import_eth_wallet7.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
-    let perAddressCap = import_eth_wallet7.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
+    let maxTotalLock = import_eth_wallet8.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
+    let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+    let perAddressCap = import_eth_wallet8.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
     let tokenAddress = await timeIsMoney.token();
     let obj = {
       mode,
@@ -22328,7 +22380,7 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
           try {
             let stakingRewardInfo = await getStakingRewardInfoByAddresses(option2, currentAddress, releaseTime.toNumber());
             if (stakingRewardInfo) {
-              let vestedReward = new import_eth_wallet7.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
+              let vestedReward = new import_eth_wallet8.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
               rewardsData.push(__spreadProps(__spreadValues(__spreadValues({}, option2), stakingRewardInfo), {
                 vestedReward,
                 index
@@ -22382,7 +22434,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
   return campaigns;
 };
 var getAllCampaignsInfo = async (stakingInfo) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let chainId = wallet.chainId;
   let stakingCampaignInfoList = stakingInfo[chainId];
   if (!stakingCampaignInfoList)
@@ -22409,10 +22461,10 @@ var getAllCampaignsInfo = async (stakingInfo) => {
   return campaigns;
 };
 var getStakingTotalLocked = async (stakingAddress, decimalsOffset) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, stakingAddress);
   let totalLockedWei = await timeIsMoney.totalLocked();
-  let totalLocked = import_eth_wallet7.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+  let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
   return totalLocked;
 };
 var getWETH = (wallet) => {
@@ -22421,7 +22473,7 @@ var getWETH = (wallet) => {
 };
 var getLPObject = async (pairAddress) => {
   try {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     const WETH = getWETH(wallet);
     let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
     let getSymbol = await pair.symbol();
@@ -22442,13 +22494,13 @@ var getLPObject = async (pairAddress) => {
   }
 };
 var getLPBalance = async (pairAddress) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
   let balance = await pair.balanceOf(wallet.address);
-  return import_eth_wallet7.Utils.fromDecimals(balance).toFixed();
+  return import_eth_wallet8.Utils.fromDecimals(balance).toFixed();
 };
 var getVaultObject = async (vaultAddress) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
   let symbol = await vault.symbol();
   let name = await vault.name();
@@ -22465,13 +22517,13 @@ var getVaultObject = async (vaultAddress) => {
   };
 };
 var getVaultBalance = async (vaultAddress) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
   let balance = await vault.balanceOf(wallet.address);
-  return import_eth_wallet7.Utils.fromDecimals(balance).toFixed();
+  return import_eth_wallet8.Utils.fromDecimals(balance).toFixed();
 };
 var getERC20RewardCurrentAPR = async (rewardOption, lockedToken, lockedDays) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let chainId = wallet.chainId;
   const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
   if (!usdPeggedTokenAddress)
@@ -22481,11 +22533,11 @@ var getERC20RewardCurrentAPR = async (rewardOption, lockedToken, lockedDays) => 
   let lockedTokenPrice = await getTokenPrice(lockedToken.address);
   if (!rewardPrice || !lockedTokenPrice)
     return null;
-  APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
+  APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
   return APR;
 };
 var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let reserveObj;
   let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
   let reserves = await pair.getReserves();
@@ -22494,7 +22546,7 @@ var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => 
     tokenOutAddress = await pair.token1();
   }
   if (tokenInAddress && tokenOutAddress) {
-    if (new import_eth_wallet7.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
+    if (new import_eth_wallet8.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
       reserveObj = {
         reserveA: reserves._reserve0,
         reserveB: reserves._reserve1
@@ -22509,7 +22561,7 @@ var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => 
   return reserveObj;
 };
 var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address;
   let chainId = wallet.chainId;
@@ -22526,23 +22578,23 @@ var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
       let WETH9LatestRoundData = await aggregator.latestRoundData();
       let WETH9PriceFeedDecimals = await aggregator.decimals();
-      let WETH9USDPrice = new import_eth_wallet7.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+      let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
       let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
       if (!rewardReserves)
         return "";
-      rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+      rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
     } else {
       let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.tokenAddress);
       if (!rewardReserves)
         return "";
-      rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
+      rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
     }
     let lpTokenOut = lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
     let lockedLPReserves = await getReservesByPair(lpObject.address, usdPeggedTokenAddress, lpTokenOut);
     if (!lockedLPReserves)
       return "";
-    let lockedLPPrice = new import_eth_wallet7.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
-    APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+    let lockedLPPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
+    APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
   } else {
     if (!lpObject.token0 || !lpObject.token1 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() || lpObject.token1.toLowerCase() == WETHAddress.toLowerCase()) {
       let WETH9PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
@@ -22551,18 +22603,18 @@ var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
       let WETH9LatestRoundData = await aggregator.latestRoundData();
       let WETH9PriceFeedDecimals = await aggregator.decimals();
-      let WETH9USDPrice = new import_eth_wallet7.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+      let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
       let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
       if (!rewardReserves)
         return "";
-      let rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+      let rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
       let otherTokenAddress = !lpObject.token0 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
       let lockedLPReserves = await getReservesByPair(lpObject.address, WETHAddress, otherTokenAddress);
       if (!lockedLPReserves)
         return "";
-      let otherTokenPrice = new import_eth_wallet7.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
-      let lockedLPPrice = new import_eth_wallet7.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet7.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
-      APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+      let otherTokenPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
+      let lockedLPPrice = new import_eth_wallet8.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet8.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
+      APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
     }
   }
   return APR;
@@ -22573,20 +22625,20 @@ var getVaultRewardCurrentAPR = async (rewardOption, vaultObject, lockedDays) => 
   let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
   if (!assetTokenPrice || !rewardPrice)
     return "";
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultObject.address);
   let vaultTokenTotalSupply = await vault.totalSupply();
   let lpAssetBalance = await vault.lpAssetBalance();
-  let lpToAssetRatio = new import_eth_wallet7.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
-  let VaultTokenPrice = new import_eth_wallet7.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
-  APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+  let lpToAssetRatio = new import_eth_wallet8.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
+  let VaultTokenPrice = new import_eth_wallet8.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
+  APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
   return APR;
 };
 var withdrawToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
   try {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
     let receipt = await timeIsMoney.withdraw(true);
     return receipt;
@@ -22600,7 +22652,7 @@ var claimToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
   try {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let rewards = new import_time_is_money_sdk.Contracts.Rewards(wallet, contractAddress);
     let receipt = await rewards.claim();
     return receipt;
@@ -22615,9 +22667,9 @@ var lockToken = async (token, amount, contractAddress) => {
     return;
   if (!contractAddress)
     return;
-  let wallet = import_eth_wallet7.Wallet.getInstance();
+  let wallet = import_eth_wallet8.Wallet.getInstance();
   let decimals = typeof token.decimals === "object" ? token.decimals.toNumber() : token.decimals;
-  let tokenAmount = import_eth_wallet7.Utils.toDecimals(amount, decimals);
+  let tokenAmount = import_eth_wallet8.Utils.toDecimals(amount, decimals);
   let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
   let receipt = await timeIsMoney.lock(tokenAmount);
   return receipt;

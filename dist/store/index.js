@@ -6196,7 +6196,6 @@ __export(exports, {
   hasMetaMask: () => hasMetaMask,
   hasUserToken: () => hasUserToken,
   hasWallet: () => hasWallet,
-  investorClaimInfoByChainId: () => investorClaimInfoByChainId,
   isExpertMode: () => isExpertMode,
   isWalletConnected: () => isWalletConnected,
   logoutWallet: () => logoutWallet,
@@ -6222,7 +6221,7 @@ __export(exports, {
   viewOnExplorerByTxHash: () => viewOnExplorerByTxHash,
   walletList: () => walletList
 });
-var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
 var import_global2 = __toModule(require("@staking/global"));
 var import_assets2 = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
@@ -7126,37 +7125,67 @@ var availableMarketsByChainId = {
 };
 
 // src/store/data/staking.ts
+var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
 var LockTokenType;
 (function(LockTokenType2) {
   LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
   LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
   LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
 })(LockTokenType || (LockTokenType = {}));
+var StakingCampaignByChainId = {
+  56: [
+    {
+      customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
+      customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
+      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      stakings: [
+        {
+          address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
+          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+          minLockTime: new import_eth_wallet6.BigNumber("1209600"),
+          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
+            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+            multiplier: new import_eth_wallet6.BigNumber("0.03"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        },
+        {
+          address: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
+          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+          minLockTime: new import_eth_wallet6.BigNumber("2592000"),
+          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
+            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+            multiplier: new import_eth_wallet6.BigNumber("0.1"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        }
+      ]
+    }
+  ]
+};
 var USDPeggedTokenAddressMap = {
   56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
-};
-
-// src/store/data/claim.ts
-var investorClaimInfoByChainId = {
-  56: [
-    {
-      campaignId: 1,
-      campaignName: "Backer Claim",
-      campaignDesc: "Thank you for supporting OpenSwap as an early stage backer.",
-      vestingPeriod: "24 Months",
-      dripAddress: "0x0E1F5ae02eEEB1259f1DDb21D5091Ec22c2588eC"
-    }
-  ],
-  97: [
-    {
-      campaignId: 1,
-      campaignName: "Backer Claim Test",
-      campaignDesc: "Thank you for supporting OpenSwap as an early stage backer.",
-      vestingPeriod: "1 Week",
-      dripAddress: "0xFc28280774317326229aCC97C830ad77348fa1eF"
-    }
-  ]
 };
 
 // src/store/data/cross-chain.ts
@@ -7595,17 +7624,17 @@ var getWETH = (chainId) => {
   return wrappedToken;
 };
 function getChainId() {
-  return import_eth_wallet6.Wallet.getInstance().chainId;
+  return import_eth_wallet7.Wallet.getInstance().chainId;
 }
 function getWallet() {
-  return isWalletConnected() ? import_eth_wallet6.Wallet.getInstance() : new import_eth_wallet6.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
+  return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
 }
 function getWalletProvider() {
   return localStorage.getItem("walletProvider") || "";
 }
 function getErc20(address) {
   const wallet = getWallet();
-  return new import_eth_wallet6.Erc20(wallet, address);
+  return new import_eth_wallet7.Erc20(wallet, address);
 }
 function getAvailableMarkets() {
   let chainId = getChainId();
@@ -7791,7 +7820,7 @@ var projectNativeTokenSymbol = () => {
   return token ? token.symbol : "";
 };
 var getTokenObject = async (address, showBalance) => {
-  const ERC20Contract = new import_sdk2.Contracts.ERC20(import_eth_wallet6.Wallet.getInstance(), address);
+  const ERC20Contract = new import_sdk2.Contracts.ERC20(import_eth_wallet7.Wallet.getInstance(), address);
   const symbol = await ERC20Contract.symbol();
   const name = await ERC20Contract.name();
   const decimals = (await ERC20Contract.decimals()).toFixed();

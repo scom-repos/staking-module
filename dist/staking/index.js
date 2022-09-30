@@ -21267,7 +21267,7 @@ define("@staking/staking",(require, exports)=>{
 
   // src/staking-utils/API.ts
   var import_moment2 = __toModule(require_moment());
-  var import_eth_wallet7 = __toModule(__require("@ijstech/eth-wallet"));
+  var import_eth_wallet8 = __toModule(__require("@ijstech/eth-wallet"));
   var import_time_is_money_sdk = __toModule(require_lib());
   var import_sdk3 = __toModule(__require("@openswap/sdk"));
   var import_chainlink_sdk = __toModule(require_lib2());
@@ -21335,7 +21335,7 @@ define("@staking/staking",(require, exports)=>{
   })(EventId || (EventId = {}));
 
   // src/store/index.ts
-  var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
+  var import_eth_wallet7 = __toModule(__require("@ijstech/eth-wallet"));
   var import_global2 = __toModule(__require("@staking/global"));
   var import_assets2 = __toModule(__require("@staking/assets"));
   var import_sdk2 = __toModule(__require("@openswap/sdk"));
@@ -21677,12 +21677,64 @@ define("@staking/staking",(require, exports)=>{
   };
 
   // src/store/data/staking.ts
+  var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
   var LockTokenType;
   (function(LockTokenType2) {
     LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
     LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
     LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
   })(LockTokenType || (LockTokenType = {}));
+  var StakingCampaignByChainId = {
+    56: [
+      {
+        customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
+        customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
+        getTokenURL: `https://www.openswap.xyz/#/swap`,
+        stakings: [
+          {
+            address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
+            lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+            minLockTime: new import_eth_wallet6.BigNumber("1209600"),
+            entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+            entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+            perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+            maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+            customDesc: "Stake OSWAP, Earn OSWAP",
+            lockTokenType: 0,
+            rewards: [{
+              address: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
+              rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+              multiplier: new import_eth_wallet6.BigNumber("0.03"),
+              initialReward: new import_eth_wallet6.BigNumber("1"),
+              vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+              claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+              admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+            }]
+          },
+          {
+            address: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
+            lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
+            minLockTime: new import_eth_wallet6.BigNumber("2592000"),
+            entryStart: new import_eth_wallet6.BigNumber("1663074000"),
+            entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
+            perAddressCap: new import_eth_wallet6.BigNumber("3000"),
+            maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+            customDesc: "Stake OSWAP, Earn OSWAP",
+            lockTokenType: 0,
+            rewards: [{
+              address: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
+              rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
+              multiplier: new import_eth_wallet6.BigNumber("0.1"),
+              initialReward: new import_eth_wallet6.BigNumber("1"),
+              vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+              claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+              admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+            }]
+          }
+        ]
+      }
+    ]
+  };
   var USDPeggedTokenAddressMap = {
     56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
     97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
@@ -21992,10 +22044,10 @@ define("@staking/staking",(require, exports)=>{
     return state.siteEnv;
   };
   function getChainId() {
-    return import_eth_wallet6.Wallet.getInstance().chainId;
+    return import_eth_wallet7.Wallet.getInstance().chainId;
   }
   function getWallet() {
-    return isWalletConnected() ? import_eth_wallet6.Wallet.getInstance() : new import_eth_wallet6.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
+    return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
   }
   var state = {
     siteEnv: import_global2.SITE_ENV.TESTNET,
@@ -22074,7 +22126,7 @@ define("@staking/staking",(require, exports)=>{
 
   // src/staking-utils/API.ts
   var getTokenPrice = async (token) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let chainId = wallet.chainId;
     let tokenPrice;
     let tokenPriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
@@ -22098,21 +22150,21 @@ define("@staking/staking",(require, exports)=>{
         let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token0PriceFeedAddress);
         let token0LatestRoundData = await aggregator.latestRoundData();
         let token0PriceFeedDecimals = await aggregator.decimals();
-        let token0USDPrice = new import_eth_wallet7.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
-        if (new import_eth_wallet7.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
-          tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
+        let token0USDPrice = new import_eth_wallet8.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
+        if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
+          tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
         } else {
-          tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
+          tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
         }
       } else {
         let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
         let token1LatestRoundData = await aggregator.latestRoundData();
         let token1PriceFeedDecimals = await aggregator.decimals();
-        let token1USDPrice = new import_eth_wallet7.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
-        if (new import_eth_wallet7.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
-          tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
+        let token1USDPrice = new import_eth_wallet8.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
+        if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
+          tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
         } else {
-          tokenPrice = new import_eth_wallet7.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
+          tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
         }
       }
     } else {
@@ -22120,12 +22172,12 @@ define("@staking/staking",(require, exports)=>{
         let token1Price = await getTokenPrice(token1);
         if (!token1Price)
           return null;
-        tokenPrice = new import_eth_wallet7.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
+        tokenPrice = new import_eth_wallet8.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
       } else {
         let token0Price = await getTokenPrice(token0);
         if (!token0Price)
           return null;
-        tokenPrice = new import_eth_wallet7.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
+        tokenPrice = new import_eth_wallet8.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
       }
     }
     return tokenPrice;
@@ -22145,7 +22197,7 @@ define("@staking/staking",(require, exports)=>{
           multiplier: option.rate
         };
       }
-      let wallet = import_eth_wallet7.Wallet.getInstance();
+      let wallet = import_eth_wallet8.Wallet.getInstance();
       let rewardsContract;
       if (isCommonStartDate) {
         rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet, rewardAddress);
@@ -22156,9 +22208,9 @@ define("@staking/staking",(require, exports)=>{
         let rewardWei = await rewardsContract.reward();
         let unclaimedWei = await rewardsContract.unclaimed();
         let claimSoFarWei = await rewardsContract.claimSoFar(providerAddress);
-        reward = import_eth_wallet7.Utils.fromDecimals(rewardWei).toFixed();
-        claimSoFar = import_eth_wallet7.Utils.fromDecimals(claimSoFarWei).toFixed();
-        claimable = import_eth_wallet7.Utils.fromDecimals(unclaimedWei).toFixed();
+        reward = import_eth_wallet8.Utils.fromDecimals(rewardWei).toFixed();
+        claimSoFar = import_eth_wallet8.Utils.fromDecimals(claimSoFarWei).toFixed();
+        claimable = import_eth_wallet8.Utils.fromDecimals(unclaimedWei).toFixed();
       } catch (err) {
       }
       let vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
@@ -22171,7 +22223,7 @@ define("@staking/staking",(require, exports)=>{
       }
       let vestingEnd = (0, import_moment2.default)(vestingStart).add(vestingPeriod, "seconds");
       let multiplierWei = await rewardsContract.multiplier();
-      let multiplier = import_eth_wallet7.Utils.fromDecimals(multiplierWei).toFixed();
+      let multiplier = import_eth_wallet8.Utils.fromDecimals(multiplierWei).toFixed();
       return {
         vestingPeriod,
         vestingStart,
@@ -22188,7 +22240,7 @@ define("@staking/staking",(require, exports)=>{
   };
   var getStakingOptionExtendedInfoByAddress = async (option) => {
     try {
-      let wallet = import_eth_wallet7.Wallet.getInstance();
+      let wallet = import_eth_wallet8.Wallet.getInstance();
       let stakingAddress = option.stakingAddress;
       let rewardOptions = option.rewardOptions;
       let decimalsOffset = option.decimalsOffset || 0;
@@ -22198,13 +22250,13 @@ define("@staking/staking",(require, exports)=>{
       let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
       let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
       let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-      let totalCredit = import_eth_wallet7.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
-      let lockAmount = import_eth_wallet7.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
+      let totalCredit = import_eth_wallet8.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
+      let lockAmount = import_eth_wallet8.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
       let stakeQty = withdrawn ? "0" : lockAmount;
       let mode = "";
-      if (new import_eth_wallet7.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
+      if (new import_eth_wallet8.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
         mode = "Claim";
-      } else if (new import_eth_wallet7.BigNumber(stakeQty).isZero()) {
+      } else if (new import_eth_wallet8.BigNumber(stakeQty).isZero()) {
         mode = "Stake";
       } else {
         mode = "Unlock";
@@ -22221,9 +22273,9 @@ define("@staking/staking",(require, exports)=>{
       let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
       let perAddressCapWei = await timeIsMoney.perAddressCap();
       let lockedTime = releaseTime.minus(minimumLockTime);
-      let maxTotalLock = import_eth_wallet7.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
-      let totalLocked = import_eth_wallet7.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
-      let perAddressCap = import_eth_wallet7.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
+      let maxTotalLock = import_eth_wallet8.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
+      let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+      let perAddressCap = import_eth_wallet8.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
       let tokenAddress = await timeIsMoney.token();
       let obj = {
         mode,
@@ -22249,7 +22301,7 @@ define("@staking/staking",(require, exports)=>{
             try {
               let stakingRewardInfo = await getStakingRewardInfoByAddresses(option2, currentAddress, releaseTime.toNumber());
               if (stakingRewardInfo) {
-                let vestedReward = new import_eth_wallet7.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
+                let vestedReward = new import_eth_wallet8.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
                 rewardsData.push(__spreadProps(__spreadValues(__spreadValues({}, option2), stakingRewardInfo), {
                   vestedReward,
                   index
@@ -22303,7 +22355,7 @@ define("@staking/staking",(require, exports)=>{
     return campaigns;
   };
   var getAllCampaignsInfo = async (stakingInfo) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let chainId = wallet.chainId;
     let stakingCampaignInfoList = stakingInfo[chainId];
     if (!stakingCampaignInfoList)
@@ -22330,10 +22382,10 @@ define("@staking/staking",(require, exports)=>{
     return campaigns;
   };
   var getStakingTotalLocked = async (stakingAddress, decimalsOffset) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, stakingAddress);
     let totalLockedWei = await timeIsMoney.totalLocked();
-    let totalLocked = import_eth_wallet7.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+    let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
     return totalLocked;
   };
   var getWETH = (wallet) => {
@@ -22342,7 +22394,7 @@ define("@staking/staking",(require, exports)=>{
   };
   var getLPObject = async (pairAddress) => {
     try {
-      let wallet = import_eth_wallet7.Wallet.getInstance();
+      let wallet = import_eth_wallet8.Wallet.getInstance();
       const WETH = getWETH(wallet);
       let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
       let getSymbol = await pair.symbol();
@@ -22363,7 +22415,7 @@ define("@staking/staking",(require, exports)=>{
     }
   };
   var getVaultObject = async (vaultAddress) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
     let symbol = await vault.symbol();
     let name = await vault.name();
@@ -22380,7 +22432,7 @@ define("@staking/staking",(require, exports)=>{
     };
   };
   var getERC20RewardCurrentAPR = async (rewardOption, lockedToken, lockedDays) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let chainId = wallet.chainId;
     const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
     if (!usdPeggedTokenAddress)
@@ -22390,11 +22442,11 @@ define("@staking/staking",(require, exports)=>{
     let lockedTokenPrice = await getTokenPrice(lockedToken.address);
     if (!rewardPrice || !lockedTokenPrice)
       return null;
-    APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
+    APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
     return APR;
   };
   var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let reserveObj;
     let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
     let reserves = await pair.getReserves();
@@ -22403,7 +22455,7 @@ define("@staking/staking",(require, exports)=>{
       tokenOutAddress = await pair.token1();
     }
     if (tokenInAddress && tokenOutAddress) {
-      if (new import_eth_wallet7.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
+      if (new import_eth_wallet8.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
         reserveObj = {
           reserveA: reserves._reserve0,
           reserveB: reserves._reserve1
@@ -22418,7 +22470,7 @@ define("@staking/staking",(require, exports)=>{
     return reserveObj;
   };
   var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     const WETH = getWETH(wallet);
     const WETHAddress = WETH.address;
     let chainId = wallet.chainId;
@@ -22435,23 +22487,23 @@ define("@staking/staking",(require, exports)=>{
         let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
         let WETH9LatestRoundData = await aggregator.latestRoundData();
         let WETH9PriceFeedDecimals = await aggregator.decimals();
-        let WETH9USDPrice = new import_eth_wallet7.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+        let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
         let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
         if (!rewardReserves)
           return "";
-        rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+        rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
       } else {
         let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.tokenAddress);
         if (!rewardReserves)
           return "";
-        rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
+        rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
       }
       let lpTokenOut = lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
       let lockedLPReserves = await getReservesByPair(lpObject.address, usdPeggedTokenAddress, lpTokenOut);
       if (!lockedLPReserves)
         return "";
-      let lockedLPPrice = new import_eth_wallet7.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
-      APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+      let lockedLPPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
+      APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
     } else {
       if (!lpObject.token0 || !lpObject.token1 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() || lpObject.token1.toLowerCase() == WETHAddress.toLowerCase()) {
         let WETH9PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
@@ -22460,18 +22512,18 @@ define("@staking/staking",(require, exports)=>{
         let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
         let WETH9LatestRoundData = await aggregator.latestRoundData();
         let WETH9PriceFeedDecimals = await aggregator.decimals();
-        let WETH9USDPrice = new import_eth_wallet7.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+        let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
         let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
         if (!rewardReserves)
           return "";
-        let rewardPrice = new import_eth_wallet7.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+        let rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
         let otherTokenAddress = !lpObject.token0 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
         let lockedLPReserves = await getReservesByPair(lpObject.address, WETHAddress, otherTokenAddress);
         if (!lockedLPReserves)
           return "";
-        let otherTokenPrice = new import_eth_wallet7.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
-        let lockedLPPrice = new import_eth_wallet7.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet7.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
-        APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+        let otherTokenPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
+        let lockedLPPrice = new import_eth_wallet8.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet8.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
+        APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
       }
     }
     return APR;
@@ -22482,20 +22534,20 @@ define("@staking/staking",(require, exports)=>{
     let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
     if (!assetTokenPrice || !rewardPrice)
       return "";
-    let wallet = import_eth_wallet7.Wallet.getInstance();
+    let wallet = import_eth_wallet8.Wallet.getInstance();
     let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultObject.address);
     let vaultTokenTotalSupply = await vault.totalSupply();
     let lpAssetBalance = await vault.lpAssetBalance();
-    let lpToAssetRatio = new import_eth_wallet7.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
-    let VaultTokenPrice = new import_eth_wallet7.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
-    APR = new import_eth_wallet7.BigNumber(rewardOption.rate).times(new import_eth_wallet7.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet7.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+    let lpToAssetRatio = new import_eth_wallet8.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
+    let VaultTokenPrice = new import_eth_wallet8.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
+    APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
     return APR;
   };
   var withdrawToken = async (contractAddress, callback) => {
     if (!contractAddress)
       return;
     try {
-      let wallet = import_eth_wallet7.Wallet.getInstance();
+      let wallet = import_eth_wallet8.Wallet.getInstance();
       let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
       let receipt = await timeIsMoney.withdraw(true);
       return receipt;
@@ -22509,7 +22561,7 @@ define("@staking/staking",(require, exports)=>{
     if (!contractAddress)
       return;
     try {
-      let wallet = import_eth_wallet7.Wallet.getInstance();
+      let wallet = import_eth_wallet8.Wallet.getInstance();
       let rewards = new import_time_is_money_sdk.Contracts.Rewards(wallet, contractAddress);
       let receipt = await rewards.claim();
       return receipt;
@@ -22583,7 +22635,7 @@ define("@staking/staking",(require, exports)=>{
   // src/staking/staking.tsx
   var import_assets5 = __toModule(__require("@staking/assets"));
   var import_moment3 = __toModule(require_moment());
-  var import_eth_wallet9 = __toModule(__require("@ijstech/eth-wallet"));
+  var import_eth_wallet10 = __toModule(__require("@ijstech/eth-wallet"));
 
   // src/result/result.tsx
   var import_components3 = __toModule(__require("@ijstech/components"));
@@ -22838,7 +22890,7 @@ define("@staking/staking",(require, exports)=>{
   ], Result);
 
   // src/config.ts
-  var import_eth_wallet8 = __toModule(__require("@ijstech/eth-wallet"));
+  var import_eth_wallet9 = __toModule(__require("@ijstech/eth-wallet"));
   var import_global5 = __toModule(__require("@staking/global"));
   var StakingCampaignInfoByChainId = {
     1: [],
@@ -23071,7 +23123,7 @@ define("@staking/staking",(require, exports)=>{
             {
               rewardAddress: "0xa083B9B2adE0B235176ee4227Bc50f459fD15700",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet8.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
               rateDesc: "1 LP : 0.699 OSWAP",
               claimStartTime: 1630416600
             }
@@ -23100,7 +23152,7 @@ define("@staking/staking",(require, exports)=>{
             {
               rewardAddress: "0x84DD0bde1A040989dfC5C23C9644a691505880D3",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet8.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
               rateDesc: "1 LP : 0.0595 OSWAP",
               claimStartTime: 1630416600
             }
@@ -23121,7 +23173,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x4710f86E0B87854F955295Eb555f8cd2a546365f",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(1).div(3).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
               rateDesc: "3 IF : 1 OSWAP"
             }]
           },
@@ -23153,7 +23205,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0xe935d589550B5fe6A4FBcb203fE1B0ab74441Eec",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(1).div(5).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(5).toFixed(),
               rateDesc: "5 C98 : 1 OSWAP"
             }]
           },
@@ -23165,7 +23217,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x174D975e3f99d865C5383F931F8eb84B0fA8Ed8e",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(3).div(5).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(3).div(5).toFixed(),
               rateDesc: "5 C98 : 3 OSWAP"
             }]
           }
@@ -23185,7 +23237,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x646C5e3Ec40706372243accF2D457D9162553685",
               tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-              rate: new import_eth_wallet8.BigNumber(1).div(3).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
               rateDesc: "3 OAX : 1 OSWAP"
             }]
           },
@@ -23373,7 +23425,7 @@ define("@staking/staking",(require, exports)=>{
             {
               rewardAddress: "0x2Cf36cC2656993347c3280c95b232E7e8Eef7ed6",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet8.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
               rateDesc: "1 LP : 0.699 OSWAP",
               claimStartTime: 1630416600
             }
@@ -23401,7 +23453,7 @@ define("@staking/staking",(require, exports)=>{
             {
               rewardAddress: "0x0d92ec679BbaB83e0c1839e82fc4a400c2ee6E5F",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet8.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
               rateDesc: "1 LP : 0.0595 OSWAP",
               claimStartTime: 1630416600
             }
@@ -23422,7 +23474,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x6127A08a2Adc8ee56611c92Ff3f46A8b78C1C25F",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(1).div(3).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
               rateDesc: "3 IF : 1 OSWAP"
             }]
           },
@@ -23454,7 +23506,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0xc51ab6Cf26E762Af0f0f9515352f3f4904948b12",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(1).div(5).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(5).toFixed(),
               rateDesc: "5 C98 : 1 OSWAP"
             }]
           },
@@ -23466,7 +23518,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x25baBD786b14dc375baEC8a7AEcEE1226B08EfCd",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(3).div(5).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(3).div(5).toFixed(),
               rateDesc: "5 C98 : 3 OSWAP"
             }]
           }
@@ -23486,7 +23538,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0xEF4Faa48Ee32E2D47503a821eb7E8607D52489AC",
               tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-              rate: new import_eth_wallet8.BigNumber(1).div(3).toFixed(),
+              rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
               rateDesc: "3 OAX : 1 OSWAP"
             }]
           },
@@ -23767,7 +23819,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0x557EF6a7fc628eB9f399DAAe4b89EB2f8a443154",
               tokenAddress: "0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c",
-              rate: `${new import_eth_wallet8.BigNumber("5010000000000").shiftedBy(18 - 6)}`,
+              rate: `${new import_eth_wallet9.BigNumber("5010000000000").shiftedBy(18 - 6)}`,
               rateDesc: "1 vtUSDC : 5.01 OSWAP"
             }]
           },
@@ -23779,7 +23831,7 @@ define("@staking/staking",(require, exports)=>{
             rewardOptions: [{
               rewardAddress: "0xEB94cc393530b19B293b97b40dc97fD39072b6A6",
               tokenAddress: "0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c",
-              rate: `${new import_eth_wallet8.BigNumber("12027000000000").shiftedBy(18 - 6)}`,
+              rate: `${new import_eth_wallet9.BigNumber("12027000000000").shiftedBy(18 - 6)}`,
               rateDesc: "1 vtUSDC : 12.027 OSWAP"
             }]
           }
@@ -24531,9 +24583,9 @@ define("@staking/staking",(require, exports)=>{
           (0, import_store5.setTokenMap)();
         };
         const selectedProvider = localStorage.getItem("walletProvider");
-        const isValidProvider = Object.values(import_eth_wallet9.WalletPlugin).includes(selectedProvider);
-        if (!import_eth_wallet9.Wallet.getInstance().chainId) {
-          import_eth_wallet9.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
+        const isValidProvider = Object.values(import_eth_wallet10.WalletPlugin).includes(selectedProvider);
+        if (!import_eth_wallet10.Wallet.getInstance().chainId) {
+          import_eth_wallet10.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
         }
         if ((0, import_store5.hasWallet)() && isValidProvider) {
           await (0, import_store5.connectWallet)(selectedProvider, {
@@ -24773,7 +24825,7 @@ define("@staking/staking",(require, exports)=>{
             for (const o of options) {
               const _totalLocked = await getStakingTotalLocked(o.stakingAddress, o.decimalsOffset);
               totalLocked[o.stakingAddress] = _totalLocked;
-              const optionQty = new import_eth_wallet9.BigNumber(o.maxTotalLock).minus(_totalLocked);
+              const optionQty = new import_eth_wallet10.BigNumber(o.maxTotalLock).minus(_totalLocked);
               const lbOptionQty = document.querySelector(`#lb-${o.stakingAddress}`);
               if (lbOptionQty) {
                 lbOptionQty.caption = `${(0, import_global6.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
@@ -24993,7 +25045,7 @@ define("@staking/staking",(require, exports)=>{
             const optionAvailableQtyLabel = await import_components5.Label.create();
             optionAvailableQtyLabel.classList.add("ml-auto");
             optionAvailableQtyLabel.id = `lb-${option.stakingAddress}`;
-            optionAvailableQtyLabel.caption = `${(0, import_global6.formatNumber)(new import_eth_wallet9.BigNumber(option.maxTotalLock).minus(totalLocked[option.stakingAddress]))} ${lockedTokenSymbol}`;
+            optionAvailableQtyLabel.caption = `${(0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.maxTotalLock).minus(totalLocked[option.stakingAddress]))} ${lockedTokenSymbol}`;
             const claimStakedRow = await import_components5.HStack.create();
             claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
               class: "mr-025",
@@ -25061,7 +25113,7 @@ define("@staking/staking",(require, exports)=>{
                 const btnClaim = await import_components5.Button.create({
                   rightIcon: { spin: true, visible: false },
                   caption: `Claim ${rewardSymbol}`,
-                  enabled: !(!passClaimStartTime || new import_eth_wallet9.BigNumber(reward.claimable).isZero())
+                  enabled: !(!passClaimStartTime || new import_eth_wallet10.BigNumber(reward.claimable).isZero())
                 });
                 btnClaim.id = `btnClaim-${idx2}-${option.stakingAddress}`;
                 btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
@@ -25100,7 +25152,7 @@ define("@staking/staking",(require, exports)=>{
             ] : [];
             const getAprValue = (rewardOption) => {
               if (rewardOption && aprInfo && aprInfo[rewardOption.tokenAddress]) {
-                const apr = new import_eth_wallet9.BigNumber(aprInfo[rewardOption.tokenAddress]).times(100).toFormat(2, import_eth_wallet9.BigNumber.ROUND_DOWN);
+                const apr = new import_eth_wallet10.BigNumber(aprInfo[rewardOption.tokenAddress]).times(100).toFormat(2, import_eth_wallet10.BigNumber.ROUND_DOWN);
                 return `${apr}%`;
               }
               return "";
@@ -25205,7 +25257,7 @@ define("@staking/staking",(require, exports)=>{
             }), /* @__PURE__ */ this.$render("i-panel", {
               class: isClaim ? "hidden" : "custom-divider"
             }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
-              const earnedQty = (0, import_global6.formatNumber)(new import_eth_wallet9.BigNumber(option.totalCredit).times(rewardOption.rate));
+              const earnedQty = (0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.totalCredit).times(rewardOption.rate));
               const earnedSymbol = this.getRewardToken(rewardOption.tokenAddress).symbol || "";
               return /* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
