@@ -21970,5 +21970,970 @@ StakingBlock = __decorateClass([
 //! moment.js
 //! momentjs.com
 //! version : 2.29.1
+"lbDuration",
+        class: "text-yellow",
+        caption: "-"
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        class: "w-50"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        caption: "Max QTY."
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbMaxQty",
+        class: "text-yellow",
+        caption: "-"
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        class: "w-50"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        caption: "Available QTY."
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbAvailableQty",
+        class: "text-yellow",
+        caption: "-"
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        id: "colYourStakeQty",
+        class: "w-50"
+      }), /* @__PURE__ */ this.$render("i-panel", {
+        id: "sectionEarnedQty",
+        class: "w-100"
+      }), /* @__PURE__ */ this.$render("i-vstack", {
+        id: "colIndividualCap",
+        class: "w-50"
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        class: "w-100"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        caption: "Maturity"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbMaturity",
+        class: "text-yellow",
+        caption: "-"
+      }))), /* @__PURE__ */ this.$render("i-panel", {
+        id: "sectionTokenInput",
+        class: "input--token-box mb-1"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        class: "mb-075"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        caption: "Input"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbBalance",
+        class: "text-yellow text-normal w-100 text-right",
+        caption: "-"
+      })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-input", {
+        id: "inputAmount",
+        inputType: "number",
+        placeholder: "0.0",
+        class: "token-input w-100 mr-025",
+        width: "100%",
+        onChanged: () => this.onInputAmount()
+      }), /* @__PURE__ */ this.$render("i-button", {
+        id: "btnMax",
+        caption: "Max",
+        enabled: false,
+        class: "btn-os btn-max",
+        onClick: () => this.setMaxBalance()
+      }), /* @__PURE__ */ this.$render("i-hstack", {
+        id: "rowImgToken",
+        verticalAlignment: "center"
+      }))), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-button", {
+        id: "btnApprove",
+        caption: "Approve Token",
+        enabled: false,
+        visible: false,
+        width: "100%",
+        class: "btn-os btn-approve mb-075 mr-025",
+        rightIcon: { spin: true, visible: false },
+        onClick: () => this.onApproveToken()
+      }), /* @__PURE__ */ this.$render("i-button", {
+        id: "btnStake",
+        caption: "Stake",
+        enabled: false,
+        width: "100%",
+        rightIcon: { spin: true, visible: false },
+        class: "btn-os btn-approve mb-075"
+      }))))))), /* @__PURE__ */ this.$render("i-modal", {
+        id: "modalActions",
+        class: "custom-modal",
+        closeIcon: { name: "times" }
+      }, /* @__PURE__ */ this.$render("i-panel", {
+        class: "manage-header"
+      }, /* @__PURE__ */ this.$render("i-icon", {
+        width: 24,
+        height: 24,
+        name: "times",
+        class: "cursor-pointer",
+        onClick: () => this.closeModal()
+      })), /* @__PURE__ */ this.$render("i-panel", {
+        class: "i-modal_content"
+      }, /* @__PURE__ */ this.$render("i-panel", {
+        class: "mt-1"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        verticalAlignment: "center",
+        horizontalAlignment: "center",
+        class: "mb-1"
+      }, /* @__PURE__ */ this.$render("i-image", {
+        width: 80,
+        height: 80,
+        url: import_assets3.default.fullPath("img/warning-icon.png")
+      })), /* @__PURE__ */ this.$render("i-panel", {
+        class: "description-time"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        id: "lbTimer",
+        caption: "Please note that you will forfeit your rewards by unstaking. You are not eligible for rewards until"
+      })), /* @__PURE__ */ this.$render("i-hstack", {
+        verticalAlignment: "center",
+        horizontalAlignment: "center",
+        class: "group-btn"
+      }, /* @__PURE__ */ this.$render("i-button", {
+        caption: "Cancel",
+        class: "btn-os btn-cancel",
+        onClick: () => this.closeModal()
+      }), /* @__PURE__ */ this.$render("i-button", {
+        caption: "Proceed",
+        class: "btn-os btn-submit",
+        onClick: () => this.onStake()
+      }))))));
+    }
+  };
+  ManageStake = __decorateClass([
+    (0, import_components5.customElements)("manage-stake")
+  ], ManageStake);
+
+  // src/staking/staking.tsx
+  import_components6.Styles.Theme.applyTheme(import_components6.Styles.Theme.darkTheme);
+  var StakingBlock = class extends import_components6.Module {
+    constructor(parent, options) {
+      super(parent, options);
+      this.campaigns = [];
+      this.listAprTimer = [];
+      this.listActiveTimer = [];
+      this.tokenIcon = tokenIcon || "img/swap/openswap.png";
+      this.tokenMap = {};
+      this.registerEvent = () => {
+        this.$eventBus.register(this, import_global4.EventId.IsWalletConnected, this.onWalletConnect);
+        this.$eventBus.register(this, import_global4.EventId.IsWalletDisconnected, this.onWalletConnect);
+        this.$eventBus.register(this, import_global4.EventId.chainChanged, this.onChainChange);
+        this.$eventBus.register(this, import_global4.EventId.EmitButtonStatus, this.updateButtonStatus);
+      };
+      this.onWalletConnect = async (connected) => {
+        this.onSetupPage(connected);
+      };
+      this.onChainChange = () => {
+        this.onSetupPage((0, import_store5.isWalletConnected)());
+      };
+      this.initWalletData = async () => {
+        let accountsChangedEventHandler = async (account) => {
+          (0, import_store5.setTokenMap)();
+        };
+        let chainChangedEventHandler = async (hexChainId) => {
+          (0, import_store5.setTokenMap)();
+        };
+        const selectedProvider = localStorage.getItem("walletProvider");
+        const isValidProvider = Object.values(import_eth_wallet6.WalletPlugin).includes(selectedProvider);
+        if (!import_eth_wallet6.Wallet.getInstance().chainId) {
+          import_eth_wallet6.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
+        }
+        if ((0, import_store5.hasWallet)() && isValidProvider) {
+          await (0, import_store5.connectWallet)(selectedProvider, {
+            "accountsChanged": accountsChangedEventHandler,
+            "chainChanged": chainChangedEventHandler
+          });
+        }
+      };
+      this.onSetupPage = async (connected, hideLoading) => {
+        if (!hideLoading) {
+          this.loadingElm.visible = true;
+        }
+        if (!connected) {
+          this.stakingElm.clearInnerHTML();
+          this.stakingElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+            width: "100%",
+            margin: { top: 100 },
+            verticalAlignment: "center",
+            horizontalAlignment: "center"
+          }, /* @__PURE__ */ this.$render("i-label", {
+            caption: "Please connect with your wallet!"
+          })));
+          this.loadingElm.visible = false;
+          return;
+        }
+        this.campaigns = await getAllCampaignsInfo(import_store5.StakingCampaignByChainId);
+        await this.renderCampaigns(hideLoading);
+        if (!hideLoading) {
+          this.loadingElm.visible = false;
+        }
+      };
+      this.showResultMessage = (result, status, content) => {
+        if (!result)
+          return;
+        let params = { status };
+        if (status === "success") {
+          params.txtHash = content;
+        } else {
+          params.content = content;
+        }
+        result.message = __spreadValues({}, params);
+        result.showModal();
+      };
+      this.onStake = async (option) => {
+        const manageStake = new ManageStake();
+        manageStake.onRefresh = () => this.onSetupPage((0, import_store5.isWalletConnected)(), true);
+        this.manageStakeElm.clearInnerHTML();
+        this.manageStakeElm.appendChild(manageStake);
+        manageStake.showModal(option, `#btn-${option.address}`);
+      };
+      this.onUnstake = async (btnUnstake, data) => {
+        if (data.option.mode !== "Claim") {
+          this.onStake(data.option);
+        } else {
+          this.showResultMessage(this.stakingResult, "warning", `Unstake ${data.lockedTokenSymbol}`);
+          const callBack = async (err, reply) => {
+            if (err) {
+              this.showResultMessage(this.stakingResult, "error", err);
+            } else {
+              this.showResultMessage(this.stakingResult, "success", reply);
+              btnUnstake.enabled = false;
+              btnUnstake.rightIcon.visible = true;
+            }
+          };
+          const confirmationCallBack = async (receipt) => {
+            await this.onSetupPage((0, import_store5.isWalletConnected)(), true);
+            if (!btnUnstake)
+              return;
+            btnUnstake.rightIcon.visible = false;
+            btnUnstake.enabled = true;
+          };
+          (0, import_global4.registerSendTxEvents)({
+            transactionHash: callBack,
+            confirmation: confirmationCallBack
+          });
+          withdrawToken(data.option.address, callBack);
+        }
+      };
+      this.onClaim = async (btnClaim, data) => {
+        this.showResultMessage(this.stakingResult, "warning", `Claim ${data.rewardSymbol}`);
+        const callBack = async (err, reply) => {
+          if (err) {
+            this.showResultMessage(this.stakingResult, "error", err);
+          } else {
+            this.showResultMessage(this.stakingResult, "success", reply);
+            btnClaim.enabled = false;
+            btnClaim.rightIcon.visible = true;
+          }
+        };
+        const confirmationCallBack = async (receipt) => {
+          await this.onSetupPage((0, import_store5.isWalletConnected)(), true);
+          if (!btnClaim)
+            return;
+          btnClaim.rightIcon.visible = false;
+          btnClaim.enabled = true;
+        };
+        (0, import_global4.registerSendTxEvents)({
+          transactionHash: callBack,
+          confirmation: confirmationCallBack
+        });
+        claimToken(data.reward.address, callBack);
+      };
+      this.removeTimer = () => {
+        for (const timer of this.listAprTimer) {
+          clearInterval(timer);
+        }
+        this.listAprTimer = [];
+        for (const timer of this.listActiveTimer) {
+          clearInterval(timer);
+        }
+        this.listActiveTimer = [];
+      };
+      this.getRewardToken = (tokenAddress) => {
+        return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress == null ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
+      };
+      this.getLPToken = (campaign, token, chainId) => {
+        if (campaign.getTokenURL) {
+          window.open(campaign.getTokenURL);
+        } else {
+          window.open(getTokenUrl ? getTokenUrl : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+        }
+      };
+      this.onLoad = () => {
+        this.onSetupPage((0, import_store5.isWalletConnected)());
+      };
+      this.init = () => {
+        super.init();
+        this.stakingResult = new Result();
+        this.stakingComponent.appendChild(this.stakingResult);
+        this.initWalletData();
+        (0, import_store5.setDataFromSCConfig)(import_store5.Networks, import_store5.InfuraId);
+        (0, import_store5.setCurrentChainId)((0, import_store5.getDefaultChainId)());
+      };
+      this.updateButtonStatus = async (data) => {
+        if (data) {
+          const { value, key, text } = data;
+          const elm = this.stakingElm.querySelector(key);
+          if (elm) {
+            elm.rightIcon.visible = value;
+            elm.caption = text;
+          }
+        }
+      };
+      this.getBtnText = (key, text) => {
+        const data = (0, import_store5.getStakingStatus)(key);
+        if (data.value) {
+          return data.text;
+        }
+        return text;
+      };
+      this.renderCampaigns = async (hideLoading) => {
+        if (!hideLoading) {
+          this.stakingElm.clearInnerHTML();
+        }
+        this.tokenMap = (0, import_store5.getTokenMap)();
+        const chainId = (0, import_store5.getChainId)();
+        const network = (0, import_store5.getNetworkInfo)(chainId);
+        if (!this.noCampaignSection) {
+          this.noCampaignSection = await import_components6.Panel.create();
+          this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+            class: "no-campaign"
+          }, /* @__PURE__ */ this.$render("i-image", {
+            url: import_assets4.default.fullPath("img/staking/TrollTrooper.svg")
+          }), /* @__PURE__ */ this.$render("i-label", {
+            caption: "No Campaigns"
+          })));
+        }
+        this.noCampaignSection.visible = false;
+        if (this.campaigns && !this.campaigns.length) {
+          this.stakingElm.clearInnerHTML();
+          this.stakingElm.appendChild(this.noCampaignSection);
+          this.noCampaignSection.visible = true;
+          return;
+        }
+        let nodeItems = [];
+        this.removeTimer();
+        for (let idx = 0; idx < this.campaigns.length; idx++) {
+          const campaign = this.campaigns[idx];
+          const containerSection = await import_components6.Panel.create();
+          containerSection.id = `campaign-${idx}`;
+          containerSection.classList.add("container-custom");
+          const options = campaign.options;
+          const stakingInfo = options ? options[0] : null;
+          let lpTokenData = {};
+          let vaultTokenData = {};
+          if (stakingInfo && stakingInfo.tokenAddress) {
+            if (stakingInfo.lockTokenType == import_store5.LockTokenType.LP_Token) {
+              lpTokenData = {
+                "object": await getLPObject(stakingInfo.tokenAddress)
+              };
+            } else if (stakingInfo.lockTokenType == import_store5.LockTokenType.VAULT_Token) {
+              vaultTokenData = {
+                "object": await getVaultObject(stakingInfo.tokenAddress)
+              };
+            }
+          }
+          const tokenInfo = {
+            tokenAddress: campaign.tokenAddress,
+            lpToken: lpTokenData,
+            vaultToken: vaultTokenData
+          };
+          const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
+          const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
+          const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+          const isSimplified = campaign.isSimplified;
+          const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
+          const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
+          let isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+          let isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
+          let totalTokens = 0;
+          let availableQty = 0;
+          let totalLocked = {};
+          const totalTokensLabel = await import_components6.Label.create();
+          const availableQtyLabel = await import_components6.Label.create();
+          const activeTimerRow = await import_components6.VStack.create();
+          const endHours = await import_components6.Label.create();
+          const endDays = await import_components6.Label.create();
+          const endMins = await import_components6.Label.create();
+          const stickerSection = await import_components6.Panel.create();
+          const stickerLabel = await import_components6.Label.create();
+          const stickerIcon = await import_components6.Icon.create();
+          const simplifiedRow = await import_components6.VStack.create();
+          stickerSection.classList.add("sticker");
+          endHours.classList.add("timer-value");
+          endDays.classList.add("timer-value");
+          endMins.classList.add("timer-value");
+          if (isSimplified) {
+            simplifiedRow.classList.add("simplified");
+            simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+              class: "simplified-description"
+            }, /* @__PURE__ */ this.$render("i-label", {
+              caption: `Don't have ${network == null ? void 0 : network.name} ${lockedTokenSymbol}?`
+            }), /* @__PURE__ */ this.$render("i-image", {
+              width: 25,
+              height: 25,
+              url: import_assets4.default.fullPath((network == null ? void 0 : network.img) || "")
+            })));
+            simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+              class: "simplified-link"
+            }, /* @__PURE__ */ this.$render("i-label", {
+              caption: `Flip ERC20 ${lockedTokenSymbol} to ${network == null ? void 0 : network.name} ${lockedTokenSymbol}`
+            }), /* @__PURE__ */ this.$render("i-label", {
+              link: { href: campaign.getTokenURL2 },
+              caption: "HERE"
+            }), /* @__PURE__ */ this.$render("i-label", {
+              caption: "now!"
+            })));
+          }
+          const setAvailableQty = async () => {
+            if (!(0, import_store5.isWalletConnected)())
+              return;
+            let _totalTokens = 0;
+            let _availableQty = 0;
+            for (const o of options) {
+              const _totalLocked = await getStakingTotalLocked(o.address, o.decimalsOffset);
+              totalLocked[o.address] = _totalLocked;
+              const optionQty = new import_eth_wallet6.BigNumber(o.maxTotalLock).minus(_totalLocked);
+              const lbOptionQty = document.querySelector(`#lb-${o.address}`);
+              if (lbOptionQty) {
+                lbOptionQty.caption = `${(0, import_global4.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
+              }
+              const btnStake = document.querySelector(`#btn-${o.address}`);
+              const isStaking = (0, import_store5.getStakingStatus)(`#btn-${o.address}`).value;
+              if (btnStake && btnStake.caption === "Stake") {
+                btnStake.enabled = !isStaking && !(!isStarted || o.mode === "Stake" && (optionQty.lte(0) || isClosed));
+              } else if (btnStake && btnStake.caption === "Unstake") {
+                btnStake.enabled = !isStaking && o.stakeQty != "0";
+              }
+              const stickerOption = document.querySelector(`#sticker-${o.address}`);
+              if (optionQty.lte(0) && stickerOption) {
+                stickerOption.visible = true;
+              }
+              _totalTokens += parseFloat(o.maxTotalLock);
+              _availableQty += parseFloat(o.maxTotalLock) - parseFloat(_totalLocked);
+            }
+            ;
+            totalTokens = _totalTokens;
+            availableQty = _availableQty;
+            totalTokensLabel.caption = `${(0, import_global4.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
+            availableQtyLabel.caption = `${(0, import_global4.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+            if (isClosed) {
+              if (stickerLabel.caption !== "Closed") {
+                stickerSection.classList.add("closed");
+                stickerSection.classList.remove("sold-out");
+                stickerLabel.caption = "Closed";
+                stickerIcon.name = "check-square";
+              }
+            } else if (availableQty === 0) {
+              if (stickerLabel.caption !== "Sold Out") {
+                stickerLabel.caption = "Sold Out";
+                stickerIcon.name = "star";
+                stickerSection.classList.add("sold-out");
+              }
+            } else {
+              if (stickerLabel.caption !== "Active") {
+                stickerLabel.caption = "Active";
+                stickerIcon.name = "star";
+              }
+            }
+          };
+          const setEndRemainingTime = () => {
+            isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+            isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
+            if (isStarted && !isClosed) {
+              activeTimerRow.visible = true;
+            } else {
+              activeTimerRow.visible = false;
+            }
+            if (activeEndTime == 0) {
+              endDays.caption = endHours.caption = endMins.caption = "0";
+              if (this.listActiveTimer[idx]) {
+                clearInterval(this.listActiveTimer[idx]);
+              }
+            } else {
+              const days = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "days");
+              const hours = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "hours") - days * 24;
+              const mins = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "minutes") - days * 24 * 60 - hours * 60;
+              endDays.caption = `${days}`;
+              endHours.caption = `${hours}`;
+              endMins.caption = `${mins}`;
+            }
+          };
+          const setTimer = () => {
+            setEndRemainingTime();
+            setAvailableQty();
+          };
+          setTimer();
+          this.listActiveTimer.push(setInterval(setTimer, 2e3));
+          stickerSection.appendChild(/* @__PURE__ */ this.$render("i-vstack", {
+            class: "sticker-text"
+          }, stickerIcon, stickerLabel));
+          activeTimerRow.appendChild(/* @__PURE__ */ this.$render("i-vstack", null, /* @__PURE__ */ this.$render("i-label", {
+            caption: "Time until the staking campaign ends:"
+          }), /* @__PURE__ */ this.$render("i-panel", {
+            margin: { top: 4 },
+            class: "custom-timer"
+          }, endDays, /* @__PURE__ */ this.$render("i-label", {
+            caption: "D",
+            class: "timer-unit"
+          }), endHours, /* @__PURE__ */ this.$render("i-label", {
+            caption: "H",
+            class: "timer-unit"
+          }), endMins, /* @__PURE__ */ this.$render("i-label", {
+            caption: "M",
+            class: "timer-unit"
+          }))));
+          totalTokensLabel.classList.add("bold");
+          availableQtyLabel.classList.add("bold");
+          totalTokensLabel.caption = `${(0, import_global4.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
+          availableQtyLabel.caption = `${(0, import_global4.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+          totalTokensLabel.classList.add("text-right");
+          availableQtyLabel.classList.add("text-right");
+          const rowItems = [
+            {
+              title: "Total Tokens:",
+              value: totalTokensLabel.caption,
+              isHidden: isSimplified,
+              img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
+              elm: totalTokensLabel
+            },
+            {
+              title: "Available QTY:",
+              value: availableQtyLabel.caption,
+              isHidden: isSimplified,
+              img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
+              elm: availableQtyLabel
+            },
+            {
+              title: "Campaign Start:",
+              value: (0, import_moment4.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
+              isHidden: isStarted || isSimplified,
+              img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
+            },
+            {
+              title: "Vesting Period:",
+              value: campaign.vestingPeriod,
+              isHidden: !campaign.vestingPeriod || isSimplified,
+              img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
+            }
+          ];
+          nodeItems.push(containerSection);
+          containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+            class: "row-custom",
+            width: "100%",
+            wrap: "wrap"
+          }, /* @__PURE__ */ this.$render("i-vstack", {
+            class: "column-custom"
+          }, /* @__PURE__ */ this.$render("i-vstack", {
+            class: "banner",
+            verticalAlignment: "space-between"
+          }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
+            verticalAlignment: "center",
+            class: "campaign-name"
+          }, /* @__PURE__ */ this.$render("i-image", {
+            width: "25px",
+            height: "25px",
+            url: import_assets4.default.fullPath(this.tokenIcon)
+          }), /* @__PURE__ */ this.$render("i-label", {
+            caption: campaign.campaignName
+          })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
+            class: "campaign-description",
+            caption: campaign.campaignDesc
+          })), /* @__PURE__ */ this.$render("i-panel", null, rowItems.filter((f) => !f.isHidden).map((v) => {
+            return /* @__PURE__ */ this.$render("i-hstack", {
+              verticalAlignment: "start",
+              horizontalAlignment: "space-between",
+              class: "row-item"
+            }, /* @__PURE__ */ this.$render("i-hstack", {
+              class: "col-item"
+            }, /* @__PURE__ */ this.$render("i-image", {
+              class: "custom-icon",
+              url: v.img
+            }), /* @__PURE__ */ this.$render("i-label", {
+              class: "no-wrap",
+              caption: v.title
+            })), /* @__PURE__ */ this.$render("i-vstack", {
+              width: "auto",
+              horizontalAlignment: "end"
+            }, v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
+              class: "bold text-right",
+              caption: v.value
+            })));
+          })), simplifiedRow, /* @__PURE__ */ this.$render("i-hstack", {
+            verticalAlignment: "center",
+            class: "get-token",
+            onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId)
+          }, /* @__PURE__ */ this.$render("i-label", {
+            class: "bold",
+            caption: `Get ${lockedTokenSymbol}`
+          }), lockedTokenIconPaths.map((v) => {
+            return /* @__PURE__ */ this.$render("i-image", {
+              width: 25,
+              height: 25,
+              url: import_assets4.default.fullPath(v)
+            });
+          }), /* @__PURE__ */ this.$render("i-icon", {
+            name: "external-link-alt",
+            width: "14",
+            height: "14",
+            fill: "#fff"
+          })), activeTimerRow)), await Promise.all(options.map(async (option) => {
+            const stickerOptionSection = await import_components6.Panel.create();
+            stickerOptionSection.classList.add("sticker", "sold-out", "hidden", "sticker-text");
+            stickerOptionSection.id = `sticker-${option.address}`;
+            stickerOptionSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+              class: "sticker-text"
+            }, /* @__PURE__ */ this.$render("i-icon", {
+              name: "star"
+            }), /* @__PURE__ */ this.$render("i-label", {
+              caption: "Sold Out"
+            })));
+            const key = `btn-${option.address}`;
+            const btnStake = await import_components6.Button.create({
+              caption: this.getBtnText(key, "Stake"),
+              rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
+            });
+            const btnUnstake = await import_components6.Button.create({
+              caption: this.getBtnText(key, "Unstake"),
+              rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
+            });
+            if (option.mode === "Stake") {
+              btnUnstake.visible = false;
+              btnStake.id = key;
+              btnStake.enabled = !isClosed;
+              btnStake.classList.add("btn-os", "btn-stake");
+              btnStake.onClick = () => this.onStake(option);
+            } else {
+              btnStake.visible = false;
+              btnUnstake.id = key;
+              btnUnstake.classList.add("btn-os", "btn-stake");
+              btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
+            }
+            const isClaim = option.mode === "Claim";
+            const rewardOptions = !isClaim ? option.rewards : [];
+            const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {};
+            const lpRewardTokenIconPath = !isClaim && rewardToken.address ? (0, import_store5.getTokenIconPath)(rewardToken, chainId) : "";
+            let aprInfo = {};
+            const optionAvailableQtyLabel = await import_components6.Label.create();
+            optionAvailableQtyLabel.classList.add("ml-auto");
+            optionAvailableQtyLabel.id = `lb-${option.address}`;
+            optionAvailableQtyLabel.caption = `${(0, import_global4.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]))} ${lockedTokenSymbol}`;
+            const claimStakedRow = await import_components6.HStack.create();
+            claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
+              class: "mr-025",
+              caption: "You Staked:"
+            }));
+            claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
+              class: "ml-auto",
+              caption: `${(0, import_global4.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
+            }));
+            const rowRewardsLocked = await import_components6.Panel.create();
+            const rowRewardsVesting = await import_components6.Panel.create();
+            const rowRewardsVestingEnd = await import_components6.Panel.create();
+            const rowRewardsClaimable = await import_components6.Panel.create();
+            const rowRewardsClaimBtn = await import_components6.Panel.create();
+            if (isClaim) {
+              claimStakedRow.classList.add("mb-1");
+              for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
+                const reward = option.rewardsData[idx2];
+                const rewardToken2 = this.getRewardToken(reward.rewardTokenAddress);
+                const rewardSymbol = rewardToken2.symbol || "";
+                rowRewardsLocked.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  horizontalAlignment: "space-between"
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  caption: `${rewardSymbol} Locked:`
+                }), /* @__PURE__ */ this.$render("i-label", {
+                  class: "bold",
+                  caption: `${(0, import_global4.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
+                })));
+                rowRewardsVesting.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  horizontalAlignment: "space-between"
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  caption: `${rewardSymbol} Vesting Start:`
+                }), /* @__PURE__ */ this.$render("i-label", {
+                  class: "bold",
+                  caption: reward.vestingStart ? reward.vestingStart.format("YYYY-MM-DD HH:mm:ss") : "TBC"
+                })));
+                rowRewardsVestingEnd.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  horizontalAlignment: "space-between"
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  caption: `${rewardSymbol} Vesting End:`
+                }), /* @__PURE__ */ this.$render("i-label", {
+                  class: "bold",
+                  caption: reward.vestingEnd ? reward.vestingEnd.format("YYYY-MM-DD HH:mm:ss") : "TBC"
+                })));
+                const passClaimStartTime = !(reward.claimStartTime && (0, import_moment4.default)().diff(import_moment4.default.unix(reward.claimStartTime)) < 0);
+                let rewardClaimable = `0 ${rewardSymbol}`;
+                if (passClaimStartTime) {
+                  rewardClaimable = `${(0, import_global4.formatNumber)(reward.claimable)} ${rewardSymbol}`;
+                }
+                let startClaimingText = "";
+                if (!(!reward.claimStartTime || passClaimStartTime)) {
+                  const claimStart = import_moment4.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
+                  startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+                }
+                rowRewardsClaimable.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  horizontalAlignment: "space-between"
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  caption: `${rewardSymbol} Claimable:`
+                }), /* @__PURE__ */ this.$render("i-label", {
+                  class: "bold",
+                  caption: rewardClaimable
+                }), startClaimingText ? /* @__PURE__ */ this.$render("i-label", {
+                  caption: startClaimingText
+                }) : []));
+                const btnClaim = await import_components6.Button.create({
+                  rightIcon: { spin: true, visible: false },
+                  caption: `Claim ${rewardSymbol}`,
+                  enabled: !(!passClaimStartTime || new import_eth_wallet6.BigNumber(reward.claimable).isZero())
+                });
+                btnClaim.id = `btnClaim-${idx2}-${option.address}`;
+                btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
+                btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
+                rowRewardsClaimBtn.appendChild(btnClaim);
+              }
+              ;
+            } else {
+              rowRewardsLocked.visible = false;
+              rowRewardsVesting.visible = false;
+              rowRewardsVestingEnd.visible = false;
+              rowRewardsClaimable.visible = false;
+              rowRewardsClaimBtn.visible = false;
+            }
+            const rowOptionItems = !isClaim ? [
+              {
+                title: "Max. QTY",
+                value: `${(0, import_global4.formatNumber)(option.maxTotalLock)} ${lockedTokenSymbol}`,
+                isHidden: isSimplified
+              },
+              {
+                title: "Available QTY",
+                value: optionAvailableQtyLabel.caption,
+                isHidden: isSimplified,
+                elm: optionAvailableQtyLabel
+              },
+              {
+                title: "Individual Cap",
+                value: `${(0, import_global4.formatNumber)(option.perAddressCap)} ${lockedTokenSymbol}`
+              },
+              {
+                title: "Campaign Start Date",
+                value: (0, import_global4.formatDate)(option.startOfEntryPeriod, "DD MMM YYYY"),
+                isHidden: !isSimplified
+              }
+            ] : [];
+            const getAprValue = (rewardOption) => {
+              if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+                const apr = new import_eth_wallet6.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, import_eth_wallet6.BigNumber.ROUND_DOWN);
+                return `${apr}%`;
+              }
+              return "";
+            };
+            const durationDays = option.minLockTime / (60 * 60 * 24);
+            return /* @__PURE__ */ this.$render("i-vstack", {
+              class: "column-custom"
+            }, /* @__PURE__ */ this.$render("i-panel", {
+              class: "bg-color"
+            }, stickerOptionSection, /* @__PURE__ */ this.$render("i-panel", {
+              class: "header-info"
+            }, /* @__PURE__ */ this.$render("i-hstack", {
+              verticalAlignment: "center",
+              horizontalAlignment: "center"
+            }, lockedTokenIconPaths.map((v) => {
+              return /* @__PURE__ */ this.$render("i-image", {
+                width: 25,
+                height: 25,
+                url: import_assets4.default.fullPath(v)
+              });
+            }), /* @__PURE__ */ this.$render("i-label", {
+              class: "bold",
+              caption: durationDays < 1 ? "< 1 Day" : `${durationDays} Days`
+            })), /* @__PURE__ */ this.$render("i-label", {
+              caption: option.customDesc
+            })), /* @__PURE__ */ this.$render("i-panel", {
+              class: "img-custom"
+            }, option.lockTokenType === import_store5.LockTokenType.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {
+              class: "group-img"
+            }, /* @__PURE__ */ this.$render("i-image", {
+              width: 75,
+              height: 75,
+              url: import_assets4.default.fullPath(lpRewardTokenIconPath)
+            }), /* @__PURE__ */ this.$render("i-icon", {
+              name: "plus",
+              width: 16,
+              height: 16
+            }), /* @__PURE__ */ this.$render("i-image", {
+              width: 75,
+              height: 75,
+              url: import_assets4.default.fullPath(this.tokenIcon)
+            })) : /* @__PURE__ */ this.$render("i-image", {
+              width: 75,
+              height: 75,
+              url: import_assets4.default.fullPath(this.tokenIcon)
+            })), /* @__PURE__ */ this.$render("i-panel", {
+              class: "info-stake"
+            }, btnStake, await Promise.all(rewardOptions.map(async (rewardOption) => {
+              const labelApr = await import_components6.Label.create();
+              labelApr.classList.add("ml-auto");
+              const rateDesc = `1 ${(0, import_store5.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet6.BigNumber(rewardOption.multiplier).toFixed()} ${(0, import_store5.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+              const updateApr = async () => {
+                if (option.lockTokenType === import_store5.LockTokenType.ERC20_Token) {
+                  const apr = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
+                  if (!isNaN(parseFloat(apr))) {
+                    aprInfo[rewardOption.rewardTokenAddress] = apr;
+                  }
+                } else if (option.lockTokenType === import_store5.LockTokenType.LP_Token) {
+                  if (rewardOption.referencePair) {
+                    aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, durationDays);
+                  }
+                } else {
+                  aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, durationDays);
+                }
+                const aprValue2 = getAprValue(rewardOption);
+                if (isSimplified) {
+                  labelApr.caption = aprValue2;
+                } else {
+                  labelApr.caption = aprValue2 ? `(${aprValue2} APR) ${rateDesc}` : rateDesc;
+                }
+              };
+              updateApr();
+              this.listAprTimer.push(setInterval(updateApr, 1e4));
+              const aprValue = getAprValue(rewardOption);
+              if (isSimplified) {
+                labelApr.caption = aprValue;
+                return /* @__PURE__ */ this.$render("i-vstack", null, /* @__PURE__ */ this.$render("i-hstack", {
+                  horizontalAlignment: "space-between"
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  class: "mr-025",
+                  caption: "Rate"
+                }), /* @__PURE__ */ this.$render("i-label", {
+                  class: "bold",
+                  caption: rateDesc
+                })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
+                  class: "mr-025",
+                  caption: "APR"
+                }), labelApr));
+              }
+              labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
+              return /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: "Rate"
+              }), labelApr);
+            })), rowOptionItems.filter((f) => !f.isHidden).map((v) => {
+              return /* @__PURE__ */ this.$render("i-hstack", {
+                horizontalAlignment: "space-between"
+              }, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: v.title
+              }), v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
+                caption: v.value
+              }));
+            }), /* @__PURE__ */ this.$render("i-panel", {
+              class: isClaim ? "hidden" : "custom-divider"
+            }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
+              const earnedQty = (0, import_global4.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
+              const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
+              return /* @__PURE__ */ this.$render("i-hstack", {
+                horizontalAlignment: "space-between"
+              }, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: "You Earned"
+              }), /* @__PURE__ */ this.$render("i-label", {
+                caption: `${earnedQty} ${earnedSymbol}`
+              }));
+            })), /* @__PURE__ */ this.$render("i-label", {
+              class: "view-contract pointer",
+              margin: { top: isClaim ? 0 : 16 },
+              onClick: () => (0, import_store5.viewOnExplorerByAddress)(chainId, option.address)
+            }, /* @__PURE__ */ this.$render("i-label", {
+              caption: "View Contract"
+            }), /* @__PURE__ */ this.$render("i-icon", {
+              name: "external-link-alt",
+              width: "14",
+              height: "14",
+              fill: "#fff",
+              class: "inline-block"
+            }))));
+          }))));
+        }
+        ;
+        this.stakingElm.clearInnerHTML();
+        this.stakingElm.append(this.noCampaignSection, ...nodeItems);
+      };
+      this.$eventBus = import_components6.application.EventBus;
+      this.registerEvent();
+    }
+    validateConfig() {
+    }
+    async getData() {
+    }
+    async setData() {
+    }
+    async getTag() {
+      return this.tag;
+    }
+    async setTag(value) {
+    }
+    async edit() {
+    }
+    async confirm() {
+    }
+    async discard() {
+    }
+    async config() {
+    }
+    render() {
+      return /* @__PURE__ */ this.$render("i-panel", {
+        id: "stakingComponent",
+        class: "staking-component"
+      }, /* @__PURE__ */ this.$render("i-panel", {
+        class: "staking-layout"
+      }, /* @__PURE__ */ this.$render("i-vstack", {
+        id: "loadingElm",
+        class: "i-loading-overlay",
+        minHeight: 500
+      }, /* @__PURE__ */ this.$render("i-vstack", {
+        class: "i-loading-spinner",
+        horizontalAlignment: "center",
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-icon", {
+        class: "i-loading-spinner_icon",
+        image: { url: import_assets4.default.fullPath("img/loading.svg"), width: 36, height: 36 }
+      }), /* @__PURE__ */ this.$render("i-label", {
+        caption: "Loading...",
+        font: { color: "#FD4A4C", size: "1.5em" },
+        class: "i-loading-spinner_text"
+      }))), /* @__PURE__ */ this.$render("i-panel", {
+        id: "stakingElm",
+        class: "wrapper"
+      })), /* @__PURE__ */ this.$render("i-panel", {
+        id: "manageStakeElm"
+      }));
+    }
+  };
+  StakingBlock = __decorateClass([
+    (0, import_components6.customElements)("i-section-staking")
+  ], StakingBlock);
+
+  // src/demo/index.tsx
+  var StakingEarn = class extends import_components7.Module {
+    constructor(parent, options) {
+      super(parent, options);
+    }
+    async init() {
+      super.init();
+      const stakingUI = await StakingBlock.create({});
+      this.stakingElm.appendChild(stakingUI);
+    }
+    render() {
+      return /* @__PURE__ */ this.$render("i-panel", {
+        class: "staking-rewards"
+      }, /* @__PURE__ */ this.$render("i-panel", {
+        id: "stakingElm"
+      }));
+    }
+  };
+  StakingEarn = __decorateClass([
+    import_components7.customModule
+  ], StakingEarn);
+})();
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! moment.js
+//! momentjs.com
+//! version : 2.29.1
   
   });
