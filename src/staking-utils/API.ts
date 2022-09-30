@@ -14,12 +14,11 @@ import {
   USDPeggedTokenAddressMap,
   ToUSDPriceFeedAddressesMap,
   WETHByChainId,
-  getChainId,
   tokenPriceAMMReference,
   StakingCampaign,
   Staking,
   Reward
-} from "../store";
+} from "@staking/store";
 
 export const getTokenPrice = async (token: string) => { // in USD value
   let wallet = Wallet.getInstance();

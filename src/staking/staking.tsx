@@ -1,6 +1,6 @@
 import { Styles, Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType, getStakingStatus, getNetworkExplorerName } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -21,9 +21,10 @@ import Assets from '@staking/assets';
 import moment from 'moment';
 import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import { Result } from '../result';
-import { getTokenUrl, manageStakeUrl, tokenIcon } from '../config';
+import { getTokenUrl, tokenIcon } from '../config';
 Styles.Theme.applyTheme(Styles.Theme.darkTheme);
 import './staking.css';
+import { ManageStake } from './manageStake';
 
 declare global {
 	namespace JSX {
@@ -42,9 +43,11 @@ export class StakingBlock extends Module implements PageBlock {
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaigns: any = [];
+	private stakingComponent: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
 	private stakingResult: Result;
+	private manageStakeElm: Panel;
 	private listAprTimer: any = [];
 	private listActiveTimer: any = [];
 	private tokenIcon = tokenIcon || 'img/swap/openswap.png';
@@ -95,6 +98,7 @@ export class StakingBlock extends Module implements PageBlock {
 		this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
 		this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
 		this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
+		this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus);
 	}
 
 	private onWalletConnect = async (connected: boolean) => {
@@ -154,17 +158,17 @@ export class StakingBlock extends Module implements PageBlock {
 		result.showModal();
 	}
 
-	private onStake = (stakingAddress: string) => {
-		if (manageStakeUrl) {
-			window.location.assign(`${manageStakeUrl}=${stakingAddress}`);
-		} else {
-			window.location.assign(`#/staking/manage-stake?address=${stakingAddress}`);
-		}
+	private onStake = async (option: any) => {
+		const manageStake = new ManageStake();
+		manageStake.onRefresh = () => this.onSetupPage(isWalletConnected(), true);
+		this.manageStakeElm.clearInnerHTML();
+		this.manageStakeElm.appendChild(manageStake);
+		manageStake.showModal(option, `#btn-${option.address}`);
 	}
 
 	private onUnstake = async (btnUnstake: Button, data: any) => {
 		if (data.option.mode !== 'Claim') {
-			this.onStake(data.option.address);
+			this.onStake(data.option);
 		} else {
 			this.showResultMessage(this.stakingResult, 'warning', `Unstake ${data.lockedTokenSymbol}`);
 			const callBack = async (err: any, reply: any) => {
@@ -217,7 +221,7 @@ export class StakingBlock extends Module implements PageBlock {
 			confirmation: confirmationCallBack
 		});
 
-		claimToken(data.reward.rewardAddress, callBack);
+		claimToken(data.reward.address, callBack);
 	}
 
 	private removeTimer = () => {
@@ -250,11 +254,30 @@ export class StakingBlock extends Module implements PageBlock {
 	init = () => {
 		super.init();
 		this.stakingResult = new Result();
-		this.appendChild(this.stakingResult);
+		this.stakingComponent.appendChild(this.stakingResult);
 		this.initWalletData();
 		setDataFromSCConfig(Networks, InfuraId);
 		setCurrentChainId(getDefaultChainId());
 	}
+
+	private updateButtonStatus = async (data: any) => {
+    if (data) {
+      const { value, key, text } = data;
+      const elm = this.stakingElm.querySelector(key) as Button;
+      if (elm) {
+        elm.rightIcon.visible = value;
+        elm.caption = text;
+      }
+    }
+  }
+
+	private getBtnText = (key: string, text: string) => {
+    const data = getStakingStatus(key);
+    if (data.value) {
+      return data.text;
+    }
+    return text;
+  }
 
 	private renderCampaigns = async (hideLoading?: boolean) => {
 		if (!hideLoading) {
@@ -363,10 +386,11 @@ export class StakingBlock extends Module implements PageBlock {
 						lbOptionQty.caption = `${formatNumber(optionQty)} ${lockedTokenSymbol}`;
 					}
 					const btnStake = document.querySelector(`#btn-${o.address}`) as Button;
+					const isStaking = getStakingStatus(`#btn-${o.address}`).value;
 					if (btnStake && btnStake.caption === 'Stake') {
-						btnStake.enabled = !(!isStarted || o.mode === 'Stake' && (optionQty.lte(0) || isClosed));
+						btnStake.enabled = !isStaking && !(!isStarted || o.mode === 'Stake' && (optionQty.lte(0) || isClosed));
 					} else if (btnStake && btnStake.caption === 'Unstake') {
-						btnStake.enabled = o.stakeQty != "0";
+						btnStake.enabled = !isStaking && o.stakeQty != "0";
 					}
 					const stickerOption = document.querySelector(`#sticker-${o.address}`) as Panel;
 					if (optionQty.lte(0) && stickerOption) {
@@ -540,21 +564,24 @@ export class StakingBlock extends Module implements PageBlock {
 								</i-panel>
 							)
 
-							const btnStake = await Button.create();
+							const key = `btn-${option.address}`;
+							const btnStake = await Button.create({
+								caption: this.getBtnText(key, 'Stake'),
+								rightIcon: { spin: true, visible: getStakingStatus(key).value }
+							});
 							const btnUnstake = await Button.create({
-								rightIcon: { spin: true, visible: false }
+								caption: this.getBtnText(key, 'Unstake'),
+								rightIcon: { spin: true, visible: getStakingStatus(key).value }
 							});
 							if (option.mode === 'Stake') {
 								btnUnstake.visible = false;
-								btnStake.id = `btn-${option.address}`;
+								btnStake.id = key;
 								btnStake.enabled = !isClosed;
-								btnStake.caption = 'Stake';
 								btnStake.classList.add('btn-os', 'btn-stake');
-								btnStake.onClick = () => this.onStake(option.address);
+								btnStake.onClick = () => this.onStake(option);
 							} else {
 								btnStake.visible = false;
-								btnUnstake.id = `btn-${option.address}`;
-								btnUnstake.caption = 'Unstake';
+								btnUnstake.id = key;
 								btnUnstake.classList.add('btn-os', 'btn-stake');
 								btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
 							}
@@ -583,8 +610,8 @@ export class StakingBlock extends Module implements PageBlock {
 							if (isClaim) {
 								claimStakedRow.classList.add('mb-1');
 								for (let idx = 0; idx < option.rewardsData.length; idx++) {
-									const reward = option.rewardsData[idx]
-									const rewardToken = this.getRewardToken(reward.tokenAddress);
+									const reward = option.rewardsData[idx];
+									const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
 									const rewardSymbol = rewardToken.symbol || '';
 									rowRewardsLocked.appendChild(
 										<i-hstack horizontalAlignment="space-between">
@@ -793,7 +820,7 @@ export class StakingBlock extends Module implements PageBlock {
 
 	render() {
 		return (
-			<i-panel class="staking-component">
+			<i-panel id="stakingComponent" class="staking-component">
 				<i-panel class="staking-layout">
 					<i-vstack id="loadingElm" class="i-loading-overlay" minHeight={500}>
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
@@ -809,6 +836,7 @@ export class StakingBlock extends Module implements PageBlock {
 					</i-vstack>
 					<i-panel id="stakingElm" class="wrapper" />
 				</i-panel>
+				<i-panel id="manageStakeElm" />
 			</i-panel>
 		)
 	}
