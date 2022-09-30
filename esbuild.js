@@ -32,13 +32,7 @@ const GlobalBuildModuleList = [
     sourceFilePath: 'src/store/index.ts',
     distFilePath: './dist/store/index.js',
     moduleName: '@staking/store'
-  },
-  // demo
-  {
-    sourceFilePath: 'src/demo/index.tsx',
-    distFilePath: './dist/demo/index.js',
-    moduleName: '@staking/demo'
-  },
+  }
 ]
 
 const GlobalModuleESBuildConfig = {
@@ -119,7 +113,7 @@ async function buildLocalModule() {
       '@staking/global',
       '@staking/store',
     ],
-    outdir: 'dist/staking',
+    outdir: 'dist/demo',
     bundle: true,
     minify: false,
     format: 'iife',
