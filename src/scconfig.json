@@ -21,7 +21,7 @@
     "@ijstech/eth-wallet-web3modal": "{LIB}/lib/eth-wallet-web3modal/index.js",
     "@staking/sdks": "{root}/sdks/index.js",
     "@staking/assets": "{root}/assets/index.js",
-    "@openswap/global": "{root}/global/index.js",
-    "@openswap/store": "{root}/store/index.js"
+    "@staking/global": "{root}/global/index.js",
+    "@staking/store": "{root}/store/index.js"
   }
 }

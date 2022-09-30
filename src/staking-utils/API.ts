@@ -7,10 +7,7 @@ import { Contracts as CrossChainContracts } from "@ijstech/cross-chain-bridge";
 import { 
   ERC20ApprovalModel, 
   IERC20ApprovalEventOptions, 
-  ITokenObject, 
-  RewardOption,
-  StakingCampaignOption,
-  StakingCampaignInfo
+  ITokenObject,
 } from "../global";
 import { 
   getTokenMap,

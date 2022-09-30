@@ -1,4 +1,6 @@
-import { BigNumber } from "@ijstech/eth-wallet"
+import { BigNumber } from "@ijstech/eth-wallet";
+
+const baseUrl = 'https://openswap.xyz/#';
 
 enum LockTokenType {
   ERC20_Token,
@@ -53,7 +55,7 @@ const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {
     {
       customName: 'OpenSwap 1st Anniversary<br>Birthday Staking Campaign',
       customDesc: 'Wow, Time Flies.. Let\'s Go Bridge Soon<br>Stake Now!',
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      getTokenURL: `${baseUrl}/swap`,
       stakings: [{
         address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
         lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
@@ -100,7 +102,7 @@ const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {
     {
       customName: 'Testing 1',
       customDesc: 'line 1<br>line 2',
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      getTokenURL: `${baseUrl}/swap`,
       stakings: [{
         address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
         lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
@@ -155,6 +157,7 @@ export {
   StakingCampaign,
   Staking,
   Reward,
+  LockTokenType,
   StakingCampaignByChainId,
   USDPeggedTokenAddressMap
 }

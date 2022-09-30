@@ -1,6 +1,6 @@
 import { Styles, Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -13,7 +13,6 @@ import {
 	getAllCampaignsInfo,
 } from '@staking/staking-utils';
 import {
-	StakingType,
 	getLockedTokenObject,
 	getLockedTokenSymbol,
 	getLockedTokenIconPaths,
@@ -293,11 +292,11 @@ export class StakingBlock extends Module implements PageBlock {
 			let lpTokenData: any = {};
 			let vaultTokenData: any = {};
 			if (stakingInfo && stakingInfo.tokenAddress) {
-				if (stakingInfo.lockTokenType == StakingType.LP_Token) {
+				if (stakingInfo.lockTokenType == LockTokenType.LP_Token) {
 					lpTokenData = {
 						'object': await getLPObject(stakingInfo.tokenAddress)
 					}
-				} else if (stakingInfo.lockTokenType == StakingType.VAULT_Token) {
+				} else if (stakingInfo.lockTokenType == LockTokenType.VAULT_Token) {
 					vaultTokenData = {
 						'object': await getVaultObject(stakingInfo.tokenAddress)
 					}
@@ -689,7 +688,7 @@ export class StakingBlock extends Module implements PageBlock {
 									</i-panel>
 									<i-panel class="img-custom">
 										{
-											(option.lockTokenType === StakingType.LP_Token && rewardOptions.length === 2)
+											(option.lockTokenType === LockTokenType.LP_Token && rewardOptions.length === 2)
 												?
 												<i-panel class="group-img">
 													<i-image width={75} height={75} url={Assets.fullPath(lpRewardTokenIconPath)} />
@@ -708,12 +707,12 @@ export class StakingBlock extends Module implements PageBlock {
 												labelApr.classList.add('ml-auto');
 												const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 												const updateApr = async () => {
-													if (option.lockTokenType === StakingType.ERC20_Token) {
+													if (option.lockTokenType === LockTokenType.ERC20_Token) {
 														const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
 														if (!isNaN(parseFloat(apr))) {
 															aprInfo[rewardOption.rewardTokenAddress] = apr;
 														}
-													} else if (option.lockTokenType === StakingType.LP_Token) {
+													} else if (option.lockTokenType === LockTokenType.LP_Token) {
 														if (rewardOption.referencePair) {
 															aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, durationDays);
 														}

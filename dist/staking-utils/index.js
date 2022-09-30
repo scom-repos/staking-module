@@ -21411,14 +21411,6 @@ var getERC20Allowance = async (token, spenderAddress) => {
   return allowance;
 };
 
-// src/global/interfaces/staking.ts
-var StakingType;
-(function(StakingType2) {
-  StakingType2[StakingType2["ERC20_Token"] = 0] = "ERC20_Token";
-  StakingType2[StakingType2["LP_Token"] = 1] = "LP_Token";
-  StakingType2[StakingType2["VAULT_Token"] = 2] = "VAULT_Token";
-})(StakingType || (StakingType = {}));
-
 // src/global/index.ts
 var QueueType;
 (function(QueueType2) {
@@ -21608,6 +21600,7 @@ var tokenPriceAMMReference = {
 
 // src/store/data/staking.ts
 var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var baseUrl = "https://openswap.xyz/#";
 var LockTokenType;
 (function(LockTokenType2) {
   LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
@@ -21619,7 +21612,7 @@ var StakingCampaignByChainId = {
     {
       customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
       customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      getTokenURL: `${baseUrl}/swap`,
       stakings: [
         {
           address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
@@ -21668,7 +21661,7 @@ var StakingCampaignByChainId = {
     {
       customName: "Testing 1",
       customDesc: "line 1<br>line 2",
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      getTokenURL: `${baseUrl}/swap`,
       stakings: [
         {
           address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
@@ -22284,7 +22277,10 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
     let campaignObj = {
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
+      vestingPeriod: stakingCampaignInfo.vestingPeriod,
+      isSimplified: stakingCampaignInfo.isSimplified,
       getTokenURL: stakingCampaignInfo.getTokenURL,
+      getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo
     };
     if (durationOptionsWithExtendedInfo.length > 0) {
