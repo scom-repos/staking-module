@@ -90,6 +90,53 @@ const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {
         }]  
       }]
     }
+  ],
+  43113: [
+    {
+      customName: 'Testing 1',
+      customDesc: 'line 1<br>line 2',
+      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      stakings: [{
+        address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
+        lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+        minLockTime: new BigNumber("300"), //in second, 5 mins.
+        entryStart: new BigNumber("1662624142"), //unix
+        entryEnd: new BigNumber("1682899200"), //unix
+        perAddressCap: new BigNumber("100000"),
+        maxTotalLock: new BigNumber("100000"),
+        customDesc: "Stake OSWAP, Earn OSWAP",
+        lockTokenType: LockTokenType.ERC20_Token,
+        rewards: [{
+          address: '0xA4B199b1B4C7C4Ef2d10E1eA11A9DE7F60e84164',
+          rewardTokenAddress: '0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C',
+          multiplier: new BigNumber("0.03"), 
+          initialReward: new BigNumber("1"),
+          vestingPeriod: new BigNumber("0"),
+          claimDeadline: new BigNumber("253402214400"),
+          admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3",
+        }]  
+      },
+      {
+        address: '0xf9dA3743c57ec64505F27B9822BaFB0f8ab5E90d',
+        lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+        minLockTime: new BigNumber("86400"), //in second, 1 day.
+        entryStart: new BigNumber("1662624142"), //unix
+        entryEnd: new BigNumber("1682899200"), //unix
+        perAddressCap: new BigNumber("100000"),
+        maxTotalLock: new BigNumber("100000"),
+        customDesc: "Stake OSWAP, Earn OSWAP",
+        lockTokenType: LockTokenType.ERC20_Token,
+        rewards: [{
+          address: '0x8820b70EC48B259D83C6E4BB95E5e9955C39F670',
+          rewardTokenAddress: '0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C',
+          multiplier: new BigNumber("0.1"), 
+          initialReward: new BigNumber("1"),
+          vestingPeriod: new BigNumber("0"),
+          claimDeadline: new BigNumber("253402214400"),
+          admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3",
+        }]  
+      }]
+    }
   ]
 }
 
