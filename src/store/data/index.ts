@@ -10,7 +10,6 @@ export {
 } from './tokens';
 
 export {CoreContractAddressesByChainId} from './core';
-export {ProviderConfig, Market, ProviderConfigMap, availableMarketsByChainId} from './swap';
 
 export {
   USDPeggedTokenAddressMap

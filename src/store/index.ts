@@ -15,7 +15,6 @@ import {
   CoreContractAddressesByChainId,
   ChainNativeTokenByChainId,
   WETHByChainId,
-  availableMarketsByChainId,
   getTokenIconPath,
 } from './data';
 
@@ -38,12 +37,6 @@ export {
 
   //core
   CoreContractAddressesByChainId,
-
-  //swap
-  ProviderConfig,
-  Market,
-  ProviderConfigMap,
-  availableMarketsByChainId,
   
   //staking
   USDPeggedTokenAddressMap,
@@ -151,34 +144,12 @@ export function getErc20(address: string) {
   return new Erc20(wallet, address);
 }
 
-export function getAvailableMarkets() {
-  let chainId = getChainId();
-  let markets = availableMarketsByChainId[chainId];
-  return markets;
-}
-
 export const isExpertMode = (): boolean => {
   return state.isExpertMode;
 }
 
 export function toggleExpertMode() {
   state.isExpertMode = !state.isExpertMode
-}
-
-export const getSlippageTolerance = (): any => {
-  return state.slippageTolerance
-};
-
-export const setSlippageTolerance = (value: any) => {
-  state.slippageTolerance = value
-}
-
-export const getTransactionDeadline = (): any => {
-  return state.transactionDeadline;
-}
-
-export const setTransactionDeadline = (value: any) => {
-  state.transactionDeadline = value
 }
 
 export const getTokenList = (chainId: number) => {

@@ -6142,10 +6142,8 @@ __export(exports, {
   DefaultERC20Tokens: () => DefaultERC20Tokens,
   DefaultTokens: () => DefaultTokens,
   InfuraId: () => InfuraId,
-  Market: () => Market,
   MockOracleMap: () => MockOracleMap,
   Networks: () => Networks,
-  ProviderConfigMap: () => ProviderConfigMap,
   ToUSDPriceFeedAddressesMap: () => ToUSDPriceFeedAddressesMap,
   TrollManagementActionType: () => TrollManagementActionType,
   TrollStatus: () => TrollStatus,
@@ -6157,12 +6155,10 @@ __export(exports, {
   VaultType: () => VaultType,
   WETHByChainId: () => WETHByChainId,
   addUserTokens: () => addUserTokens,
-  availableMarketsByChainId: () => availableMarketsByChainId,
   baseRoute: () => baseRoute,
   connectWallet: () => connectWallet,
   crossChainNativeTokenList: () => crossChainNativeTokenList,
   getAddresses: () => getAddresses,
-  getAvailableMarkets: () => getAvailableMarkets,
   getBridgeVaultVersion: () => getBridgeVaultVersion,
   getChainId: () => getChainId,
   getChainNativeToken: () => getChainNativeToken,
@@ -6178,7 +6174,6 @@ __export(exports, {
   getOpenSwapToken: () => getOpenSwapToken,
   getSiteEnv: () => getSiteEnv,
   getSiteSupportedNetworks: () => getSiteSupportedNetworks,
-  getSlippageTolerance: () => getSlippageTolerance,
   getTokenBalance: () => getTokenBalance,
   getTokenBalances: () => getTokenBalances,
   getTokenDecimals: () => getTokenDecimals,
@@ -6188,7 +6183,6 @@ __export(exports, {
   getTokenMap: () => getTokenMap,
   getTokenObject: () => getTokenObject,
   getTokensDataList: () => getTokensDataList,
-  getTransactionDeadline: () => getTransactionDeadline,
   getUserTokens: () => getUserTokens,
   getWETH: () => getWETH,
   getWallet: () => getWallet,
@@ -6205,10 +6199,8 @@ __export(exports, {
   setCurrentChainId: () => setCurrentChainId,
   setDataFromSCConfig: () => setDataFromSCConfig,
   setSiteEnv: () => setSiteEnv,
-  setSlippageTolerance: () => setSlippageTolerance,
   setTokenBalances: () => setTokenBalances,
   setTokenMap: () => setTokenMap,
-  setTransactionDeadline: () => setTransactionDeadline,
   setUserTokens: () => setUserTokens,
   state: () => state,
   switchNetwork: () => switchNetwork,
@@ -6223,7 +6215,7 @@ __export(exports, {
 });
 var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
 var import_global2 = __toModule(require("@staking/global"));
-var import_assets2 = __toModule(require("@staking/assets"));
+var import_assets = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
 
 // src/store/wallet.ts
@@ -6899,231 +6891,6 @@ var CoreContractAddressesByChainId = {
   }
 };
 
-// src/store/data/swap.ts
-var import_assets = __toModule(require("@staking/assets"));
-var Market;
-(function(Market2) {
-  Market2[Market2["OPENSWAP"] = 0] = "OPENSWAP";
-  Market2[Market2["UNISWAP"] = 1] = "UNISWAP";
-  Market2[Market2["SUSHISWAP"] = 2] = "SUSHISWAP";
-  Market2[Market2["PANCAKESWAPV1"] = 3] = "PANCAKESWAPV1";
-  Market2[Market2["PANCAKESWAP"] = 4] = "PANCAKESWAP";
-  Market2[Market2["BAKERYSWAP"] = 5] = "BAKERYSWAP";
-  Market2[Market2["BURGERSWAP"] = 6] = "BURGERSWAP";
-  Market2[Market2["IFSWAPV1"] = 7] = "IFSWAPV1";
-  Market2[Market2["OPENSWAPV1"] = 8] = "OPENSWAPV1";
-  Market2[Market2["HYBRID"] = 9] = "HYBRID";
-  Market2[Market2["MIXED_QUEUE"] = 10] = "MIXED_QUEUE";
-  Market2[Market2["GROUP_QUEUE"] = 11] = "GROUP_QUEUE";
-  Market2[Market2["QUICKSWAP"] = 12] = "QUICKSWAP";
-  Market2[Market2["BISWAP"] = 13] = "BISWAP";
-  Market2[Market2["PANGOLIN"] = 14] = "PANGOLIN";
-  Market2[Market2["TRADERJOE"] = 15] = "TRADERJOE";
-  Market2[Market2["SPIRITSWAP"] = 16] = "SPIRITSWAP";
-  Market2[Market2["SPOOKYSWAP"] = 17] = "SPOOKYSWAP";
-  Market2[Market2["PEGGED_QUEUE"] = 18] = "PEGGED_QUEUE";
-  Market2[Market2["HAKUSWAP"] = 19] = "HAKUSWAP";
-  Market2[Market2["JETSWAP"] = 20] = "JETSWAP";
-  Market2[Market2["IFSWAPV3"] = 21] = "IFSWAPV3";
-})(Market || (Market = {}));
-var ProviderConfigMap = {
-  OpenSwap: {
-    caption: "OpenSwap",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 0,
-    key: "OpenSwap",
-    dexId: 1,
-    supportedChains: [42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338]
-  },
-  Uniswap: {
-    caption: "Uniswap",
-    image: import_assets.default.fullPath("img/swap/uniswap-logo.svg"),
-    marketCode: 1,
-    key: "Uniswap",
-    dexId: 10,
-    supportedChains: [1, 42]
-  },
-  SushiSwap: {
-    caption: "SushiSwap",
-    image: import_assets.default.fullPath("img/swap/sushiswap-logo.svg"),
-    marketCode: 2,
-    key: "SushiSwap",
-    dexId: 8,
-    supportedChains: [1, 42, 137, 250, 43113, 43114]
-  },
-  PancakeSwap: {
-    caption: "PancakeSwap",
-    image: import_assets.default.fullPath("img/swap/pancakeswap.svg"),
-    marketCode: 4,
-    key: "PancakeSwap",
-    dexId: 2,
-    supportedChains: [56, 97]
-  },
-  PancakeSwapV1: {
-    caption: "PancakeSwapV1",
-    image: import_assets.default.fullPath("img/pancakeswap.svg"),
-    marketCode: 3,
-    key: "PancakeSwapV1"
-  },
-  BakerySwap: {
-    caption: "BakerySwap",
-    image: import_assets.default.fullPath("img/swap/bakeryswap.svg"),
-    marketCode: 5,
-    key: "BakerySwap",
-    dexId: 3,
-    supportedChains: [56, 97]
-  },
-  BurgerSwap: {
-    caption: "BurgerSwap",
-    image: import_assets.default.fullPath("img/swap/burgerswap.png"),
-    marketCode: 6,
-    key: "BurgerSwap",
-    dexId: 4
-  },
-  Oracle: {
-    caption: "Oracle",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 10,
-    key: "Oracle",
-    dexId: 5,
-    supportedChains: [56, 97, 43113, 43114]
-  },
-  PeggedOracle: {
-    caption: "Pegged Queue",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 18,
-    key: "PeggedOracle"
-  },
-  GroupQueue: {
-    caption: "Group Queue",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 11,
-    key: "GroupQueue"
-  },
-  IFSwapV1: {
-    caption: "IFSwapV1",
-    image: import_assets.default.fullPath("img/swap/IFSwapV1.png"),
-    marketCode: 7,
-    key: "IFSwapV1",
-    dexId: 7,
-    supportedChains: [56]
-  },
-  IFSwapV3: {
-    caption: "IFSwapV3",
-    image: import_assets.default.fullPath("img/swap/IFSwapV1.png"),
-    marketCode: 21,
-    key: "IFSwapV3",
-    dexId: 18,
-    supportedChains: [56]
-  },
-  OpenSwapV1: {
-    caption: "OpenSwapV1",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 8,
-    key: "OpenSwapV1"
-  },
-  Hybrid: {
-    caption: "Smart Router",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 9,
-    key: "Hybrid",
-    dexId: 0,
-    supportedChains: [42, 56, 97, 43113, 43114]
-  },
-  QuickSwap: {
-    caption: "QuickSwap",
-    image: import_assets.default.fullPath("img/swap/quickswap-logo.png"),
-    marketCode: 12,
-    key: "QuickSwap",
-    dexId: 9,
-    supportedChains: [137]
-  },
-  BiSwap: {
-    caption: "BiSwap",
-    image: import_assets.default.fullPath("img/swap/biswapsvg.svg"),
-    marketCode: 13,
-    key: "BiSwap",
-    dexId: 11,
-    supportedChains: [56]
-  },
-  Pangolin: {
-    caption: "Pangolin",
-    image: import_assets.default.fullPath("img/swap/pangolin.svg"),
-    marketCode: 14,
-    key: "Pangolin",
-    dexId: 12,
-    supportedChains: [43113, 43114]
-  },
-  TraderJoe: {
-    caption: "TraderJoe",
-    image: import_assets.default.fullPath("img/swap/traderjoe.svg"),
-    marketCode: 15,
-    key: "TraderJoe",
-    dexId: 13,
-    supportedChains: [43114]
-  },
-  SpiritSwap: {
-    caption: "SpiritSwap",
-    image: import_assets.default.fullPath("img/swap/spiritswap-logo.svg"),
-    marketCode: 16,
-    key: "SpiritSwap",
-    dexId: 15,
-    supportedChains: [250]
-  },
-  SpookySwap: {
-    caption: "SpookySwap",
-    image: import_assets.default.fullPath("img/swap/spookyswap-logo.svg"),
-    marketCode: 17,
-    key: "SpookySwap",
-    dexId: 14,
-    supportedChains: [250]
-  }
-};
-var availableMarketsByChainId = {
-  1: [
-    "Uniswap",
-    "SushiSwap"
-  ],
-  4: [
-    "OpenSwap",
-    "Uniswap",
-    "SushiSwap"
-  ],
-  42: [
-    "OpenSwap",
-    "Uniswap",
-    "SushiSwap"
-  ],
-  56: [
-    "OpenSwap",
-    "PancakeSwap",
-    "BakerySwap",
-    "IFSwapV1",
-    "BiSwap",
-    "IFSwapV3"
-  ],
-  97: [
-    "OpenSwap",
-    "PancakeSwap",
-    "BakerySwap",
-    "BurgerSwap"
-  ],
-  137: [
-    "SushiSwap",
-    "QuickSwap"
-  ],
-  1287: ["OpenSwap"],
-  1337: ["OpenSwap"],
-  31337: ["OpenSwap"],
-  80001: ["OpenSwap"],
-  43114: ["OpenSwap", "Pangolin", "TraderJoe", "SushiSwap"],
-  43113: ["Pangolin", "OpenSwap", "SushiSwap"],
-  250: ["SpiritSwap", "SpookySwap", "SushiSwap"],
-  4002: ["OpenSwap"],
-  13370: ["OpenSwap"],
-  338: ["OpenSwap"]
-};
-
 // src/store/data/staking.ts
 var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
 var LockTokenType;
@@ -7636,29 +7403,12 @@ function getErc20(address) {
   const wallet = getWallet();
   return new import_eth_wallet7.Erc20(wallet, address);
 }
-function getAvailableMarkets() {
-  let chainId = getChainId();
-  let markets = availableMarketsByChainId[chainId];
-  return markets;
-}
 var isExpertMode = () => {
   return state.isExpertMode;
 };
 function toggleExpertMode() {
   state.isExpertMode = !state.isExpertMode;
 }
-var getSlippageTolerance = () => {
-  return state.slippageTolerance;
-};
-var setSlippageTolerance = (value) => {
-  state.slippageTolerance = value;
-};
-var getTransactionDeadline = () => {
-  return state.transactionDeadline;
-};
-var setTransactionDeadline = (value) => {
-  state.transactionDeadline = value;
-};
 var getTokenList = (chainId) => {
   const tokenList = [...DefaultTokens[chainId]];
   const userCustomTokens = getUserTokens(chainId);
@@ -7802,11 +7552,11 @@ var getNetworkImg = (chainId) => {
   try {
     const network = getNetworkInfo(chainId);
     if (network) {
-      return import_assets2.default.fullPath(network.img);
+      return import_assets.default.fullPath(network.img);
     }
   } catch (e) {
   }
-  return import_assets2.default.fullPath("img/tokens/token-placeholder.svg");
+  return import_assets.default.fullPath("img/tokens/token-placeholder.svg");
 };
 var projectNativeToken = () => {
   let chainId = getChainId();
@@ -7912,7 +7662,7 @@ var getTokenIcon = (address) => {
   } else {
     tokenObject = tokenMap[address.toLowerCase()];
   }
-  return import_assets2.default.fullPath(getTokenIconPath(tokenObject, getChainId()));
+  return import_assets.default.fullPath(getTokenIconPath(tokenObject, getChainId()));
 };
 var tokenSymbol = (address) => {
   if (!address)

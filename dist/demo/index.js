@@ -21337,7 +21337,7 @@ var EventId;
 // src/store/index.ts
 var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
 var import_global2 = __toModule(require("@staking/global"));
-var import_assets2 = __toModule(require("@staking/assets"));
+var import_assets = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
 
 // src/store/wallet.ts
@@ -21492,187 +21492,6 @@ var tokenPriceAMMReference = {
   },
   43114: {
     "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93": "0xBeaE5AaA6d76ABe711336801D590850e18cB3C6b"
-  }
-};
-
-// src/store/data/swap.ts
-var import_assets = __toModule(require("@staking/assets"));
-var Market;
-(function(Market2) {
-  Market2[Market2["OPENSWAP"] = 0] = "OPENSWAP";
-  Market2[Market2["UNISWAP"] = 1] = "UNISWAP";
-  Market2[Market2["SUSHISWAP"] = 2] = "SUSHISWAP";
-  Market2[Market2["PANCAKESWAPV1"] = 3] = "PANCAKESWAPV1";
-  Market2[Market2["PANCAKESWAP"] = 4] = "PANCAKESWAP";
-  Market2[Market2["BAKERYSWAP"] = 5] = "BAKERYSWAP";
-  Market2[Market2["BURGERSWAP"] = 6] = "BURGERSWAP";
-  Market2[Market2["IFSWAPV1"] = 7] = "IFSWAPV1";
-  Market2[Market2["OPENSWAPV1"] = 8] = "OPENSWAPV1";
-  Market2[Market2["HYBRID"] = 9] = "HYBRID";
-  Market2[Market2["MIXED_QUEUE"] = 10] = "MIXED_QUEUE";
-  Market2[Market2["GROUP_QUEUE"] = 11] = "GROUP_QUEUE";
-  Market2[Market2["QUICKSWAP"] = 12] = "QUICKSWAP";
-  Market2[Market2["BISWAP"] = 13] = "BISWAP";
-  Market2[Market2["PANGOLIN"] = 14] = "PANGOLIN";
-  Market2[Market2["TRADERJOE"] = 15] = "TRADERJOE";
-  Market2[Market2["SPIRITSWAP"] = 16] = "SPIRITSWAP";
-  Market2[Market2["SPOOKYSWAP"] = 17] = "SPOOKYSWAP";
-  Market2[Market2["PEGGED_QUEUE"] = 18] = "PEGGED_QUEUE";
-  Market2[Market2["HAKUSWAP"] = 19] = "HAKUSWAP";
-  Market2[Market2["JETSWAP"] = 20] = "JETSWAP";
-  Market2[Market2["IFSWAPV3"] = 21] = "IFSWAPV3";
-})(Market || (Market = {}));
-var ProviderConfigMap = {
-  OpenSwap: {
-    caption: "OpenSwap",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 0,
-    key: "OpenSwap",
-    dexId: 1,
-    supportedChains: [42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338]
-  },
-  Uniswap: {
-    caption: "Uniswap",
-    image: import_assets.default.fullPath("img/swap/uniswap-logo.svg"),
-    marketCode: 1,
-    key: "Uniswap",
-    dexId: 10,
-    supportedChains: [1, 42]
-  },
-  SushiSwap: {
-    caption: "SushiSwap",
-    image: import_assets.default.fullPath("img/swap/sushiswap-logo.svg"),
-    marketCode: 2,
-    key: "SushiSwap",
-    dexId: 8,
-    supportedChains: [1, 42, 137, 250, 43113, 43114]
-  },
-  PancakeSwap: {
-    caption: "PancakeSwap",
-    image: import_assets.default.fullPath("img/swap/pancakeswap.svg"),
-    marketCode: 4,
-    key: "PancakeSwap",
-    dexId: 2,
-    supportedChains: [56, 97]
-  },
-  PancakeSwapV1: {
-    caption: "PancakeSwapV1",
-    image: import_assets.default.fullPath("img/pancakeswap.svg"),
-    marketCode: 3,
-    key: "PancakeSwapV1"
-  },
-  BakerySwap: {
-    caption: "BakerySwap",
-    image: import_assets.default.fullPath("img/swap/bakeryswap.svg"),
-    marketCode: 5,
-    key: "BakerySwap",
-    dexId: 3,
-    supportedChains: [56, 97]
-  },
-  BurgerSwap: {
-    caption: "BurgerSwap",
-    image: import_assets.default.fullPath("img/swap/burgerswap.png"),
-    marketCode: 6,
-    key: "BurgerSwap",
-    dexId: 4
-  },
-  Oracle: {
-    caption: "Oracle",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 10,
-    key: "Oracle",
-    dexId: 5,
-    supportedChains: [56, 97, 43113, 43114]
-  },
-  PeggedOracle: {
-    caption: "Pegged Queue",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 18,
-    key: "PeggedOracle"
-  },
-  GroupQueue: {
-    caption: "Group Queue",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 11,
-    key: "GroupQueue"
-  },
-  IFSwapV1: {
-    caption: "IFSwapV1",
-    image: import_assets.default.fullPath("img/swap/IFSwapV1.png"),
-    marketCode: 7,
-    key: "IFSwapV1",
-    dexId: 7,
-    supportedChains: [56]
-  },
-  IFSwapV3: {
-    caption: "IFSwapV3",
-    image: import_assets.default.fullPath("img/swap/IFSwapV1.png"),
-    marketCode: 21,
-    key: "IFSwapV3",
-    dexId: 18,
-    supportedChains: [56]
-  },
-  OpenSwapV1: {
-    caption: "OpenSwapV1",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 8,
-    key: "OpenSwapV1"
-  },
-  Hybrid: {
-    caption: "Smart Router",
-    image: import_assets.default.fullPath("img/swap/openswap.png"),
-    marketCode: 9,
-    key: "Hybrid",
-    dexId: 0,
-    supportedChains: [42, 56, 97, 43113, 43114]
-  },
-  QuickSwap: {
-    caption: "QuickSwap",
-    image: import_assets.default.fullPath("img/swap/quickswap-logo.png"),
-    marketCode: 12,
-    key: "QuickSwap",
-    dexId: 9,
-    supportedChains: [137]
-  },
-  BiSwap: {
-    caption: "BiSwap",
-    image: import_assets.default.fullPath("img/swap/biswapsvg.svg"),
-    marketCode: 13,
-    key: "BiSwap",
-    dexId: 11,
-    supportedChains: [56]
-  },
-  Pangolin: {
-    caption: "Pangolin",
-    image: import_assets.default.fullPath("img/swap/pangolin.svg"),
-    marketCode: 14,
-    key: "Pangolin",
-    dexId: 12,
-    supportedChains: [43113, 43114]
-  },
-  TraderJoe: {
-    caption: "TraderJoe",
-    image: import_assets.default.fullPath("img/swap/traderjoe.svg"),
-    marketCode: 15,
-    key: "TraderJoe",
-    dexId: 13,
-    supportedChains: [43114]
-  },
-  SpiritSwap: {
-    caption: "SpiritSwap",
-    image: import_assets.default.fullPath("img/swap/spiritswap-logo.svg"),
-    marketCode: 16,
-    key: "SpiritSwap",
-    dexId: 15,
-    supportedChains: [250]
-  },
-  SpookySwap: {
-    caption: "SpookySwap",
-    image: import_assets.default.fullPath("img/swap/spookyswap-logo.svg"),
-    marketCode: 17,
-    key: "SpookySwap",
-    dexId: 14,
-    supportedChains: [250]
   }
 };
 
@@ -22633,7 +22452,7 @@ var getLockedTokenIconPaths = (info, tokenObject, chainId, tokenMap) => {
 };
 
 // src/staking/staking.tsx
-var import_assets5 = __toModule(require("@staking/assets"));
+var import_assets4 = __toModule(require("@staking/assets"));
 var import_moment3 = __toModule(require_moment());
 var import_eth_wallet10 = __toModule(require("@ijstech/eth-wallet"));
 
@@ -22699,7 +22518,7 @@ var result_css_default = import_components2.Styles.style({
 });
 
 // src/result/result.tsx
-var import_assets3 = __toModule(require("@staking/assets"));
+var import_assets2 = __toModule(require("@staking/assets"));
 var Result = class extends import_components3.Module {
   get message() {
     return this._message;
@@ -22761,7 +22580,7 @@ var Result = class extends import_components3.Module {
         verticalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-icon", {
         class: "i-loading-spinner_icon",
-        image: { url: import_assets3.default.fullPath("img/loading.svg"), width: 24, height: 24 }
+        image: { url: import_assets2.default.fullPath("img/loading.svg"), width: 24, height: 24 }
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Loading...",
         font: { color: "#FD4A4C" },
@@ -22789,7 +22608,7 @@ var Result = class extends import_components3.Module {
       const explorerName = getNetworkExplorerName(chainId);
       const image = await import_components3.Image.create({
         width: "50px",
-        url: import_assets3.default.fullPath("img/success-icon.svg")
+        url: import_assets2.default.fullPath("img/success-icon.svg")
       });
       image.classList.add("inline-block", "mb");
       mainSection.appendChild(image);
@@ -22836,7 +22655,7 @@ var Result = class extends import_components3.Module {
     } else {
       const image = await import_components3.Image.create({
         width: "50px",
-        url: import_assets3.default.fullPath("img/oswap_error.png")
+        url: import_assets2.default.fullPath("img/oswap_error.png")
       });
       image.classList.add("inline-block", "mb");
       mainSection.appendChild(image);
@@ -24044,7 +23863,7 @@ var StakingCampaignInfoByChainId = {
 
 // src/staking/staking.css.ts
 var import_components4 = __toModule(require("@ijstech/components"));
-var import_assets4 = __toModule(require("@staking/assets"));
+var import_assets3 = __toModule(require("@staking/assets"));
 var Theme2 = import_components4.Styles.Theme.ThemeVars;
 import_components4.Styles.Theme.darkTheme.background.default = "#0c1234";
 import_components4.Styles.Theme.darkTheme.background.paper = "#1f1e4f";
@@ -24069,49 +23888,49 @@ var colorVar = {
 };
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaBoldIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBoldIt.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "italic"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaLight.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaLight.ttf")}") format("truetype")`,
   fontWeight: "300",
   fontStyle: "normal"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaLightIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaLightIt.ttf")}") format("truetype")`,
   fontWeight: "300",
   fontStyle: "italic"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaReg.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaReg.ttf")}") format("truetype")`,
   fontWeight: "normal",
   fontStyle: "normal"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaRegIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaRegIt.ttf")}") format("truetype")`,
   fontWeight: "normal",
   fontStyle: "italic"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets4.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
 import_components4.Styles.fontFace({
   fontFamily: "Apple SD Gothic Neo",
-  src: `url("${import_assets4.default.fullPath("fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf")}") format("truetype")`,
+  src: `url("${import_assets3.default.fullPath("fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
@@ -24731,7 +24550,7 @@ var StakingBlock = class extends import_components5.Module {
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
           class: "no-campaign"
         }, /* @__PURE__ */ this.$render("i-image", {
-          url: import_assets5.default.fullPath("img/staking/TrollTrooper.svg")
+          url: import_assets4.default.fullPath("img/staking/TrollTrooper.svg")
         }), /* @__PURE__ */ this.$render("i-label", {
           caption: "No Campaigns"
         })));
@@ -24804,7 +24623,7 @@ var StakingBlock = class extends import_components5.Module {
           }), /* @__PURE__ */ this.$render("i-image", {
             width: 25,
             height: 25,
-            url: import_assets5.default.fullPath((network == null ? void 0 : network.img) || "")
+            url: import_assets4.default.fullPath((network == null ? void 0 : network.img) || "")
           })));
           simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
             class: "simplified-link"
@@ -24925,27 +24744,27 @@ var StakingBlock = class extends import_components5.Module {
             title: "Total Tokens:",
             value: totalTokensLabel.caption,
             isHidden: isSimplified,
-            img: import_assets5.default.fullPath("img/staking/dot-circle.svg"),
+            img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
             elm: totalTokensLabel
           },
           {
             title: "Available QTY:",
             value: availableQtyLabel.caption,
             isHidden: isSimplified,
-            img: import_assets5.default.fullPath("img/staking/dot-circle.svg"),
+            img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
             elm: availableQtyLabel
           },
           {
             title: "Campaign Start:",
             value: (0, import_moment3.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
             isHidden: isStarted || isSimplified,
-            img: import_assets5.default.fullPath("img/staking/stopwatch.svg")
+            img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
           },
           {
             title: "Vesting Period:",
             value: campaign.vestingPeriod,
             isHidden: !campaign.vestingPeriod || isSimplified,
-            img: import_assets5.default.fullPath("img/staking/stopwatch.svg")
+            img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
           }
         ];
         nodeItems.push(containerSection);
@@ -24964,7 +24783,7 @@ var StakingBlock = class extends import_components5.Module {
         }, /* @__PURE__ */ this.$render("i-image", {
           width: "25px",
           height: "25px",
-          url: import_assets5.default.fullPath(this.tokenIcon)
+          url: import_assets4.default.fullPath(this.tokenIcon)
         }), /* @__PURE__ */ this.$render("i-label", {
           caption: campaign.campaignName
         })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
@@ -25001,7 +24820,7 @@ var StakingBlock = class extends import_components5.Module {
           return /* @__PURE__ */ this.$render("i-image", {
             width: 25,
             height: 25,
-            url: import_assets5.default.fullPath(v)
+            url: import_assets4.default.fullPath(v)
           });
         }), /* @__PURE__ */ this.$render("i-icon", {
           name: "external-link-alt",
@@ -25170,7 +24989,7 @@ var StakingBlock = class extends import_components5.Module {
             return /* @__PURE__ */ this.$render("i-image", {
               width: 25,
               height: 25,
-              url: import_assets5.default.fullPath(v)
+              url: import_assets4.default.fullPath(v)
             });
           }), /* @__PURE__ */ this.$render("i-label", {
             class: "bold",
@@ -25184,7 +25003,7 @@ var StakingBlock = class extends import_components5.Module {
           }, /* @__PURE__ */ this.$render("i-image", {
             width: 75,
             height: 75,
-            url: import_assets5.default.fullPath(lpRewardTokenIconPath)
+            url: import_assets4.default.fullPath(lpRewardTokenIconPath)
           }), /* @__PURE__ */ this.$render("i-icon", {
             name: "plus",
             width: 16,
@@ -25192,11 +25011,11 @@ var StakingBlock = class extends import_components5.Module {
           }), /* @__PURE__ */ this.$render("i-image", {
             width: 75,
             height: 75,
-            url: import_assets5.default.fullPath(this.tokenIcon)
+            url: import_assets4.default.fullPath(this.tokenIcon)
           })) : /* @__PURE__ */ this.$render("i-image", {
             width: 75,
             height: 75,
-            url: import_assets5.default.fullPath(this.tokenIcon)
+            url: import_assets4.default.fullPath(this.tokenIcon)
           })), /* @__PURE__ */ this.$render("i-panel", {
             class: "info-stake"
           }, btnStake, await Promise.all(rewardOptions.map(async (rewardOption) => {
@@ -25323,7 +25142,7 @@ var StakingBlock = class extends import_components5.Module {
       verticalAlignment: "center"
     }, /* @__PURE__ */ this.$render("i-icon", {
       class: "i-loading-spinner_icon",
-      image: { url: import_assets5.default.fullPath("img/loading.svg"), width: 36, height: 36 }
+      image: { url: import_assets4.default.fullPath("img/loading.svg"), width: 36, height: 36 }
     }), /* @__PURE__ */ this.$render("i-label", {
       caption: "Loading...",
       font: { color: "#FD4A4C", size: "1.5em" },
