@@ -18,7 +18,10 @@ import {
   ToUSDPriceFeedAddressesMap,
   WETHByChainId,
   getChainId,
-  tokenPriceAMMReference
+  tokenPriceAMMReference,
+  StakingCampaign,
+  Staking,
+  Reward
 } from "../store";
 
 export const getTokenPrice = async (token: string) => { // in USD value
@@ -81,9 +84,9 @@ export const getTokenPrice = async (token: string) => { // in USD value
   return tokenPrice;
 }
 
-const getStakingRewardInfoByAddresses = async (option: RewardOption, providerAddress: string, releaseTime: number) => {
+const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: string, releaseTime: number) => {
   try {
-    let rewardAddress = option.rewardAddress;
+    let rewardAddress = option.address;
     let isCommonStartDate = option.isCommonStartDate;
     let reward = '0';
     let claimSoFar = '0';
@@ -93,7 +96,7 @@ const getStakingRewardInfoByAddresses = async (option: RewardOption, providerAdd
         reward,
         claimSoFar,
         claimable,
-        multiplier: option.rate
+        multiplier: option.multiplier
       }
     }
 
@@ -148,14 +151,14 @@ const getStakingRewardInfoByAddresses = async (option: RewardOption, providerAdd
   }
 }
 
-const getStakingOptionExtendedInfoByAddress = async (option: StakingCampaignOption) => {
+const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
   try {
     let wallet = Wallet.getInstance();
-    let stakingAddress = option.stakingAddress;
-    let rewardOptions = option.rewardOptions;
+    let stakingAddress = option.address;
+    let rewardOptions = option.rewards;
     let decimalsOffset = option.decimalsOffset || 0;
     let currentAddress = wallet.address;
-    let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].rewardAddress;
+    let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].address;
 
     let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
 
@@ -250,29 +253,26 @@ const getStakingOptionExtendedInfoByAddress = async (option: StakingCampaignOpti
   }
 }
 
-const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaignInfo[], addDurationOption: (options: any[], defaultOption: StakingCampaignOption) => void) => {
+const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaign[], addDurationOption: (options: any[], defaultOption: Staking) => void) => {
   let campaigns: any[] = [];
   for (let i = 0; i < stakingCampaignInfoList.length; i++) {
     let stakingCampaignInfo = stakingCampaignInfoList[i];
     let durationOptionsWithExtendedInfo: any[] = [];
-    let durationOptions = stakingCampaignInfo.options;
+    let durationOptions = stakingCampaignInfo.stakings;
     for (let j = 0; j < durationOptions.length; j++) {
       let durationOption = durationOptions[j];
       addDurationOption(durationOptionsWithExtendedInfo, durationOption);
     }
 
     let campaignObj: any = {
-      campaignName: stakingCampaignInfo.campaignName,
-      campaignDesc: stakingCampaignInfo.campaignDesc,
-      campaignPeriod: stakingCampaignInfo.campaignPeriod,
+      campaignName: stakingCampaignInfo.customName,
+      campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
       isSimplified: stakingCampaignInfo.isSimplified,
       getTokenURL: stakingCampaignInfo.getTokenURL,
       getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo,
-      decimalsOffset: stakingCampaignInfo.decimalsOffset,
     }
-
     if (durationOptionsWithExtendedInfo.length > 0) {
       campaignObj = {
         ...campaignObj,
@@ -284,19 +284,19 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaignI
   return campaigns;
 }
 
-const getAllCampaignsInfo = async (stakingInfo: { [key: number]: StakingCampaignInfo[] }) => {
+const getAllCampaignsInfo = async (stakingInfo: { [key: number]: StakingCampaign[] }) => {
   let wallet = Wallet.getInstance();
   let chainId = wallet.chainId;
   let stakingCampaignInfoList = stakingInfo[chainId];
   if (!stakingCampaignInfoList) return [];
 
   let optionExtendedInfoMap: any = {};
-  let allCampaignOptions = (stakingCampaignInfoList as any).flatMap((v: any) => v.options);
+  let allCampaignOptions = (stakingCampaignInfoList as any).flatMap((v: any) => v.stakings);
   let promises = allCampaignOptions.map(async (option: any, index: any) => {
     return new Promise<void>(async (resolve, reject) => {
       try {
         let optionExtendedInfo = await getStakingOptionExtendedInfoByAddress(option);
-        if (optionExtendedInfo) optionExtendedInfoMap[option.stakingAddress] = optionExtendedInfo;
+        if (optionExtendedInfo) optionExtendedInfoMap[option.address] = optionExtendedInfo;
       }
       catch (error) { }
       resolve();
@@ -304,11 +304,11 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: StakingCampaign
   });
   await Promise.all(promises);
 
-  let campaigns: any[] = await composeCampaignInfoList(stakingCampaignInfoList, (options: any[], defaultOption: StakingCampaignOption) => {
-    if (optionExtendedInfoMap[defaultOption.stakingAddress]) {
+  let campaigns: any[] = await composeCampaignInfoList(stakingCampaignInfoList, (options: any[], defaultOption: Staking) => {
+    if (defaultOption.address && optionExtendedInfoMap[defaultOption.address]) {
       options.push({
         ...defaultOption,
-        ...optionExtendedInfoMap[defaultOption.stakingAddress]
+        ...optionExtendedInfoMap[defaultOption.address]
       })
     }
   })
@@ -385,17 +385,17 @@ const getVaultBalance = async (vaultAddress: string) => {
   return Utils.fromDecimals(balance).toFixed();
 }
 
-const getERC20RewardCurrentAPR = async (rewardOption: any, lockedToken: any, lockedDays: string) => {
+const getERC20RewardCurrentAPR = async (rewardOption: any, lockedToken: any, lockedDays: number) => {
   let wallet = Wallet.getInstance();
   let chainId = wallet.chainId;
   const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
   if (!usdPeggedTokenAddress) return '';
 
   let APR = "";
-  let rewardPrice = await getTokenPrice(rewardOption.tokenAddress);
+  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress);
   let lockedTokenPrice = await getTokenPrice(lockedToken.address);
   if (!rewardPrice || !lockedTokenPrice) return null;
-  APR = new BigNumber(rewardOption.rate).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
+  APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
   return APR
 }
 
@@ -425,7 +425,7 @@ const getReservesByPair = async (pairAddress: string, tokenInAddress?: string, t
   return reserveObj;
 }
 
-const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDays: string) => {
+const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDays: number) => {
   let wallet = Wallet.getInstance();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address!;
@@ -445,12 +445,12 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
       let WETH9PriceFeedDecimals = await aggregator.decimals();
       let WETH9USDPrice = new BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
 
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves) return '';
       rewardPrice = new BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
     }
     else {
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.tokenAddress);
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves) return '';
       rewardPrice = new BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
     }
@@ -459,7 +459,7 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
     let lockedLPReserves = await getReservesByPair(lpObject.address, usdPeggedTokenAddress, lpTokenOut);
     if (!lockedLPReserves) return '';
     let lockedLPPrice = new BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
-    APR = new BigNumber(rewardOption.rate).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+    APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
   }
   else {
     if (!lpObject.token0 || !lpObject.token1 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() || lpObject.token1.toLowerCase() == WETHAddress.toLowerCase()) {
@@ -471,7 +471,7 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
       let WETH9PriceFeedDecimals = await aggregator.decimals();
       let WETH9USDPrice = new BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
 
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves) return '';
       let rewardPrice = new BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
 
@@ -481,16 +481,16 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
       let otherTokenPrice = new BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
 
       let lockedLPPrice = new BigNumber(otherTokenPrice).times(2).div(new BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
-      APR = new BigNumber(rewardOption.rate).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+      APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
     }
   }
 
   return APR;
 }
 
-const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, lockedDays: string) => {
+const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, lockedDays: number) => {
   let APR = '';
-  let rewardPrice = await getTokenPrice(rewardOption.tokenAddress)
+  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress)
   let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
   if (!assetTokenPrice || !rewardPrice) return '';
   let wallet = Wallet.getInstance();
@@ -499,7 +499,7 @@ const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, loc
   let lpAssetBalance =  await vault.lpAssetBalance();
   let lpToAssetRatio = new BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
   let VaultTokenPrice = new BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed()
-  APR = new BigNumber(rewardOption.rate).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+  APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
   return APR; 
 }
 

@@ -6144,6 +6144,7 @@ __export(exports, {
   InfuraId: () => InfuraId,
   MockOracleMap: () => MockOracleMap,
   Networks: () => Networks,
+  StakingCampaignByChainId: () => StakingCampaignByChainId,
   ToUSDPriceFeedAddressesMap: () => ToUSDPriceFeedAddressesMap,
   TrollManagementActionType: () => TrollManagementActionType,
   TrollStatus: () => TrollStatus,
@@ -6944,6 +6945,55 @@ var StakingCampaignByChainId = {
             vestingPeriod: new import_eth_wallet6.BigNumber("0"),
             claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
             admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        }
+      ]
+    }
+  ],
+  43113: [
+    {
+      customName: "Testing 1",
+      customDesc: "line 1<br>line 2",
+      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      stakings: [
+        {
+          address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
+          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+          minLockTime: new import_eth_wallet6.BigNumber("300"),
+          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
+          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
+          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0xA4B199b1B4C7C4Ef2d10E1eA11A9DE7F60e84164",
+            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+            multiplier: new import_eth_wallet6.BigNumber("0.03"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
+          }]
+        },
+        {
+          address: "0xf9dA3743c57ec64505F27B9822BaFB0f8ab5E90d",
+          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+          minLockTime: new import_eth_wallet6.BigNumber("86400"),
+          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
+          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
+          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x8820b70EC48B259D83C6E4BB95E5e9955C39F670",
+            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+            multiplier: new import_eth_wallet6.BigNumber("0.1"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
           }]
         }
       ]

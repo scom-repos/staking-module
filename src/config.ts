@@ -1,6 +1,12 @@
 import { BigNumber } from "@ijstech/eth-wallet";
 import { StakingCampaignInfo, StakingType } from "@staking/global";
 
+const baseUrl = 'https://openswap.xyz/#';
+
+export const tokenIcon = 'img/swap/openswap.png';
+export const getTokenUrl = `${baseUrl}/swap`;
+export const manageStakeUrl = `${baseUrl}/staking/manage-stake?address=`;
+
 export const StakingCampaignInfoByChainId: { [key: number]: StakingCampaignInfo[] } = {
 	1: [
 	],

@@ -39,6 +39,10 @@ export {
   CoreContractAddressesByChainId,
   
   //staking
+  StakingCampaign,
+  Staking,
+  Reward,
+  StakingCampaignByChainId,
   USDPeggedTokenAddressMap,
   
   //cross-chain

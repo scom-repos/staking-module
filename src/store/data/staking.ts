@@ -11,6 +11,9 @@ interface StakingCampaign {
   customName: string,
   customDesc?: string,
   getTokenURL?: string,
+  vestingPeriod?: string,
+  isSimplified?: boolean,
+  getTokenURL2?: string,
 
   stakings: Staking[],
 }
@@ -28,6 +31,7 @@ interface Staking {
   //custom
   customDesc?: string,
   lockTokenType: LockTokenType,
+  decimalsOffset?: number,
 
   rewards: Reward[]
 }
@@ -41,6 +45,7 @@ interface Reward {
   vestingPeriod: BigNumber, // in second
   claimDeadline: BigNumber, //unix
   admin: string, // can only withdraw remaining fund after claimDeadline.
+  isCommonStartDate?: boolean,
 }
 
 const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {
@@ -141,7 +146,15 @@ const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {
 }
 
 
-export const USDPeggedTokenAddressMap: { [key: number]: string } = {
+const USDPeggedTokenAddressMap: { [key: number]: string } = {
   56: '0xe9e7cea3dedca5984780bafc599bd69add087d56', //BUSD
   97: '0xDe9334C157968320f26e449331D6544b89bbD00F', //BUSD
+}
+
+export {
+  StakingCampaign,
+  Staking,
+  Reward,
+  StakingCampaignByChainId,
+  USDPeggedTokenAddressMap
 }
