@@ -6142,8 +6142,10 @@ __export(exports, {
   DefaultERC20Tokens: () => DefaultERC20Tokens,
   DefaultTokens: () => DefaultTokens,
   InfuraId: () => InfuraId,
+  LockTokenType: () => LockTokenType,
   MockOracleMap: () => MockOracleMap,
   Networks: () => Networks,
+  StakingCampaignByChainId: () => StakingCampaignByChainId,
   ToUSDPriceFeedAddressesMap: () => ToUSDPriceFeedAddressesMap,
   TrollManagementActionType: () => TrollManagementActionType,
   TrollStatus: () => TrollStatus,
@@ -6162,8 +6164,8 @@ __export(exports, {
   getBridgeVaultVersion: () => getBridgeVaultVersion,
   getChainId: () => getChainId,
   getChainNativeToken: () => getChainNativeToken,
-  getCurrentChainId: () => getCurrentChainId,
-  getDefaultChainId: () => getDefaultChainId,
+  getCurrentChainId: () => getCurrentChainId2,
+  getDefaultChainId: () => getDefaultChainId2,
   getErc20: () => getErc20,
   getFilteredNetworks: () => getFilteredNetworks,
   getInfuraId: () => getInfuraId,
@@ -6174,6 +6176,7 @@ __export(exports, {
   getOpenSwapToken: () => getOpenSwapToken,
   getSiteEnv: () => getSiteEnv,
   getSiteSupportedNetworks: () => getSiteSupportedNetworks,
+  getStakingStatus: () => getStakingStatus,
   getTokenBalance: () => getTokenBalance,
   getTokenBalances: () => getTokenBalances,
   getTokenDecimals: () => getTokenDecimals,
@@ -6196,9 +6199,10 @@ __export(exports, {
   nullAddress: () => nullAddress,
   projectNativeToken: () => projectNativeToken,
   projectNativeTokenSymbol: () => projectNativeTokenSymbol,
-  setCurrentChainId: () => setCurrentChainId,
+  setCurrentChainId: () => setCurrentChainId2,
   setDataFromSCConfig: () => setDataFromSCConfig,
   setSiteEnv: () => setSiteEnv,
+  setStakingStatus: () => setStakingStatus,
   setTokenBalances: () => setTokenBalances,
   setTokenMap: () => setTokenMap,
   setUserTokens: () => setUserTokens,
@@ -6208,7 +6212,7 @@ __export(exports, {
   tokenPriceAMMReference: () => tokenPriceAMMReference,
   tokenSymbol: () => tokenSymbol,
   truncateAddress: () => truncateAddress,
-  updateAllTokenBalances: () => updateAllTokenBalances,
+  updateAllTokenBalances: () => updateAllTokenBalances2,
   viewOnExplorerByAddress: () => viewOnExplorerByAddress,
   viewOnExplorerByTxHash: () => viewOnExplorerByTxHash,
   walletList: () => walletList
@@ -6279,6 +6283,7 @@ var getWalletOptions = () => {
 
 // src/store/wallet.ts
 var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
+var import_store = __toModule(require("@staking/store"));
 
 // src/global/approvalModel/index.ts
 var import_eth_wallet2 = __toModule(require("@ijstech/eth-wallet"));
@@ -6303,14 +6308,6 @@ var SITE_ENV;
 var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
 var import_sdk = __toModule(require("@openswap/sdk"));
 
-// src/global/interfaces/staking.ts
-var StakingType;
-(function(StakingType2) {
-  StakingType2[StakingType2["ERC20_Token"] = 0] = "ERC20_Token";
-  StakingType2[StakingType2["LP_Token"] = 1] = "LP_Token";
-  StakingType2[StakingType2["VAULT_Token"] = 2] = "VAULT_Token";
-})(StakingType || (StakingType = {}));
-
 // src/global/index.ts
 var QueueType;
 (function(QueueType2) {
@@ -6320,25 +6317,25 @@ var QueueType;
   QueueType2[QueueType2["PEGGED_QUEUE"] = 3] = "PEGGED_QUEUE";
 })(QueueType || (QueueType = {}));
 var EventId;
-(function(EventId2) {
-  EventId2["ConnectWallet"] = "connectWallet";
-  EventId2["IsWalletConnected"] = "isWalletConnected";
-  EventId2["IsWalletDisconnected"] = "IsWalletDisconnected";
-  EventId2["Paid"] = "Paid";
-  EventId2["chainChanged"] = "chainChanged";
-  EventId2["ShowExpertModal"] = "showExpertModal";
-  EventId2["ShowTransactionModal"] = "showTransactionModal";
-  EventId2["SlippageToleranceChanged"] = "slippageToleranceChanged";
-  EventId2["ExpertModeChanged"] = "expertModeChanged";
-  EventId2["ShowResult"] = "showResult";
-  EventId2["SetResultMessage"] = "setResultMessage";
-  EventId2["ShowBondModal"] = "ShowBondModal";
-  EventId2["ChangeSeletedImage"] = "ChangeSeletedImage";
-  EventId2["EmitFocusField"] = "emitFocusField";
-  EventId2["EmitFieldChange"] = "emitFieldChange";
-  EventId2["ShowActionQueueModal"] = "showActionQueueModal";
-  EventId2["EmitButtonStatus"] = "emitButtonStatus";
-  EventId2["EmitNewToken"] = "emitNewToken";
+(function(EventId3) {
+  EventId3["ConnectWallet"] = "connectWallet";
+  EventId3["IsWalletConnected"] = "isWalletConnected";
+  EventId3["IsWalletDisconnected"] = "IsWalletDisconnected";
+  EventId3["Paid"] = "Paid";
+  EventId3["chainChanged"] = "chainChanged";
+  EventId3["ShowExpertModal"] = "showExpertModal";
+  EventId3["ShowTransactionModal"] = "showTransactionModal";
+  EventId3["SlippageToleranceChanged"] = "slippageToleranceChanged";
+  EventId3["ExpertModeChanged"] = "expertModeChanged";
+  EventId3["ShowResult"] = "showResult";
+  EventId3["SetResultMessage"] = "setResultMessage";
+  EventId3["ShowBondModal"] = "ShowBondModal";
+  EventId3["ChangeSeletedImage"] = "ChangeSeletedImage";
+  EventId3["EmitFocusField"] = "emitFocusField";
+  EventId3["EmitFieldChange"] = "emitFieldChange";
+  EventId3["ShowActionQueueModal"] = "showActionQueueModal";
+  EventId3["EmitButtonStatus"] = "emitButtonStatus";
+  EventId3["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/store/wallet.ts
@@ -6351,7 +6348,7 @@ async function connectWallet(walletPlugin, eventHandlers) {
   const walletOptions = getWalletOptions();
   let providerOptions = walletOptions[walletPlugin];
   if (!wallet.chainId) {
-    wallet.chainId = getDefaultChainId();
+    wallet.chainId = (0, import_store.getDefaultChainId)();
   }
   await wallet.connect(walletPlugin, {
     onAccountChanged: async (account) => {
@@ -6362,11 +6359,11 @@ async function connectWallet(walletPlugin, eventHandlers) {
       const connected = !!account;
       if (connected) {
         localStorage.setItem("walletProvider", ((_b = (_a = import_eth_wallet5.Wallet.getInstance()) == null ? void 0 : _a.clientSideProvider) == null ? void 0 : _b.walletPlugin) || "");
-        if (wallet.chainId !== getCurrentChainId()) {
-          setCurrentChainId(wallet.chainId);
+        if (wallet.chainId !== (0, import_store.getCurrentChainId)()) {
+          (0, import_store.setCurrentChainId)(wallet.chainId);
           import_components.application.EventBus.dispatch(EventId.chainChanged, wallet.chainId);
         }
-        await updateAllTokenBalances();
+        await (0, import_store.updateAllTokenBalances)();
       }
       import_components.application.EventBus.dispatch(EventId.IsWalletConnected, connected);
     },
@@ -6375,8 +6372,8 @@ async function connectWallet(walletPlugin, eventHandlers) {
       if (eventHandlers && eventHandlers.chainChanged) {
         eventHandlers.chainChanged(chainId);
       }
-      setCurrentChainId(chainId);
-      await updateAllTokenBalances();
+      (0, import_store.setCurrentChainId)(chainId);
+      await (0, import_store.updateAllTokenBalances)();
       import_components.application.EventBus.dispatch(EventId.chainChanged, chainId);
     }
   }, providerOptions);
@@ -6385,7 +6382,7 @@ async function connectWallet(walletPlugin, eventHandlers) {
 async function switchNetwork(chainId) {
   var _a;
   if (!isWalletConnected()) {
-    setCurrentChainId(chainId);
+    (0, import_store.setCurrentChainId)(chainId);
     import_eth_wallet5.Wallet.getInstance().chainId = chainId;
     import_components.application.EventBus.dispatch(EventId.chainChanged, chainId);
     return;
@@ -6893,6 +6890,7 @@ var CoreContractAddressesByChainId = {
 
 // src/store/data/staking.ts
 var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
+var baseUrl = "https://openswap.xyz/#";
 var LockTokenType;
 (function(LockTokenType2) {
   LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
@@ -6904,7 +6902,7 @@ var StakingCampaignByChainId = {
     {
       customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
       customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
+      getTokenURL: `${baseUrl}/swap`,
       stakings: [
         {
           address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
@@ -6944,6 +6942,55 @@ var StakingCampaignByChainId = {
             vestingPeriod: new import_eth_wallet6.BigNumber("0"),
             claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
             admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
+          }]
+        }
+      ]
+    }
+  ],
+  43113: [
+    {
+      customName: "Testing 1",
+      customDesc: "line 1<br>line 2",
+      getTokenURL: `${baseUrl}/swap`,
+      stakings: [
+        {
+          address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
+          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+          minLockTime: new import_eth_wallet6.BigNumber("300"),
+          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
+          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
+          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0xA4B199b1B4C7C4Ef2d10E1eA11A9DE7F60e84164",
+            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+            multiplier: new import_eth_wallet6.BigNumber("0.03"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
+          }]
+        },
+        {
+          address: "0xf9dA3743c57ec64505F27B9822BaFB0f8ab5E90d",
+          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+          minLockTime: new import_eth_wallet6.BigNumber("86400"),
+          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
+          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
+          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
+          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
+          customDesc: "Stake OSWAP, Earn OSWAP",
+          lockTokenType: 0,
+          rewards: [{
+            address: "0x8820b70EC48B259D83C6E4BB95E5e9955C39F670",
+            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+            multiplier: new import_eth_wallet6.BigNumber("0.1"),
+            initialReward: new import_eth_wallet6.BigNumber("1"),
+            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
+            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
+            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
           }]
         }
       ]
@@ -7334,6 +7381,7 @@ var Networks = [
 ];
 
 // src/store/index.ts
+var import_components2 = __toModule(require("@ijstech/components"));
 var nullAddress = "0x0000000000000000000000000000000000000000";
 var TOKENS = "oswap_user_tokens_";
 var getUserTokens = (chainId) => {
@@ -7374,10 +7422,10 @@ var setSiteEnv = (value) => {
 var getSiteEnv = () => {
   return state.siteEnv;
 };
-var setCurrentChainId = (value) => {
+var setCurrentChainId2 = (value) => {
   state.currentChainId = value;
 };
-var getCurrentChainId = () => {
+var getCurrentChainId2 = () => {
   return state.currentChainId;
 };
 function getAddresses(chainId) {
@@ -7394,7 +7442,7 @@ function getChainId() {
   return import_eth_wallet7.Wallet.getInstance().chainId;
 }
 function getWallet() {
-  return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
+  return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId2()).rpc);
 }
 function getWalletProvider() {
   return localStorage.getItem("walletProvider") || "";
@@ -7417,7 +7465,7 @@ var getTokenList = (chainId) => {
   }
   return tokenList;
 };
-async function updateAllTokenBalances() {
+async function updateAllTokenBalances2() {
   const wallet = getWallet();
   let allTokenBalancesMap = {};
   if (!wallet.chainId || !DefaultTokens[wallet.chainId])
@@ -7455,7 +7503,7 @@ var getTokenBalance = (token) => {
   return balance;
 };
 var setTokenBalances = async (value) => {
-  state.tokenBalances = value ? value : await updateAllTokenBalances();
+  state.tokenBalances = value ? value : await updateAllTokenBalances2();
 };
 var state = {
   siteEnv: import_global2.SITE_ENV.TESTNET,
@@ -7467,7 +7515,8 @@ var state = {
   tokenMap: {},
   userTokens: {},
   infuraId: "",
-  networkMap: {}
+  networkMap: {},
+  stakingStatusMap: {}
 };
 var setDataFromSCConfig = (networkList, infuraId) => {
   if (infuraId) {
@@ -7477,7 +7526,7 @@ var setDataFromSCConfig = (networkList, infuraId) => {
     setNetworkList(networkList);
   }
 };
-var getDefaultChainId = () => {
+var getDefaultChainId2 = () => {
   switch (getSiteEnv()) {
     case import_global2.SITE_ENV.TESTNET:
       return 97;
@@ -7701,6 +7750,13 @@ var viewOnExplorerByAddress = (chainId, address) => {
     let url = `${network.explorerAddressUrl}${address}`;
     window.open(url);
   }
+};
+var setStakingStatus = (key, value, text) => {
+  state.stakingStatusMap[key] = { value, text };
+  import_components2.application.EventBus.dispatch(import_global2.EventId.EmitButtonStatus, { key, value, text });
+};
+var getStakingStatus = (key) => {
+  return state.stakingStatusMap[key] || { value: false, text: "Stake" };
 };
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT

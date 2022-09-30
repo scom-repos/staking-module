@@ -114,9 +114,5 @@ export {
 } from './utils/common';
 
 export {
-    StakingType,
-    RewardOption,
-    StakingCampaignOption,
-    StakingCampaignInfo,
     PageBlock,
 } from './interfaces';

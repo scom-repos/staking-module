@@ -12998,7 +12998,7 @@ var require_deployMainChain = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.deploy = exports.DefaultDeploymentOptions = void 0;
     var eth_wallet_1 = require("@ijstech/eth-wallet");
-    var Contracts4 = __importStar(require_contracts3());
+    var Contracts3 = __importStar(require_contracts3());
     exports.DefaultDeploymentOptions = {
       govToken: "",
       votingManager: "",
@@ -13017,7 +13017,7 @@ var require_deployMainChain = __commonJS({
     async function deploy(wallet, options) {
       let result = {};
       options = options || exports.DefaultDeploymentOptions;
-      let trollRegistry = new Contracts4.OSWAP_MainChainTrollRegistry(wallet);
+      let trollRegistry = new Contracts3.OSWAP_MainChainTrollRegistry(wallet);
       await trollRegistry.deploy({
         govToken: options.govToken,
         superTrollNft: options.superTrollNft,
@@ -13026,9 +13026,9 @@ var require_deployMainChain = __commonJS({
       result.trollRegistry = trollRegistry.address;
       let votingManager;
       if (options.votingManager) {
-        votingManager = new Contracts4.OSWAP_VotingManager(wallet, options.votingManager);
+        votingManager = new Contracts3.OSWAP_VotingManager(wallet, options.votingManager);
       } else {
-        votingManager = new Contracts4.OSWAP_VotingManager(wallet);
+        votingManager = new Contracts3.OSWAP_VotingManager(wallet);
         result.votingManager = await votingManager.deploy({
           trollRegistry: trollRegistry.address,
           names: options.votingProfiles.name,
@@ -13041,15 +13041,15 @@ var require_deployMainChain = __commonJS({
         await votingManager.initAdmin(options.vetoAdmin);
       }
       await trollRegistry.initAddress(votingManager.address);
-      let votingRegistry = new Contracts4.OSWAP_VotingRegistry(wallet);
+      let votingRegistry = new Contracts3.OSWAP_VotingRegistry(wallet);
       result.votingRegistry = await votingRegistry.deploy(votingManager.address);
       await votingManager.setVotingRegister(votingRegistry.address);
-      let votingExecutor = new Contracts4.OSWAP_MainChainVotingExecutor(wallet);
+      let votingExecutor = new Contracts3.OSWAP_MainChainVotingExecutor(wallet);
       result.votingExecutor = await votingExecutor.deploy(votingManager.address);
-      let chainRegistry = new Contracts4.OSWAP_ChainRegistry(wallet);
+      let chainRegistry = new Contracts3.OSWAP_ChainRegistry(wallet);
       result.chainRegistry = await chainRegistry.deploy(votingManager.address);
       await votingExecutor.initAddress(chainRegistry.address);
-      let chainRegistryExecutor = new Contracts4.OSWAP_ChainRegistryExecutor(wallet);
+      let chainRegistryExecutor = new Contracts3.OSWAP_ChainRegistryExecutor(wallet);
       result.chainRegistryExecutor = await chainRegistryExecutor.deploy({ chainRegistry: chainRegistry.address, votingManager: votingManager.address });
       await votingManager.initVotingExecutor([votingExecutor.address, chainRegistryExecutor.address]);
       console.log(result);
@@ -13094,7 +13094,7 @@ var require_deploySideChain = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.deployStakingOnly = exports.deploy = exports.DefaultDeploymentOptions = void 0;
     var eth_wallet_1 = require("@ijstech/eth-wallet");
-    var Contracts4 = __importStar(require_contracts3());
+    var Contracts3 = __importStar(require_contracts3());
     exports.DefaultDeploymentOptions = {
       govToken: eth_wallet_1.Utils.nullAddress,
       swapPolicy: eth_wallet_1.Utils.nullAddress,
@@ -13114,9 +13114,9 @@ var require_deploySideChain = __commonJS({
     async function deploy(wallet, options) {
       let result = { vaultRegistry: {}, bridgeVault: {} };
       options = options || exports.DefaultDeploymentOptions;
-      let wrapper = new Contracts4.OSWAP_RouterVaultWrapper(wallet);
+      let wrapper = new Contracts3.OSWAP_RouterVaultWrapper(wallet);
       result.wrapper = await wrapper.deploy();
-      let configStore = new Contracts4.OSWAP_ConfigStore(wallet);
+      let configStore = new Contracts3.OSWAP_ConfigStore(wallet);
       await configStore.deploy({
         govToken: options.govToken,
         swapPolicy: options.swapPolicy,
@@ -13134,25 +13134,25 @@ var require_deploySideChain = __commonJS({
       });
       result.configStore = configStore.address;
       await wrapper.initAddress(configStore.address);
-      let trollRegistry = new Contracts4.OSWAP_SideChainTrollRegistry(wallet);
+      let trollRegistry = new Contracts3.OSWAP_SideChainTrollRegistry(wallet);
       await trollRegistry.deploy(configStore.address);
       result.trollRegistry = trollRegistry.address;
       if (await configStore.votingExecutorManager() == eth_wallet_1.Utils.nullAddress)
         await configStore.initAddress(result.trollRegistry);
-      let votingExecutor = new Contracts4.OSWAP_SideChainVotingExecutor(wallet);
+      let votingExecutor = new Contracts3.OSWAP_SideChainVotingExecutor(wallet);
       await votingExecutor.deploy(trollRegistry.address);
       result.votingExecutor = votingExecutor.address;
       for (let i = 0; i < options.vaultTokens.length; i++) {
         let vaultToken = options.vaultTokens[i];
-        let vaultRegistry = new Contracts4.OSWAP_BridgeVaultTrollRegistry(wallet);
+        let vaultRegistry = new Contracts3.OSWAP_BridgeVaultTrollRegistry(wallet);
         result.vaultRegistry[vaultToken] = await vaultRegistry.deploy(trollRegistry.address);
         let bridgeVaultAddress;
         let bridgeVault;
         if (options.bridgeVaults && options.bridgeVaults[vaultToken]) {
           bridgeVaultAddress = options.bridgeVaults[vaultToken];
-          bridgeVault = new Contracts4.OSWAP_BridgeVault(wallet, bridgeVaultAddress);
+          bridgeVault = new Contracts3.OSWAP_BridgeVault(wallet, bridgeVaultAddress);
         } else {
-          bridgeVault = new Contracts4.OSWAP_BridgeVault(wallet);
+          bridgeVault = new Contracts3.OSWAP_BridgeVault(wallet);
           await bridgeVault.deploy({
             vaultRegistry: vaultRegistry.address,
             configStore: configStore.address,
@@ -13175,7 +13175,7 @@ var require_deploySideChain = __commonJS({
     async function deployStakingOnly(wallet, options) {
       let result = { vaultRegistry: {}, bridgeVault: {} };
       options = options || exports.DefaultDeploymentOptions;
-      let configStore = new Contracts4.OSWAP_ConfigStore(wallet);
+      let configStore = new Contracts3.OSWAP_ConfigStore(wallet);
       if (options.configStore && options.configStore != eth_wallet_1.Utils.nullAddress) {
         configStore.at(options.configStore);
       } else {
@@ -13198,7 +13198,7 @@ var require_deploySideChain = __commonJS({
       result.configStore = configStore.address;
       for (let i = 0; i < options.vaultTokens.length; i++) {
         let vaultToken = options.vaultTokens[i];
-        let bridgeVault = new Contracts4.OSWAP_BridgeVault(wallet);
+        let bridgeVault = new Contracts3.OSWAP_BridgeVault(wallet);
         if (options.bridgeVaults && options.bridgeVaults[vaultToken] && options.bridgeVaults[vaultToken] != eth_wallet_1.Utils.nullAddress) {
           bridgeVault.at(options.bridgeVaults[vaultToken]);
         } else {
@@ -13577,7 +13577,7 @@ var require_mainChainVoting = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MainChainVoting = void 0;
     var eth_wallet_1 = require("@ijstech/eth-wallet");
-    var Contracts4 = __importStar(require_contracts3());
+    var Contracts3 = __importStar(require_contracts3());
     var MainChainVoting = class {
       constructor(wallet, votingManager, votingRegistry, votingExecutor) {
         this.wallet = wallet;
@@ -13639,7 +13639,7 @@ var require_mainChainVoting = __commonJS({
         let event = this.votingManager.parseNewVoteEvent(receipt)[0];
         let voteAddr = event.vote;
         console.log("voting address " + voteAddr);
-        let voting = new Contracts4.OSWAP_VotingContract(this.wallet, voteAddr);
+        let voting = new Contracts3.OSWAP_VotingContract(this.wallet, voteAddr);
         return voting;
       }
     };
@@ -14354,22 +14354,22 @@ var require_crossChain = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCrossChain = exports.buildTokenPairByAddress = exports.buildTokenPairBySymbol = exports.CrossChainMulti = exports.CrossChainSingle = exports.SideChain = exports.MainChain = void 0;
     var sdk_1 = require("@openswap/sdk");
-    var Contracts4 = __importStar(require_contracts3());
+    var Contracts3 = __importStar(require_contracts3());
     var bridgeVault_1 = require_bridgeVault();
     var bridgeVaultTrollRegistry_1 = require_bridgeVaultTrollRegistry();
     var mainChainVoting_1 = require_mainChainVoting();
     var sideChainVoting_1 = require_sideChainVoting();
     function MainChain(wallet, result, tokenList) {
-      let votingManager = new Contracts4.OSWAP_VotingManager(wallet, result.votingManager);
-      let votingRegistry = new Contracts4.OSWAP_VotingRegistry(wallet, result.votingRegistry);
-      let votingExecutor = new Contracts4.OSWAP_MainChainVotingExecutor(wallet, result.votingExecutor);
+      let votingManager = new Contracts3.OSWAP_VotingManager(wallet, result.votingManager);
+      let votingRegistry = new Contracts3.OSWAP_VotingRegistry(wallet, result.votingRegistry);
+      let votingExecutor = new Contracts3.OSWAP_MainChainVotingExecutor(wallet, result.votingExecutor);
       return {
         votingManager,
-        trollRegistry: new Contracts4.OSWAP_MainChainTrollRegistry(wallet, result.trollRegistry),
+        trollRegistry: new Contracts3.OSWAP_MainChainTrollRegistry(wallet, result.trollRegistry),
         votingRegistry,
         votingExecutor,
         voting: new mainChainVoting_1.MainChainVoting(wallet, votingManager, votingRegistry, votingExecutor),
-        chainRegistry: new Contracts4.OSWAP_ChainRegistry(wallet, result.chainRegistry)
+        chainRegistry: new Contracts3.OSWAP_ChainRegistry(wallet, result.chainRegistry)
       };
     }
     exports.MainChain = MainChain;
@@ -14380,11 +14380,11 @@ var require_crossChain = __commonJS({
         _vaultRegistry[v] = _vaultRegistry[result.vaultRegistry[v]] = _vaultRegistry[result.bridgeVault[v]] = new bridgeVaultTrollRegistry_1.BridgeVaultTrollRegistry(wallet, result.vaultRegistry[v]);
         _bridgeVault[v] = _bridgeVault[result.bridgeVault[v]] = _bridgeVault[result.vaultRegistry[v]] = new bridgeVault_1.BridgeVault(wallet, result.bridgeVault[v], tokenList);
       }
-      let votingExecutor = new Contracts4.OSWAP_SideChainVotingExecutor(wallet, result.votingExecutor);
-      let wrapper = new Contracts4.OSWAP_RouterVaultWrapper(wallet, result.wrapper);
+      let votingExecutor = new Contracts3.OSWAP_SideChainVotingExecutor(wallet, result.votingExecutor);
+      let wrapper = new Contracts3.OSWAP_RouterVaultWrapper(wallet, result.wrapper);
       return {
-        configStore: new Contracts4.OSWAP_ConfigStore(wallet, result.configStore),
-        trollRegistry: new Contracts4.OSWAP_SideChainTrollRegistry(wallet, result.trollRegistry),
+        configStore: new Contracts3.OSWAP_ConfigStore(wallet, result.configStore),
+        trollRegistry: new Contracts3.OSWAP_SideChainTrollRegistry(wallet, result.trollRegistry),
         votingExecutor,
         vaultRegistry: _vaultRegistry,
         bridgeVault: _bridgeVault,
@@ -14481,15 +14481,15 @@ var require_crossChain = __commonJS({
     async function getCrossChain(wallets, chains, tokenList, wrappedTokens, chainRegistryAddress) {
       let oswap = {};
       let sideChain = {};
-      let chainRegistry = new Contracts4.OSWAP_ChainRegistry(wallets[chains.mainChain], chainRegistryAddress);
+      let chainRegistry = new Contracts3.OSWAP_ChainRegistry(wallets[chains.mainChain], chainRegistryAddress);
       let allChainIds = (await chainRegistry.allChains()).map((e) => e.toNumber());
       let vaultsLength = (await chainRegistry.vaultsLength()).toNumber();
       let mainChain;
       {
         let _trollRegistry = await chainRegistry.mainChainContractAddress("TrollRegistry");
-        let trollRegistry = new Contracts4.OSWAP_MainChainTrollRegistry(wallets[chains.mainChain], _trollRegistry);
+        let trollRegistry = new Contracts3.OSWAP_MainChainTrollRegistry(wallets[chains.mainChain], _trollRegistry);
         let _votingManager = await trollRegistry.votingManager();
-        let votingManager = new Contracts4.OSWAP_VotingManager(wallets[chains.mainChain], _votingManager);
+        let votingManager = new Contracts3.OSWAP_VotingManager(wallets[chains.mainChain], _votingManager);
         let _votingExecutor = await votingManager.votingExecutor(0);
         let _votingRegistry = await votingManager.votingRegister();
         mainChain = {
@@ -14506,9 +14506,9 @@ var require_crossChain = __commonJS({
         if (status == 1) {
           oswap[chainId] = await chainRegistry.govToken(chainId);
           let _trollRegistry = await chainRegistry.sideChainContractAddress({ param1: chainId, param2: "TrollRegistry" });
-          let trollRegistry = new Contracts4.OSWAP_SideChainTrollRegistry(wallets[chainId], _trollRegistry);
+          let trollRegistry = new Contracts3.OSWAP_SideChainTrollRegistry(wallets[chainId], _trollRegistry);
           let _configStore = await trollRegistry.configStore();
-          let configStore = new Contracts4.OSWAP_ConfigStore(wallets[chainId], _configStore);
+          let configStore = new Contracts3.OSWAP_ConfigStore(wallets[chainId], _configStore);
           let _router = await configStore.router();
           let _wrapper = await chainRegistry.sideChainContractAddress({ param1: chainId, param2: "RouterWrapper" });
           let votingExecutor = await trollRegistry.votingExecutor(0);
@@ -18859,2416 +18859,21 @@ var require_lib4 = __commonJS({
   }
 });
 
-// src/store/data/tokens/mainnet/bsc.json
-var require_bsc = __commonJS({
-  "src/store/data/tokens/mainnet/bsc.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "OpenSwap",
-        symbol: "OSWAP",
-        address: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "PancakeSwap Token",
-        symbol: "CAKE",
-        address: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
-        decimals: 18
-      },
-      {
-        name: "Cardano Token",
-        symbol: "ADA",
-        address: "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
-        decimals: 18
-      },
-      {
-        name: "AdEx Network",
-        symbol: "ADX",
-        address: "0x6bfF4Fb161347ad7de4A625AE5aa3A1CA7077819",
-        decimals: 18
-      },
-      {
-        name: "My Neigbor Alice",
-        symbol: "ALICE",
-        address: "0xAC51066d7bEC65Dc4589368da368b212745d63E8",
-        decimals: 6
-      },
-      {
-        name: "AlpaToken",
-        symbol: "ALPA",
-        address: "0xc5E6689C9c8B02be7C49912Ef19e79cF24977f03",
-        decimals: 18
-      },
-      {
-        name: "Alpaca",
-        symbol: "ALPACA",
-        address: "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
-        decimals: 18
-      },
-      {
-        name: "AlphaToken",
-        symbol: "ALPHA",
-        address: "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
-        decimals: 18
-      },
-      {
-        name: "Ampleforth",
-        symbol: "AMPL",
-        address: "0xDB021b1B247fe2F1fa57e0A87C748Cc1E321F07F",
-        decimals: 9
-      },
-      {
-        name: "Ankr",
-        symbol: "ANKR",
-        address: "0xf307910A4c7bbc79691fD374889b36d8531B08e3",
-        decimals: 18
-      },
-      {
-        name: "anyMTLX",
-        symbol: "anyMTLX",
-        address: "0x5921DEE8556c4593EeFCFad3CA5e2f618606483b",
-        decimals: 18
-      },
-      {
-        name: "APYSwap",
-        symbol: "APYS",
-        address: "0x37dfACfaeDA801437Ff648A1559d73f4C40aAcb7",
-        decimals: 18
-      },
-      {
-        name: "ARPA",
-        symbol: "ARPA",
-        address: "0x6F769E65c14Ebd1f68817F5f1DcDb61Cfa2D6f7e",
-        decimals: 18
-      },
-      {
-        name: "ARIVA",
-        symbol: "ARV",
-        address: "0x6679eB24F59dFe111864AEc72B443d1Da666B360",
-        decimals: 8
-      },
-      {
-        name: "AS Roma",
-        symbol: "ASR",
-        address: "0x80D5f92C2c8C682070C95495313dDB680B267320",
-        decimals: 2
-      },
-      {
-        name: "Automata",
-        symbol: "ATA",
-        address: "0xA2120b9e674d3fC3875f415A7DF52e382F141225",
-        decimals: 18
-      },
-      {
-        name: "Atletico de Madrid",
-        symbol: "ATM",
-        address: "0x25E9d05365c867E59C1904E7463Af9F312296f9E",
-        decimals: 2
-      },
-      {
-        name: "Cosmos Token",
-        symbol: "ATOM",
-        address: "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
-        decimals: 18
-      },
-      {
-        name: "AUTOv2",
-        symbol: "AUTO",
-        address: "0xa184088a740c695E156F91f5cC086a06bb78b827",
-        decimals: 18
-      },
-      {
-        name: "Axie Infinity Shard",
-        symbol: "AXS",
-        address: "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0",
-        decimals: 18
-      },
-      {
-        name: "BabyCake",
-        symbol: "BABYCAKE",
-        address: "0xdB8D30b74bf098aF214e862C90E647bbB1fcC58c",
-        decimals: 18
-      },
-      {
-        name: "Bakery Token",
-        symbol: "BAKE",
-        address: "0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5",
-        decimals: 18
-      },
-      {
-        name: "AllianceBlock",
-        symbol: "bALBT",
-        address: "0x72fAa679E1008Ad8382959FF48E392042A8b06f7",
-        decimals: 18
-      },
-      {
-        name: "BAND Protocol Token",
-        symbol: "BAND",
-        address: "0xAD6cAEb32CD2c308980a548bD0Bc5AA4306c6c18",
-        decimals: 18
-      },
-      {
-        name: "Basic Attention Token",
-        symbol: "BAT",
-        address: "0x101d82428437127bF1608F699CD651e6Abf9766E",
-        decimals: 18
-      },
-      {
-        name: "bBADGER",
-        symbol: "bBADGER",
-        address: "0x1F7216fdB338247512Ec99715587bb97BBf96eae",
-        decimals: 18
-      },
-      {
-        name: "Conflux",
-        symbol: "bCFX",
-        address: "0x045c4324039dA91c52C55DF5D785385Aab073DcF",
-        decimals: 18
-      },
-      {
-        name: "Bitcoin Cash Token",
-        symbol: "BCH",
-        address: "0x8fF795a6F4D97E7887C79beA79aba5cc76444aDf",
-        decimals: 18
-      },
-      {
-        name: "bDIGG",
-        symbol: "bDIGG",
-        address: "0x5986D5c77c65e5801a5cAa4fAE80089f870A71dA",
-        decimals: 18
-      },
-      {
-        name: "bDollar",
-        symbol: "BDO",
-        address: "0x190b589cf9Fb8DDEabBFeae36a813FFb2A702454",
-        decimals: 18
-      },
-      {
-        name: "Bella Protocol",
-        symbol: "BEL",
-        address: "0x8443f091997f06a61670B735ED92734F5628692F",
-        decimals: 18
-      },
-      {
-        name: "Belt",
-        symbol: "BELT",
-        address: "0xE0e514c71282b6f4e823703a39374Cf58dc3eA4f",
-        decimals: 18
-      },
-      {
-        name: "Beta Finance",
-        symbol: "BETA",
-        address: "0xBe1a001FE942f96Eea22bA08783140B9Dcc09D28",
-        decimals: 18
-      },
-      {
-        name: "Beacon ETH",
-        symbol: "BETH",
-        address: "0x250632378E573c6Be1AC2f97Fcdf00515d0Aa91B",
-        decimals: 18
-      },
-      {
-        name: "b.earnfi",
-        symbol: "BFI",
-        address: "0x81859801b01764D4f0Fa5E64729f5a6C3b91435b",
-        decimals: 18
-      },
-      {
-        name: "Beefy.finance",
-        symbol: "BIFI",
-        address: "0xCa3F508B8e4Dd382eE878A314789373D80A5190A",
-        decimals: 18
-      },
-      {
-        name: "BLINk",
-        symbol: "BLK",
-        address: "0x63870A18B6e42b01Ef1Ad8A2302ef50B7132054F",
-        decimals: 6
-      },
-      {
-        name: "Binamon",
-        symbol: "BMON",
-        address: "0x08ba0619b1e7A582E0BCe5BBE9843322C954C340",
-        decimals: 18
-      },
-      {
-        name: "Multiplier",
-        symbol: "bMXX",
-        address: "0x4131b87F74415190425ccD873048C708F8005823",
-        decimals: 18
-      },
-      {
-        name: "Bondly",
-        symbol: "BONDLY",
-        address: "0x5D0158A5c3ddF47d4Ea4517d8DB0D76aA2e87563",
-        decimals: 18
-      },
-      {
-        name: "OPEN Governance Token",
-        symbol: "bOPEN",
-        address: "0xF35262a9d427F96d2437379eF090db986eaE5d42",
-        decimals: 18
-      },
-      {
-        name: "BoringDAO",
-        symbol: "BORING",
-        address: "0xffEecbf8D7267757c2dc3d13D730E97E15BfdF7F",
-        decimals: 18
-      },
-      {
-        name: "BunnyPark",
-        symbol: "BP",
-        address: "0xACB8f52DC63BB752a51186D1c55868ADbFfEe9C1",
-        decimals: 18
-      },
-      {
-        name: "ROOBEE",
-        symbol: "bROOBEE",
-        address: "0xE64F5Cb844946C1F102Bd25bBD87a5aB4aE89Fbe",
-        decimals: 18
-      },
-      {
-        name: "Berry",
-        symbol: "BRY",
-        address: "0xf859Bf77cBe8699013d6Dbc7C2b926Aaf307F830",
-        decimals: 18
-      },
-      {
-        name: "BSC Ecosystem Defi blue chips",
-        symbol: "BSCDEFI",
-        address: "0x40E46dE174dfB776BB89E04dF1C47d8a66855EB3",
-        decimals: 18
-      },
-      {
-        name: "BSCPad",
-        symbol: "BSCPAD",
-        address: "0x5A3010d4d8D3B5fB49f8B6E57FB9E48063f16700",
-        decimals: 18
-      },
-      {
-        name: "BSCEX",
-        symbol: "BSCX",
-        address: "0x5Ac52EE5b2a633895292Ff6d8A89bB9190451587",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged Bitcoin",
-        symbol: "BTCB",
-        address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
-        decimals: 18
-      },
-      {
-        name: "Standard BTC Hashrate Token",
-        symbol: "BTCST",
-        address: "0x78650B139471520656b9E7aA7A5e9276814a38e9",
-        decimals: 17
-      },
-      {
-        name: "Bittrue",
-        symbol: "BTR",
-        address: "0x5a16E8cE8cA316407c6E6307095dc9540a8D62B3",
-        decimals: 18
-      },
-      {
-        name: "Bittorrent",
-        symbol: "BTT",
-        address: "0x8595F9dA7b868b1822194fAEd312235E43007b49",
-        decimals: 18
-      },
-      {
-        name: "Bunny Token",
-        symbol: "BUNNY",
-        address: "0xC9849E6fdB743d08fAeE3E34dd2D1bc69EA11a51",
-        decimals: 18
-      },
-      {
-        name: "Burger Swap",
-        symbol: "BURGER",
-        address: "0xAe9269f27437f0fcBC232d39Ec814844a51d6b8f",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged BUSD",
-        symbol: "BUSD",
-        address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "BUX",
-        symbol: "BUX",
-        address: "0x211FfbE424b90e25a15531ca322adF1559779E45",
-        decimals: 18
-      },
-      {
-        name: "Coin98",
-        symbol: "C98",
-        address: "0xaEC945e04baF28b135Fa7c640f624f8D90F1C3a6",
-        decimals: 18
-      },
-      {
-        name: "CanYaCoin",
-        symbol: "CAN",
-        address: "0x007EA5C0Ea75a8DF45D288a4debdD5bb633F9e56",
-        decimals: 18
-      },
-      {
-        name: "CryptoArt.ai",
-        symbol: "CART",
-        address: "0x5C8C8D560048F34E5f7f8ad71f2f81a89DBd273e",
-        decimals: 18
-      },
-      {
-        name: "ChainGuardians",
-        symbol: "CGG",
-        address: "0x1613957159E9B0ac6c80e824F7Eea748a32a0AE2",
-        decimals: 18
-      },
-      {
-        name: "Tranchess",
-        symbol: "CHESS",
-        address: "0x20de22029ab63cf9A7Cf5fEB2b737Ca1eE4c82A6",
-        decimals: 18
-      },
-      {
-        name: "Chromia",
-        symbol: "CHR",
-        address: "0xf9CeC8d50f6c8ad3Fb6dcCEC577e05aA32B224FE",
-        decimals: 6
-      },
-      {
-        name: "Compound Finance",
-        symbol: "COMP",
-        address: "0x52CE071Bd9b1C4B00A0b92D298c512478CaD67e8",
-        decimals: 18
-      },
-      {
-        name: "Contentos",
-        symbol: "COS",
-        address: "0x96Dd399F9c3AFda1F194182F71600F1B65946501",
-        decimals: 18
-      },
-      {
-        name: "Cream",
-        symbol: "CREAM",
-        address: "0xd4CB328A82bDf5f03eB737f37Fa6B370aef3e888",
-        decimals: 18
-      },
-      {
-        name: "CertiK Token",
-        symbol: "CTK",
-        address: "0xA8c2B8eec3d368C0253ad3dae65a5F2BBB89c929",
-        decimals: 6
-      },
-      {
-        name: "Concentrated Voting Power",
-        symbol: "CVP",
-        address: "0x5Ec3AdBDae549Dce842e24480Eb2434769e22B2E",
-        decimals: 18
-      },
-      {
-        name: "Cyclone",
-        symbol: "CYC",
-        address: "0x810EE35443639348aDbbC467b33310d2AB43c168",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged DAI",
-        symbol: "DAI",
-        address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "Dego.Finance",
-        symbol: "DEGO",
-        address: "0x3FdA9383A84C05eC8f7630Fe10AdF1fAC13241CC",
-        decimals: 18
-      },
-      {
-        name: "Deri",
-        symbol: "DERI",
-        address: "0xe60eaf5A997DFAe83739e035b005A33AfdCc6df5",
-        decimals: 18
-      },
-      {
-        name: "DeXe",
-        symbol: "DEXE",
-        address: "0x039cB485212f996A9DBb85A9a75d898F94d38dA6",
-        decimals: 18
-      },
-      {
-        name: "DefiDollar DAO",
-        symbol: "DFD",
-        address: "0x9899a98b222fCb2f3dbee7dF45d943093a4ff9ff",
-        decimals: 18
-      },
-      {
-        name: "DFuture",
-        symbol: "DFT",
-        address: "0x42712dF5009c20fee340B245b510c0395896cF6e",
-        decimals: 18
-      },
-      {
-        name: "Decentral Games",
-        symbol: "DG",
-        address: "0x9Fdc3ae5c814b79dcA2556564047C5e7e5449C19",
-        decimals: 18
-      },
-      {
-        name: "Ditto",
-        symbol: "DITTO",
-        address: "0x233d91A0713155003fc4DcE0AFa871b508B3B715",
-        decimals: 9
-      },
-      {
-        name: "Dodo",
-        symbol: "DODO",
-        address: "0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2",
-        decimals: 18
-      },
-      {
-        name: "Dogecoin",
-        symbol: "DOGE",
-        address: "0xbA2aE424d960c26247Dd6c32edC70B295c744C43",
-        decimals: 8
-      },
-      {
-        name: "Dopple Finance",
-        symbol: "DOP",
-        address: "0x844FA82f1E54824655470970F7004Dd90546bB28",
-        decimals: 18
-      },
-      {
-        name: "Polkadot Token",
-        symbol: "DOT",
-        address: "0x7083609fCE4d1d8Dc0C979AAb8c869Ea2C873402",
-        decimals: 18
-      },
-      {
-        name: "Dusk",
-        symbol: "DUSK",
-        address: "0xB2BD0749DBE21f623d9BABa856D3B0f0e1BFEc9C",
-        decimals: 18
-      },
-      {
-        name: "Dvision Network",
-        symbol: "DVI",
-        address: "0x758FB037A375F17c7e195CC634D77dA4F554255B",
-        decimals: 18
-      },
-      {
-        name: "Elrond",
-        symbol: "EGLD",
-        address: "0xbF7c81FFF98BbE61B40Ed186e4AfD6DDd01337fe",
-        decimals: 18
-      },
-      {
-        name: "EOS Token",
-        symbol: "EOS",
-        address: "0x56b6fB708fC5732DEC1Afc8D8556423A2EDcCbD6",
-        decimals: 18
-      },
-      {
-        name: "Ellipsis",
-        symbol: "EPS",
-        address: "0xA7f552078dcC247C2684336020c03648500C6d9F",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged ETH",
-        symbol: "ETH",
-        address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
-        decimals: 18
-      },
-      {
-        name: "Easy V2",
-        symbol: "EZ",
-        address: "0x5512014efa6Cd57764Fa743756F7a6Ce3358cC83",
-        decimals: 18
-      },
-      {
-        name: "Filecoin",
-        symbol: "FIL",
-        address: "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
-        decimals: 18
-      },
-      {
-        name: "Refinable",
-        symbol: "FINE",
-        address: "0x4e6415a5727ea08aAE4580057187923aeC331227",
-        decimals: 18
-      },
-      {
-        name: "ForTube",
-        symbol: "FOR",
-        address: "0x658A109C5900BC6d2357c87549B651670E5b0539",
-        decimals: 18
-      },
-      {
-        name: "Formation Finance",
-        symbol: "FORM",
-        address: "0x25A528af62e56512A19ce8c3cAB427807c28CC19",
-        decimals: 18
-      },
-      {
-        name: "fry.world",
-        symbol: "FRIES",
-        address: "0x393B312C01048b3ed2720bF1B090084C09e408A1",
-        decimals: 18
-      },
-      {
-        name: "Frontier Token",
-        symbol: "FRONT",
-        address: "0x928e55daB735aa8260AF3cEDadA18B5f70C72f1b",
-        decimals: 18
-      },
-      {
-        name: "Fuel",
-        symbol: "FUEL",
-        address: "0x2090c8295769791ab7A3CF1CC6e0AA19F35e441A",
-        decimals: 18
-      },
-      {
-        name: "GreenTrust",
-        symbol: "GNT",
-        address: "0xF750A26EB0aCf95556e8529E72eD530f3b60f348",
-        decimals: 18
-      },
-      {
-        name: "Gourmet Galaxy",
-        symbol: "GUM",
-        address: "0xc53708664b99DF348dd27C3Ac0759d2DA9c40462",
-        decimals: 18
-      },
-      {
-        name: "Hacken",
-        symbol: "HAI",
-        address: "0xaA9E582e5751d703F85912903bacADdFed26484C",
-        decimals: 8
-      },
-      {
-        name: "Hakka Finance",
-        symbol: "HAKKA",
-        address: "0x1D1eb8E8293222e1a29d2C0E4cE6C0Acfd89AaaC",
-        decimals: 18
-      },
-      {
-        name: "HARD",
-        symbol: "HARD",
-        address: "0xf79037F6f6bE66832DE4E7516be52826BC3cBcc4",
-        decimals: 6
-      },
-      {
-        name: "Helmet.insure",
-        symbol: "Helmet",
-        address: "0x948d2a81086A075b3130BAc19e4c6DEe1D2E3fE8",
-        decimals: 18
-      },
-      {
-        name: "MetaHero",
-        symbol: "HERO",
-        address: "0xD40bEDb44C081D2935eebA6eF5a3c8A31A1bBE13",
-        decimals: 18
-      },
-      {
-        name: "StepHero",
-        symbol: "HERO",
-        address: "0xE8176d414560cFE1Bf82Fd73B986823B89E4F545",
-        decimals: 18
-      },
-      {
-        name: "Hedget",
-        symbol: "HGET",
-        address: "0xC7d8D35EBA58a0935ff2D5a33Df105DD9f071731",
-        decimals: 6
-      },
-      {
-        name: "Hoo",
-        symbol: "HOO",
-        address: "0xE1d1F66215998786110Ba0102ef558b22224C016",
-        decimals: 8
-      },
-      {
-        name: "Hot Cross Token",
-        symbol: "HOTCROSS",
-        address: "0x4FA7163E153419E0E1064e418dd7A99314Ed27b6",
-        decimals: 18
-      },
-      {
-        name: "Hotbit",
-        symbol: "HTB",
-        address: "0x4e840AADD28DA189B9906674B4Afcb77C128d9ea",
-        decimals: 18
-      },
-      {
-        name: "HYFI",
-        symbol: "HYFI",
-        address: "0x9a319b959e33369C5eaA494a770117eE3e585318",
-        decimals: 18
-      },
-      {
-        name: "Horizon Protocol",
-        symbol: "HZN",
-        address: "0xC0eFf7749b125444953ef89682201Fb8c6A917CD",
-        decimals: 18
-      },
-      {
-        name: "Impossible Finance",
-        symbol: "IF",
-        address: "0xB0e1fc65C1a741b4662B813eB787d369b8614Af1",
-        decimals: 18
-      },
-      {
-        name: "Injective Protocol",
-        symbol: "INJ",
-        address: "0xa2B726B1145A4773F68593CF171187d8EBe4d495",
-        decimals: 18
-      },
-      {
-        name: "IoTeX",
-        symbol: "IOTX",
-        address: "0x9678E42ceBEb63F23197D726B29b1CB20d0064E5",
-        decimals: 18
-      },
-      {
-        name: "Itam",
-        symbol: "ITAM",
-        address: "0x04C747b40Be4D535fC83D09939fb0f626F32800B",
-        decimals: 18
-      },
-      {
-        name: "Juggernaut Finance",
-        symbol: "JGN",
-        address: "0xC13B7a43223BB9Bf4B69BD68Ab20ca1B79d81C75",
-        decimals: 18
-      },
-      {
-        name: "Juventus",
-        symbol: "JUV",
-        address: "0xC40C9A843E1c6D01b7578284a9028854f6683b1B",
-        decimals: 2
-      },
-      {
-        name: "Kalmar",
-        symbol: "KALM",
-        address: "0x4BA0057f784858a48fe351445C672FF2a3d43515",
-        decimals: 18
-      },
-      {
-        name: "KAVA",
-        symbol: "KAVA",
-        address: "0x5F88AB06e8dfe89DF127B2430Bba4Af600866035",
-        decimals: 6
-      },
-      {
-        name: "Kattana",
-        symbol: "KTN",
-        address: "0xDAe6c2A48BFAA66b43815c5548b10800919c993E",
-        decimals: 18
-      },
-      {
-        name: "Qian Governance Token",
-        symbol: "KUN",
-        address: "0x1A2fb0Af670D0234c2857FaD35b789F8Cb725584",
-        decimals: 18
-      },
-      {
-        name: "FC Lazio Fan Token",
-        symbol: "LAZIO",
-        address: "0x77d547256A2cD95F32F67aE0313E450Ac200648d",
-        decimals: 8
-      },
-      {
-        name: "Lien",
-        symbol: "LIEN",
-        address: "0x5d684ADaf3FcFe9CFb5ceDe3abf02F0Cdd1012E3",
-        decimals: 8
-      },
-      {
-        name: "Lightning",
-        symbol: "LIGHT",
-        address: "0x037838b556d9c9d654148a284682C55bB5f56eF4",
-        decimals: 18
-      },
-      {
-        name: "Linear Finance",
-        symbol: "LINA",
-        address: "0x762539b45A1dCcE3D36d080F74d1AED37844b878",
-        decimals: 18
-      },
-      {
-        name: "ChainLink Token",
-        symbol: "LINK",
-        address: "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
-        decimals: 18
-      },
-      {
-        name: "Litentry",
-        symbol: "LIT",
-        address: "0xb59490aB09A0f526Cc7305822aC65f2Ab12f9723",
-        decimals: 18
-      },
-      {
-        name: "Lympo Market Token",
-        symbol: "LMT",
-        address: "0x9617857E191354dbEA0b714d78Bc59e57C411087",
-        decimals: 18
-      },
-      {
-        name: "Litecoin Token",
-        symbol: "LTC",
-        address: "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
-        decimals: 18
-      },
-      {
-        name: "LTO Network",
-        symbol: "LTO",
-        address: "0x857B222Fc79e1cBBf8Ca5f78CB133d1b7CF34BBd",
-        decimals: 18
-      },
-      {
-        name: "lUSD",
-        symbol: "lUSD",
-        address: "0x23e8a70534308a4AAF76fb8C32ec13d17a3BD89e",
-        decimals: 18
-      },
-      {
-        name: "Mirror AMZN Token",
-        symbol: "mAMZN",
-        address: "0x3947B992DC0147D2D89dF0392213781b04B25075",
-        decimals: 18
-      },
-      {
-        name: "Unmarshal",
-        symbol: "MARSH",
-        address: "0x2FA5dAF6Fe0708fBD63b1A7D1592577284f52256",
-        decimals: 18
-      },
-      {
-        name: "Mask Network",
-        symbol: "MASK",
-        address: "0x2eD9a5C8C13b93955103B9a7C167B67Ef4d568a3",
-        decimals: 18
-      },
-      {
-        name: "Math",
-        symbol: "MATH",
-        address: "0xF218184Af829Cf2b0019F8E6F0b2423498a36983",
-        decimals: 18
-      },
-      {
-        name: "Mobox",
-        symbol: "MBOX",
-        address: "0x3203c9E46cA618C8C1cE5dC67e7e9D75f5da2377",
-        decimals: 18
-      },
-      {
-        name: "MCDEX",
-        symbol: "MCB",
-        address: "0x5fE80d2CD054645b9419657d3d10d26391780A7B",
-        decimals: 18
-      },
-      {
-        name: "Mirror COIN",
-        symbol: "mCOIN",
-        address: "0x49022089e78a8D46Ec87A3AF86a1Db6c189aFA6f",
-        decimals: 18
-      },
-      {
-        name: "MacaronSwap",
-        symbol: "MCRN",
-        address: "0xacb2d47827C9813AE26De80965845D80935afd0B",
-        decimals: 18
-      },
-      {
-        name: "Mirror GOOGL Token",
-        symbol: "mGOOGL",
-        address: "0x62D71B23bF15218C7d2D7E48DBbD9e9c650B173f",
-        decimals: 18
-      },
-      {
-        name: "Mirror Finance",
-        symbol: "MIR",
-        address: "0x5B6DcF557E2aBE2323c48445E8CC948910d8c2c9",
-        decimals: 18
-      },
-      {
-        name: "Mix",
-        symbol: "MIX",
-        address: "0xB67754f5b4C704A24d2db68e661b2875a4dDD197",
-        decimals: 18
-      },
-      {
-        name: "Mirror NFLX Token",
-        symbol: "mNFLX",
-        address: "0xa04F060077D90Fe2647B61e4dA4aD1F97d6649dc",
-        decimals: 18
-      },
-      {
-        name: "Meter",
-        symbol: "MTRG",
-        address: "0xBd2949F67DcdC549c6Ebe98696449Fa79D988A9F",
-        decimals: 18
-      },
-      {
-        name: "Mirror TSLA Token",
-        symbol: "mTSLA",
-        address: "0xF215A127A196e3988C09d052e16BcFD365Cd7AA3",
-        decimals: 18
-      },
-      {
-        name: "MX Token",
-        symbol: "MX",
-        address: "0x9F882567A62a5560d147d64871776EeA72Df41D3",
-        decimals: 18
-      },
-      {
-        name: "NAOS Finance",
-        symbol: "NAOS",
-        address: "0x758d08864fB6cCE3062667225ca10b8F00496cc2",
-        decimals: 18
-      },
-      {
-        name: "NAR Token",
-        symbol: "NAR",
-        address: "0xA1303E6199b319a891b79685F0537D289af1FC83",
-        decimals: 18
-      },
-      {
-        name: "APENFT",
-        symbol: "NFT",
-        address: "0x1fC9004eC7E5722891f5f38baE7678efCB11d34D",
-        decimals: 6
-      },
-      {
-        name: "Nerve Finance",
-        symbol: "NRV",
-        address: "0x42F6f551ae042cBe50C739158b4f0CAC0Edb9096",
-        decimals: 18
-      },
-      {
-        name: "Nuls",
-        symbol: "NULS",
-        address: "0x8CD6e29d3686d24d3C2018CEe54621eA0f89313B",
-        decimals: 8
-      },
-      {
-        name: "NerveNetwork",
-        symbol: "NVT",
-        address: "0xf0E406c49C63AbF358030A299C0E00118C4C6BA5",
-        decimals: 8
-      },
-      {
-        name: "Nyanswop Token",
-        symbol: "NYA",
-        address: "0xbFa0841F7a90c4CE6643f651756EE340991F99D5",
-        decimals: 18
-      },
-      {
-        name: "O3 Swap",
-        symbol: "O3",
-        address: "0xEe9801669C6138E84bD50dEB500827b776777d28",
-        decimals: 18
-      },
-      {
-        name: "Oddz",
-        symbol: "ODDZ",
-        address: "0xCD40F2670CF58720b694968698A5514e924F742d",
-        decimals: 18
-      },
-      {
-        name: "OG",
-        symbol: "OG",
-        address: "0xf05E45aD22150677a017Fbd94b84fBB63dc9b44c",
-        decimals: 2
-      },
-      {
-        name: "Oin Finance",
-        symbol: "OIN",
-        address: "0x658E64FFcF40D240A43D52CA9342140316Ae44fA",
-        decimals: 8
-      },
-      {
-        name: "Harmony One",
-        symbol: "ONE",
-        address: "0x03fF0ff224f904be3118461335064bB48Df47938",
-        decimals: 18
-      },
-      {
-        name: "BigOne Token",
-        symbol: "ONE",
-        address: "0x04BAf95Fd4C52fd09a56D840bAEe0AB8D7357bf0",
-        decimals: 18
-      },
-      {
-        name: "Ontology Token",
-        symbol: "ONT",
-        address: "0xFd7B3A77848f1C2D67E05E54d78d174a0C850335",
-        decimals: 18
-      },
-      {
-        name: "The Orbs Network",
-        symbol: "ORBS",
-        address: "0xeBd49b26169e1b52c04cFd19FCf289405dF55F80",
-        decimals: 18
-      },
-      {
-        name: "pBTC",
-        symbol: "pBTC",
-        address: "0xeD28A457A5A76596ac48d87C0f577020F6Ea1c4C",
-        decimals: 18
-      },
-      {
-        name: "PolyCrowns",
-        symbol: "pCWS",
-        address: "0xbcf39F0EDDa668C58371E519AF37CA705f2bFcbd",
-        decimals: 18
-      },
-      {
-        name: "Perlin X",
-        symbol: "PERL",
-        address: "0x0F9E4D49f25de22c2202aF916B681FBB3790497B",
-        decimals: 18
-      },
-      {
-        name: "Phala Network",
-        symbol: "PHA",
-        address: "0x0112e557d400474717056C4e6D40eDD846F38351",
-        decimals: 18
-      },
-      {
-        name: "Polkamon",
-        symbol: "PMON",
-        address: "0x1796ae0b0fa4862485106a0de9b654eFE301D0b2",
-        decimals: 18
-      },
-      {
-        name: "PNT",
-        symbol: "PNT",
-        address: "0xdaacB0Ab6Fb34d24E8a67BfA14BF4D95D4C7aF92",
-        decimals: 18
-      },
-      {
-        name: "pTokens OPEN",
-        symbol: "pOPEN",
-        address: "0xaBaE871B7E3b67aEeC6B46AE9FE1A91660AadAC5",
-        decimals: 18
-      },
-      {
-        name: "Moonpot",
-        symbol: "POTS",
-        address: "0x3Fcca8648651E5b974DD6d3e50F61567779772A8",
-        decimals: 18
-      },
-      {
-        name: "Prometeus",
-        symbol: "PROM",
-        address: "0xaF53d56ff99f1322515E54FdDE93FF8b3b7DAFd5",
-        decimals: 18
-      },
-      {
-        name: "Prosper",
-        symbol: "PROS",
-        address: "0xEd8c8Aa8299C10f067496BB66f8cC7Fb338A3405",
-        decimals: 18
-      },
-      {
-        name: "Paris Saint-Germain",
-        symbol: "PSG",
-        address: "0xBc5609612b7C44BEf426De600B5fd1379DB2EcF1",
-        decimals: 2
-      },
-      {
-        name: "Qubit Token",
-        symbol: "QBT",
-        address: "0x17B7163cf1Dbd286E262ddc68b553D899B93f526",
-        decimals: 18
-      },
-      {
-        name: "QuarkChain Token",
-        symbol: "QKC",
-        address: "0xA1434F1FC3F437fa33F7a781E041961C0205B5Da",
-        decimals: 18
-      },
-      {
-        name: "QIAN second generation dollar",
-        symbol: "QSD",
-        address: "0x07AaA29E63FFEB2EBf59B33eE61437E1a91A3bb2",
-        decimals: 18
-      },
-      {
-        name: "QUSD Stablecoin",
-        symbol: "QUSD",
-        address: "0xb8C540d00dd0Bf76ea12E4B4B95eFC90804f924E",
-        decimals: 18
-      },
-      {
-        name: "Rabbit Finance",
-        symbol: "RABBIT",
-        address: "0x95a1199EBA84ac5f19546519e287d43D2F0E1b41",
-        decimals: 18
-      },
-      {
-        name: "Ramp DEFI",
-        symbol: "RAMP",
-        address: "0x8519EA49c997f50cefFa444d240fB655e89248Aa",
-        decimals: 18
-      },
-      {
-        name: "Reef",
-        symbol: "REEF",
-        address: "0xF21768cCBC73Ea5B6fd3C687208a7c2def2d966e",
-        decimals: 18
-      },
-      {
-        name: "renBTC",
-        symbol: "renBTC",
-        address: "0xfCe146bF3146100cfe5dB4129cf6C82b0eF4Ad8c",
-        decimals: 8
-      },
-      {
-        name: "renDOGE",
-        symbol: "renDOGE",
-        address: "0xc3fEd6eB39178A541D274e6Fc748d48f0Ca01CC3",
-        decimals: 8
-      },
-      {
-        name: "renZEC",
-        symbol: "renZEC",
-        address: "0x695FD30aF473F2960e81Dc9bA7cB67679d35EDb7",
-        decimals: 8
-      },
-      {
-        name: "REVV",
-        symbol: "REVV",
-        address: "0x833F307aC507D47309fD8CDD1F835BeF8D702a93",
-        decimals: 18
-      },
-      {
-        name: "RFOX",
-        symbol: "RFOX",
-        address: "0x0a3A21356793B49154Fd3BbE91CBc2A16c0457f5",
-        decimals: 18
-      },
-      {
-        name: "Rangers Protocol",
-        symbol: "RPG",
-        address: "0xc2098a8938119A52B1F7661893c0153A6CB116d5",
-        decimals: 18
-      },
-      {
-        name: "rUSD",
-        symbol: "rUSD",
-        address: "0x07663837218A003e66310a01596af4bf4e44623D",
-        decimals: 18
-      },
-      {
-        name: "SafeMoon",
-        symbol: "SAFEMOON",
-        address: "0x8076C74C5e3F5852037F31Ff0093Eeb8c8ADd8D3",
-        decimals: 9
-      },
-      {
-        name: "bDollar Share",
-        symbol: "sBDO",
-        address: "0x0d9319565be7f53CeFE84Ad201Be3f40feAE2740",
-        decimals: 18
-      },
-      {
-        name: "SafePal Token",
-        symbol: "SFP",
-        address: "0xD41FDb03Ba84762dD66a0af1a6C8540FF1ba5dfb",
-        decimals: 18
-      },
-      {
-        name: "Seedify",
-        symbol: "SFUND",
-        address: "0x477bC8d23c634C154061869478bce96BE6045D12",
-        decimals: 18
-      },
-      {
-        name: "CryptoBlades Skill Token",
-        symbol: "SKILL",
-        address: "0x154A9F9cbd3449AD22FDaE23044319D6eF2a1Fab",
-        decimals: 18
-      },
-      {
-        name: "SPARTAN PROTOCOL TOKEN",
-        symbol: "SPARTA",
-        address: "0x3910db0600eA925F63C36DdB1351aB6E2c6eb102",
-        decimals: 18
-      },
-      {
-        name: "Splintershards",
-        symbol: "SPS",
-        address: "0x1633b7157e7638C4d6593436111Bf125Ee74703F",
-        decimals: 18
-      },
-      {
-        name: "StableXSwap",
-        symbol: "STAX",
-        address: "0x0Da6Ed8B13214Ff28e9Ca979Dd37439e8a88F6c4",
-        decimals: 18
-      },
-      {
-        name: "Sushi",
-        symbol: "SUSHI",
-        address: "0x947950BcC74888a40Ffa2593C5798F11Fc9124C4",
-        decimals: 18
-      },
-      {
-        name: "Suterusu",
-        symbol: "SUTER",
-        address: "0x4CfbBdfBd5BF0814472fF35C72717Bd095ADa055",
-        decimals: 18
-      },
-      {
-        name: "Swampy",
-        symbol: "SWAMP",
-        address: "0xc5A49b4CBe004b6FD55B30Ba1dE6AC360FF9765d",
-        decimals: 18
-      },
-      {
-        name: "SWGToken",
-        symbol: "SWG",
-        address: "0xe792f64C582698b8572AAF765bDC426AC3aEfb6B",
-        decimals: 18
-      },
-      {
-        name: "Swingby",
-        symbol: "SWINGBY",
-        address: "0x71DE20e0C4616E7fcBfDD3f875d568492cBE4739",
-        decimals: 18
-      },
-      {
-        name: "Switcheo",
-        symbol: "SWTH",
-        address: "0x250b211EE44459dAd5Cd3bCa803dD6a7EcB5d46C",
-        decimals: 8
-      },
-      {
-        name: "Swipe",
-        symbol: "SXP",
-        address: "0x47BEAd2563dCBf3bF2c9407fEa4dC236fAbA485A",
-        decimals: 18
-      },
-      {
-        name: "Tau Bitcoin",
-        symbol: "tBTC",
-        address: "0x2cD1075682b0FCCaADd0Ca629e138E64015Ba11c",
-        decimals: 9
-      },
-      {
-        name: "Tau DOGE",
-        symbol: "tDOGE",
-        address: "0xe550a593d09FBC8DCD557b5C88Cea6946A8b404A",
-        decimals: 8
-      },
-      {
-        name: "Tenet",
-        symbol: "TEN",
-        address: "0xdFF8cb622790b7F92686c722b02CaB55592f152C",
-        decimals: 18
-      },
-      {
-        name: "TitanSwap",
-        symbol: "TITAN",
-        address: "0xe898EDc43920F357A93083F1d4460437dE6dAeC2",
-        decimals: 18
-      },
-      {
-        name: "TokoCrypto",
-        symbol: "TKO",
-        address: "0x9f589e3eabe42ebC94A44727b3f3531C0c877809",
-        decimals: 18
-      },
-      {
-        name: "Alien Worlds",
-        symbol: "TLM",
-        address: "0x2222227E22102Fe3322098e4CBfE18cFebD57c95",
-        decimals: 4
-      },
-      {
-        name: "Telos",
-        symbol: "TLOS",
-        address: "0xb6C53431608E626AC81a9776ac3e999c5556717c",
-        decimals: 18
-      },
-      {
-        name: "TokenPocket",
-        symbol: "TPT",
-        address: "0xECa41281c24451168a37211F0bc2b8645AF45092",
-        decimals: 4
-      },
-      {
-        name: "Unitrade",
-        symbol: "TRADE",
-        address: "0x7af173F350D916358AF3e218Bdf2178494Beb748",
-        decimals: 18
-      },
-      {
-        name: "Tron",
-        symbol: "TRX",
-        address: "0x85EAC5Ac2F758618dFa09bDbe0cf174e7d574D5B",
-        decimals: 18
-      },
-      {
-        name: "True USD",
-        symbol: "TUSD",
-        address: "0x14016E85a25aeb13065688cAFB43044C2ef86784",
-        decimals: 18
-      },
-      {
-        name: "Trust Wallet",
-        symbol: "TWT",
-        address: "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
-        decimals: 18
-      },
-      {
-        name: "Tixl",
-        symbol: "TXL",
-        address: "0x1FFD0b47127fdd4097E54521C9E2c7f0D66AafC5",
-        decimals: 18
-      },
-      {
-        name: "UpBots",
-        symbol: "UBXT",
-        address: "0xBbEB90cFb6FAFa1F69AA130B7341089AbeEF5811",
-        decimals: 18
-      },
-      {
-        name: "Unifi Token",
-        symbol: "UNFI",
-        address: "0x728C5baC3C3e370E372Fc4671f9ef6916b814d8B",
-        decimals: 18
-      },
-      {
-        name: "Uniswap",
-        symbol: "UNI",
-        address: "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged USD Coin",
-        symbol: "USDC",
-        address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-        decimals: 18
-      },
-      {
-        name: "Binance Pegged USDT",
-        symbol: "USDT",
-        address: "0x55d398326f99059fF775485246999027B3197955",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "USDX",
-        symbol: "USDX",
-        address: "0x1203355742e76875154C0D13eB81DCD7711dC7d9",
-        decimals: 6
-      },
-      {
-        name: "UST Token",
-        symbol: "UST",
-        address: "0x23396cF899Ca06c4472205fC903bDB4de249D6fC",
-        decimals: 18
-      },
-      {
-        name: "VAI Stablecoin",
-        symbol: "VAI",
-        address: "0x4BD17003473389A42DAF6a0a729f6Fdb328BbBd7",
-        decimals: 18
-      },
-      {
-        name: "Venus Reward Token",
-        symbol: "VRT",
-        address: "0x5F84ce30DC3cF7909101C69086c50De191895883",
-        decimals: 18
-      },
-      {
-        name: "Yieldwatch",
-        symbol: "WATCH",
-        address: "0x7A9f28EB62C791422Aa23CeAE1dA9C847cBeC9b0",
-        decimals: 18
-      },
-      {
-        name: "Wault",
-        symbol: "WAULTx",
-        address: "0xB64E638E60D154B43f660a6BF8fD8a3b249a6a21",
-        decimals: 18
-      },
-      {
-        name: "WBNB Token",
-        symbol: "WBNB",
-        address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "BitWell Token",
-        symbol: "WELL",
-        address: "0xf07a32Eb035b786898c00bB1C64d8c6F8E7a46D5",
-        decimals: 18
-      },
-      {
-        name: "WaultSwap",
-        symbol: "WEX",
-        address: "0xa9c41A46a6B3531d28d5c32F6633dd2fF05dFB90",
-        decimals: 18
-      },
-      {
-        name: "WINk",
-        symbol: "WIN",
-        address: "0xaeF0d72a118ce24feE3cD1d43d383897D05B4e99",
-        decimals: 18
-      },
-      {
-        name: "Wrapped MASS",
-        symbol: "WMASS",
-        address: "0x7e396BfC8a2f84748701167c2d622F041A1D7a17",
-        decimals: 8
-      },
-      {
-        name: "Wootrade",
-        symbol: "WOO",
-        address: "0x4691937a7508860F876c9c0a2a617E7d9E945D4B",
-        decimals: 18
-      },
-      {
-        name: "Wall Street Games",
-        symbol: "WSG",
-        address: "0xA58950F05FeA2277d2608748412bf9F802eA4901",
-        decimals: 18
-      },
-      {
-        name: "Soteria",
-        symbol: "wSOTE",
-        address: "0x541E619858737031A1244A5d0Cd47E5ef480342c",
-        decimals: 18
-      },
-      {
-        name: "Xcademy",
-        symbol: "XCAD",
-        address: "0x431e0cD023a32532BF3969CddFc002c00E98429d",
-        decimals: 18
-      },
-      {
-        name: "Exeedme",
-        symbol: "XED",
-        address: "0x5621b5A3f4a8008c4CCDd1b942B121c8B1944F1f",
-        decimals: 18
-      },
-      {
-        name: "XEND",
-        symbol: "XEND",
-        address: "0x4a080377f83D669D7bB83B3184a8A5E61B500608",
-        decimals: 18
-      },
-      {
-        name: "xMARK",
-        symbol: "xMARK",
-        address: "0x26A5dFab467d4f58fB266648CAe769503CEC9580",
-        decimals: 9
-      },
-      {
-        name: "XRP Token",
-        symbol: "XRP",
-        address: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
-        decimals: 18
-      },
-      {
-        name: "Tezos Token",
-        symbol: "XTZ",
-        address: "0x16939ef78684453bfDFb47825F8a5F714f12623a",
-        decimals: 18
-      },
-      {
-        name: "Venus Token",
-        symbol: "XVS",
-        address: "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
-        decimals: 18
-      },
-      {
-        name: "yearn.finance",
-        symbol: "YFI",
-        address: "0x88f1A5ae2A3BF98AEAF342D26B30a79438c9142e",
-        decimals: 18
-      },
-      {
-        name: "YFII.finance Token",
-        symbol: "YFII",
-        address: "0x7F70642d88cf1C4a3a7abb072B53B929b653edA5",
-        decimals: 18
-      },
-      {
-        name: "Zcash Token",
-        symbol: "ZEC",
-        address: "0x1Ba42e5193dfA8B03D15dd1B86a3113bbBEF8Eeb",
-        decimals: 18
-      },
-      {
-        name: "ZeroSwapToken",
-        symbol: "ZEE",
-        address: "0x44754455564474A89358B2C2265883DF993b12F0",
-        decimals: 18
-      },
-      {
-        name: "Zilliqa",
-        symbol: "ZIL",
-        address: "0xb86AbCb37C3A4B64f74f59301AFF131a1BEcC787",
-        decimals: 12
-      },
-      {
-        name: "openANX Token",
-        symbol: "OAX",
-        address: "0x31720B2276Df3b3B757B55845d17Eea184d4fc8f",
-        decimals: 18
-      },
-      {
-        name: "Impossible Decentralized Incubator Access Token",
-        symbol: "IDIA",
-        address: "0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-        decimals: 18
-      },
-      {
-        name: "Biswap",
-        symbol: "BSW",
-        address: "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1",
-        decimals: 18
-      },
-      {
-        name: "OpenSwap Booster - IDIA Series #1",
-        symbol: "bqIDIA1",
-        address: "0x46c5BC0656301c3DFb8EF8fc44CfBF89ef121348",
-        decimals: 18
-      },
-      {
-        name: "OGS",
-        symbol: "OGS",
-        address: "0x416947e6Fc78F158fd9B775fA846B72d768879c2",
-        decimals: 18
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/mainnet/ethereum.json
-var require_ethereum = __commonJS({
-  "src/store/data/tokens/mainnet/ethereum.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
-        name: "Aave",
-        symbol: "AAVE",
-        decimals: 18
-      },
-      {
-        address: "0xfF20817765cB7f73d4bde2e66e067E58D11095C2",
-        name: "Amp",
-        symbol: "AMP",
-        decimals: 18
-      },
-      {
-        name: "Aragon Network Token",
-        address: "0x960b236A07cf122663c4303350609A66A7B288C0",
-        symbol: "ANT",
-        decimals: 18
-      },
-      {
-        name: "Balancer",
-        address: "0xba100000625a3754423978a60c9317c58a424e3D",
-        symbol: "BAL",
-        decimals: 18
-      },
-      {
-        address: "0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55",
-        name: "Band Protocol",
-        symbol: "BAND",
-        decimals: 18
-      },
-      {
-        name: "Bancor Network Token",
-        address: "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C",
-        symbol: "BNT",
-        decimals: 18
-      },
-      {
-        name: "Compound",
-        address: "0xc00e94Cb662C3520282E6f5717214004A7f26888",
-        symbol: "COMP",
-        decimals: 18
-      },
-      {
-        name: "Curve DAO Token",
-        address: "0xD533a949740bb3306d119CC777fa900bA034cd52",
-        symbol: "CRV",
-        decimals: 18
-      },
-      {
-        address: "0x41e5560054824eA6B0732E656E3Ad64E20e94E45",
-        name: "Civic",
-        symbol: "CVC",
-        decimals: 8
-      },
-      {
-        name: "Dai Stablecoin",
-        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-        symbol: "DAI",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        address: "0x0AbdAce70D3790235af448C88547603b945604ea",
-        name: "district0x",
-        symbol: "DNT",
-        decimals: 18
-      },
-      {
-        name: "Gnosis Token",
-        address: "0x6810e776880C02933D47DB1b9fc05908e5386b96",
-        symbol: "GNO",
-        decimals: 18
-      },
-      {
-        address: "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
-        name: "The Graph",
-        symbol: "GRT",
-        decimals: 18
-      },
-      {
-        address: "0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC",
-        name: "Keep Network",
-        symbol: "KEEP",
-        decimals: 18
-      },
-      {
-        name: "Kyber Network Crystal",
-        address: "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
-        symbol: "KNC",
-        decimals: 18
-      },
-      {
-        name: "ChainLink Token",
-        address: "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-        symbol: "LINK",
-        decimals: 18
-      },
-      {
-        name: "Loom Network",
-        address: "0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0",
-        symbol: "LOOM",
-        decimals: 18
-      },
-      {
-        name: "LoopringCoin V2",
-        address: "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
-        symbol: "LRC",
-        decimals: 18
-      },
-      {
-        address: "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
-        name: "Decentraland",
-        symbol: "MANA",
-        decimals: 18
-      },
-      {
-        name: "Maker",
-        address: "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
-        symbol: "MKR",
-        decimals: 18
-      },
-      {
-        address: "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
-        name: "Melon",
-        symbol: "MLN",
-        decimals: 18
-      },
-      {
-        name: "Numeraire",
-        address: "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671",
-        symbol: "NMR",
-        decimals: 18
-      },
-      {
-        address: "0x4fE83213D56308330EC302a8BD641f1d0113A4Cc",
-        name: "NuCypher",
-        symbol: "NU",
-        decimals: 18
-      },
-      {
-        name: "Orchid",
-        address: "0x4575f41308EC1483f3d399aa9a2826d74Da13Deb",
-        symbol: "OXT",
-        decimals: 18
-      },
-      {
-        name: "Republic Token",
-        address: "0x408e41876cCCDC0F92210600ef50372656052a38",
-        symbol: "REN",
-        decimals: 18
-      },
-      {
-        name: "Reputation Augur v1",
-        address: "0x1985365e9f78359a9B6AD760e32412f4a445E862",
-        symbol: "REP",
-        decimals: 18
-      },
-      {
-        name: "Reputation Augur v2",
-        address: "0x221657776846890989a759BA2973e427DfF5C9bB",
-        symbol: "REPv2",
-        decimals: 18
-      },
-      {
-        name: "Synthetix Network Token",
-        address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
-        symbol: "SNX",
-        decimals: 18
-      },
-      {
-        name: "Storj Token",
-        address: "0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC",
-        symbol: "STORJ",
-        decimals: 8
-      },
-      {
-        address: "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
-        name: "tBTC",
-        symbol: "TBTC",
-        decimals: 18
-      },
-      {
-        name: "UMA Voting Token v1",
-        address: "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
-        symbol: "UMA",
-        decimals: 18
-      },
-      {
-        name: "Uniswap",
-        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-        symbol: "UNI",
-        decimals: 18
-      },
-      {
-        name: "USDCoin",
-        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        symbol: "USDC",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "Tether USD",
-        address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "Wrapped BTC",
-        address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-        symbol: "WBTC",
-        decimals: 8,
-        isCommon: true
-      },
-      {
-        address: "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
-        name: "yearn finance",
-        symbol: "YFI",
-        decimals: 18
-      },
-      {
-        name: "0x Protocol Token",
-        address: "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
-        symbol: "ZRX",
-        decimals: 18
-      },
-      {
-        name: "openANX Token",
-        address: "0x701C244b988a513c945973dEFA05de933b23Fe1D",
-        symbol: "OAX",
-        decimals: 18
-      },
-      {
-        name: "Wrapped Ether",
-        symbol: "WETH",
-        address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/mainnet/polygon.json
-var require_polygon = __commonJS({
-  "src/store/data/tokens/mainnet/polygon.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-        name: "Wrapped Matic",
-        symbol: "WMATIC",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      { address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", name: "Wrapped Ether", symbol: "WETH", decimals: 18 },
-      { address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", name: "USD Coin (PoS)", symbol: "USDC", decimals: 6, isCommon: true },
-      { address: "0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683", name: "SAND", symbol: "SAND", decimals: 18 },
-      { address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", name: "(PoS) Tether USD", symbol: "USDT", decimals: 6 },
-      { address: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", name: "(PoS) Wrapped BTC", symbol: "WBTC", decimals: 8 },
-      { address: "0xa3Fa99A148fA48D14Ed51d610c367C61876997F1", name: "miMATIC", symbol: "miMATIC", decimals: 18 },
-      {
-        address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-        name: "(PoS) Dai Stablecoin",
-        symbol: "DAI",
-        decimals: 18,
-        isCommon: true
-      },
-      { address: "0x831753DD7087CaC61aB5644b308642cc1c33Dc13", name: "Quickswap", symbol: "QUICK", decimals: 18 },
-      { address: "0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32", name: "Telcoin (PoS)", symbol: "TEL", decimals: 2 },
-      { address: "0x385Eeac5cB85A38A9a07A70c73e0a3271CfB54A7", name: "Aavegotchi GHST Token (PoS)", symbol: "GHST", decimals: 18 },
-      { address: "0x580A84C73811E1839F75d86d75d88cCa0c241fF4", name: "Qi Dao", symbol: "QI", decimals: 18 },
-      { address: "0xE5417Af564e4bFDA1c483642db72007871397896", name: "Gains Network", symbol: "GNS", decimals: 18 },
-      { address: "0xD6DF932A45C0f255f85145f286eA0b292B21C90B", name: "Aave (PoS)", symbol: "AAVE", decimals: 18, isCommon: true },
-      { address: "0xc6C855AD634dCDAd23e64DA71Ba85b8C51E5aD7c", name: "Decentral Games ICE", symbol: "ICE", decimals: 18 },
-      { address: "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39", name: "ChainLink Token", symbol: "LINK", decimals: 18 },
-      { address: "0x2C89bbc92BD86F8075d1DEcc58C7F4E0107f286b", name: "Avalanche Token", symbol: "AVAX", decimals: 18 },
-      { address: "0xB85517b87BF64942adf3A0B9E4c71E4Bc5Caa4e5", name: "Fantom Token", symbol: "FTM", decimals: 18 },
-      { address: "0x229b1b6C23ff8953D663C4cBB519717e323a0a84", name: "BLOK", symbol: "BLOK", decimals: 18 }
-    ];
-  }
-});
-
-// src/store/data/tokens/mainnet/avalanche.json
-var require_avalanche = __commonJS({
-  "src/store/data/tokens/mainnet/avalanche.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
-        name: "Wrapped AVAX",
-        symbol: "WAVAX",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "OpenSwap",
-        symbol: "OSWAP",
-        address: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        decimals: 18,
-        isCommon: true
-      },
-      { address: "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664", name: "USD Coin", symbol: "USDC.e", decimals: 6, isCommon: true },
-      {
-        address: "0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB",
-        name: "Wrapped Ether",
-        symbol: "WETH.e",
-        decimals: 18,
-        isCommon: true
-      },
-      { address: "0xc7198437980c041c805A1EDcbA50c1Ce5db95118", name: "Tether USD", symbol: "USDT.e", decimals: 6, isCommon: true },
-      { address: "0x8729438EB15e2C8B576fCc6AeCdA6A148776C0F5", name: "BENQI", symbol: "QI", decimals: 18 },
-      { address: "0x60781C2586D68229fde47564546784ab3fACA982", name: "Pangolin", symbol: "PNG", decimals: 18 },
-      {
-        address: "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
-        name: "Dai Stablecoin",
-        symbol: "DAI.e",
-        decimals: 18,
-        isCommon: true
-      },
-      { address: "0xd1c3f94DE7e5B45fa4eDBBA472491a9f4B166FC4", name: "Avalaunch", symbol: "XAVA", decimals: 18 },
-      { address: "0x130966628846BFd36ff31a822705796e8cb8C18D", name: "Magic Internet Money", symbol: "MIM", decimals: 18 },
-      { address: "0x50b7545627a5162F82A992c33b87aDc75187B218", name: "Wrapped BTC", symbol: "WBTC.e", decimals: 8 },
-      { address: "0x5947BB275c521040051D82396192181b413227A3", name: "Chainlink Token", symbol: "LINK.e", decimals: 18 },
-      { address: "0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64", name: "Frax", symbol: "FRAX", decimals: 18 },
-      { address: "0x4f60a160D8C2DDdaAfe16FCC57566dB84D674BD6", name: "Jewels", symbol: "JEWEL", decimals: 18 },
-      { address: "0x59414b3089ce2AF0010e7523Dea7E2b35d776ec7", name: "Yak Token", symbol: "YAK", decimals: 18 },
-      { address: "0x214DB107654fF987AD859F34125307783fC8e387", name: "Frax Share", symbol: "FXS", decimals: 18 },
-      { address: "0x1C20E891Bab6b1727d14Da358FAe2984Ed9B59EB", name: "TrueUSD", symbol: "TUSD", decimals: 18 },
-      { address: "0xCE1bFFBD5374Dac86a2893119683F4911a2F7814", name: "Spell Token", symbol: "SPELL", decimals: 18 },
-      { address: "0xe896CDeaAC9615145c0cA09C8Cd5C25bced6384c", name: "PenguinToken", symbol: "PEFI", decimals: 18 },
-      { address: "0x346A59146b9b4a77100D369a3d18E8007A9F46a6", name: "AVAI", symbol: "AVAI", decimals: 18 },
-      { address: "0x321E7092a180BB43555132ec53AaA65a5bF84251", name: "Governance OHM", symbol: "gOHM", decimals: 18 },
-      { address: "0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd", name: "JoeToken", symbol: "JOE", decimals: 18 },
-      { address: "0xdef1fac7Bf08f173D286BbBDcBeeADe695129840", name: "Cerby Token", symbol: "CERBY", decimals: 18 },
-      { address: "0x63682bDC5f875e9bF69E201550658492C9763F89", name: "Betswap.gg", symbol: "BSGG", decimals: 18 },
-      { address: "0x57319d41F71E81F3c65F2a47CA4e001EbAFd4F33", name: "JoeBar", symbol: "xJOE", decimals: 18 },
-      { address: "0xe0Ce60AF0850bF54072635e66E79Df17082A1109", name: "Ice Token", symbol: "ICE", decimals: 18 },
-      { address: "0x3Ee97d514BBef95a2f110e6B9b73824719030f7a", name: "Staked Spell Token", symbol: "sSPELL", decimals: 18 },
-      { address: "0xCDEB5641dC5BF05845317B00643A713CCC3b22e6", name: "Huobi", symbol: "HT", decimals: 18 },
-      { address: "0xA56B1b9f4e5A1A1e0868F5Fd4352ce7CdF0C2A4F", name: "Matic", symbol: "MATIC", decimals: 18 },
-      { address: "0xF873633DF9D5cDd62BB1f402499CC470a72A02D7", name: "MoonRiver", symbol: "MOVR", decimals: 18 },
-      { address: "0xA384Bc7Cdc0A93e686da9E7B8C0807cD040F4E0b", name: "WOWSwap", symbol: "WOW", decimals: 18 },
-      { address: "0x0da67235dD5787D67955420C84ca1cEcd4E5Bb3b", name: "Wrapped Memo", symbol: "wMEMO", decimals: 18 },
-      { address: "0xb54f16fB19478766A268F172C9480f8da1a7c9C3", name: "Time", symbol: "TIME", decimals: 18 },
-      { address: "0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76", name: "SushiToken", symbol: "SUSHI", decimals: 18 },
-      { address: "0x63a72806098Bd3D9520cC43356dD78afe5D386D9", name: "Aave Token", symbol: "AAVE", decimals: 18 }
-    ];
-  }
-});
-
-// src/store/data/tokens/mainnet/fantom.json
-var require_fantom = __commonJS({
-  "src/store/data/tokens/mainnet/fantom.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
-        name: "Wrapped Fantom",
-        symbol: "WFTM",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      { address: "0x6c021Ae822BEa943b2E66552bDe1D2696a53fbB7", name: "TOMB", symbol: "TOMB", decimals: 18 },
-      { address: "0x4cdF39285D7Ca8eB3f090fDA0C069ba5F4145B37", name: "TSHARE", symbol: "TSHARE", decimals: 18 },
-      { address: "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", name: "USD Coin", symbol: "USDC", decimals: 6, isCommon: true },
-      { address: "0x841FAD6EAe12c286d1Fd18d1d525DFfA75C7EFFE", name: "SpookyToken", symbol: "BOO", decimals: 18 },
-      { address: "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", name: "Dai Stablecoin", symbol: "DAI", decimals: 18 },
-      { address: "0x74b23882a30290451A17c44f4F05243b6b58C76d", name: "Ethereum", symbol: "ETH", decimals: 18 },
-      { address: "0x321162Cd933E2Be498Cd2267a90534A804051b11", name: "Bitcoin", symbol: "BTC", decimals: 8 },
-      { address: "0x049d68029688eAbF473097a2fC38ef61633A3C7A", name: "Frapped USDT", symbol: "fUSDT", decimals: 6 },
-      { address: "0x82f0B8B456c1A451378467398982d4834b6829c1", name: "Magic Internet Money", symbol: "MIM", decimals: 18 },
-      { address: "0xe0654C8e6fd4D733349ac7E09f6f23DA256bF475", name: "Scream", symbol: "SCREAM", decimals: 18 },
-      { address: "0x5602df4A94eB6C680190ACCFA2A475621E0ddBdc", name: "Spartacus", symbol: "SPA", decimals: 9 },
-      { address: "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d", name: "Geist.Finance Protocol Token", symbol: "GEIST", decimals: 18 },
-      { address: "0xD67de0e0a0Fd7b15dC8348Bb9BE742F3c5850454", name: "Binance", symbol: "BNB", decimals: 18 },
-      { address: "0x5C4FDfc5233f935f20D2aDbA572F770c2E377Ab0", name: "Hector", symbol: "HEC", decimals: 9 },
-      { address: "0xb3654dc3D10Ea7645f8319668E8F54d2574FBdC8", name: "ChainLink", symbol: "LINK", decimals: 18 },
-      { address: "0x9879aBDea01a879644185341F7aF7d8343556B7a", name: "TrueUSD", symbol: "TUSD", decimals: 18 },
-      { address: "0xfB98B335551a418cD0737375a2ea0ded62Ea213b", name: "miMATIC", symbol: "miMATIC", decimals: 18 },
-      { address: "0xae75A438b2E0cB8Bb01Ec1E1e376De11D44477CC", name: "Sushi", symbol: "SUSHI", decimals: 18 },
-      { address: "0xdDcb3fFD12750B45d32E084887fdf1aABAb34239", name: "Anyswap", symbol: "ANY", decimals: 18 },
-      { address: "0x511D35c52a3C244E7b8bd92c0C297755FbD89212", name: "Avalanche", symbol: "AVAX", decimals: 18 },
-      { address: "0x468003B688943977e6130F4F68F23aad939a1040", name: "Spell Token", symbol: "SPELL", decimals: 18 },
-      { address: "0x5Cc61A78F164885776AA610fb0FE1257df78E59B", name: "SpiritSwap Token", symbol: "SPIRIT", decimals: 18 },
-      { address: "0x10b620b2dbAC4Faa7D7FFD71Da486f5D44cd86f9", name: "Liquid Driver", symbol: "LQDR", decimals: 18 },
-      { address: "0xdc301622e621166BD8E82f2cA0A26c13Ad0BE355", name: "Frax", symbol: "FRAX", decimals: 18 }
-    ];
-  }
-});
-
-// src/store/data/tokens/mainnet/cronos.json
-var require_cronos = __commonJS({
-  "src/store/data/tokens/mainnet/cronos.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23",
-        name: "WCRO",
-        symbol: "WCRO",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        address: "0xe44Fd7fCb2b1581822D0c862B68222998a0c299a",
-        name: "WETH",
-        symbol: "WCRO",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        address: "0x062E66477Faf219F25D27dCED647BF57C3107d52",
-        name: "WBTC",
-        symbol: "WBTC",
-        decimals: 8,
-        isCommon: true
-      },
-      {
-        address: "0xc21223249CA28397B4B6541dfFaEcC539BfF0c59",
-        name: "USDC",
-        symbol: "USDC",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        address: "0x66e428c3f67a68878562e79A0234c1F83c208770",
-        name: "USDT",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        address: "0xF2001B145b43032AAF5Ee2884e456CCd805F677D",
-        name: "DAI",
-        symbol: "DAI",
-        decimals: 18,
-        isCommon: true
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/kovan.json
-var require_kovan = __commonJS({
-  "src/store/data/tokens/testnet/kovan.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "Wrapped ETH",
-        address: "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
-        symbol: "WETH",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "USDC",
-        address: "0xe7EB1b3f0b7f287a93c34A313552974669C425B6",
-        symbol: "USDC",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "USDT",
-        address: "0xDcdAFd9461c2df544F6E2165481E8174e45fEbD8",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true,
-        isVaultToken: true
-      },
-      {
-        name: "DAI",
-        address: "0x25b061e0fcBB2Fbe38A5e669957eFF3DFE03d28f",
-        symbol: "DAI",
-        decimals: 18
-      },
-      {
-        name: "openANX Token",
-        address: "0xbe01a8e3F1E3841ccbf6eeEB09215A3a3bdBe336",
-        symbol: "OAX",
-        decimals: 18
-      },
-      {
-        name: "CAKE",
-        address: "0x5f33463E584D7D2Caa50b597984F0C4512A79aaf",
-        symbol: "CAKE",
-        decimals: 18
-      },
-      {
-        name: "Uniswap",
-        symbol: "UNI",
-        address: "0xB409C977546d60BFBcd235Bb6cDfB71b1364e509",
-        decimals: 18
-      },
-      {
-        name: "OpenSwap",
-        address: "0x28A6a9079fA8e041179cD13F4652af2B315b6fd8",
-        symbol: "OSWAP",
-        decimals: 18
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/bsc-testnet.json
-var require_bsc_testnet = __commonJS({
-  "src/store/data/tokens/testnet/bsc-testnet.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "Wrapped BNB",
-        address: "0xae13d989dac2f0debff460ac112a837c89baa7cd",
-        symbol: "WBNB",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "USDT",
-        address: "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "BUSD Token",
-        symbol: "BUSD",
-        address: "0xDe9334C157968320f26e449331D6544b89bbD00F",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "USDC",
-        address: "0x278B02d1b60AcD3334682F0dcF29AECcc62b28B3",
-        symbol: "USDC",
-        decimals: 18
-      },
-      {
-        name: "DAI",
-        address: "0xB78DAa2F1A2de8270a5641f052FaFC4b2b3ea3B1",
-        symbol: "DAI",
-        decimals: 18
-      },
-      {
-        name: "openANX Token",
-        address: "0x8677048f3eD472610514bA6EF6Ec2f03b550eBdB",
-        symbol: "OAX",
-        decimals: 18
-      },
-      {
-        name: "CAKE",
-        address: "0xEF899e45461F4614655AEe012ec69ae12F97F81e",
-        symbol: "CAKE",
-        decimals: 18
-      },
-      {
-        name: "BakeryToken",
-        address: "0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5",
-        symbol: "BAKE",
-        decimals: 18
-      },
-      {
-        name: "Polkadot Token",
-        symbol: "DOT",
-        address: "0x6679b8031519fA81fE681a93e98cdddA5aafa95b",
-        decimals: 18
-      },
-      {
-        name: "Impossible Finance",
-        symbol: "IF",
-        address: "0x3245fD889abe511A7d57643905368F8Ec8fd4A92",
-        decimals: 18
-      },
-      {
-        name: "Coin98",
-        symbol: "C98",
-        address: "0x5EB137B421AE7Be6Ce26C3dE7c828c475C9a69b1",
-        decimals: 18
-      },
-      {
-        name: "Impossible Decentralized Incubator Access Token",
-        symbol: "IDIA",
-        address: "0x52423B7F0769d0365EbdD79342ce167eB9C29AE2",
-        decimals: 18
-      },
-      {
-        name: "OpenSwap",
-        address: "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "mOpenSwap",
-        address: "0xC2C76387eB1cd15f2f55D2463b5AAd6fca062EB1",
-        symbol: "mOSWAP",
-        decimals: 18
-      },
-      {
-        name: "Project",
-        address: "0x100c8C9eFCb56A253d5A82059647A2adEFDC984A",
-        symbol: "PRO",
-        decimals: 18
-      },
-      {
-        name: "mProject",
-        address: "0x05039f76eB9Dcb6aB49b4D5860980e32f976e17b",
-        symbol: "mPRO",
-        decimals: 18
-      },
-      {
-        name: "mIDIA",
-        address: "0x18CE3F88De23DC2A72f3aDDeB048caa01059E9f3",
-        symbol: "mIDIA",
-        decimals: 18
-      },
-      {
-        name: "Testing",
-        address: "0xc9E10b2a33631c1F9b185Df07198591d507CcE20",
-        symbol: "TS",
-        decimals: 18
-      },
-      {
-        name: "tokenT",
-        address: "0xb79aA5c1730Ad78dD958f05fD87022aeF3e50721",
-        symbol: "TT",
-        decimals: 18
-      },
-      {
-        name: "JetSwap Token",
-        address: "0x8839903E0D698e5976C39E34bDED66F7B9a1b8c9",
-        symbol: "WINGS",
-        decimals: 18
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/fuji.json
-var require_fuji = __commonJS({
-  "src/store/data/tokens/testnet/fuji.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "Wrapped AVAX",
-        address: "0xd00ae08403B9bbb9124bB305C09058E32C39A48c",
-        symbol: "WAVAX",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "Pangolin",
-        address: "0x6d0A79756774c7cbac6Ce5c5e3b0f40b0ccCcB20",
-        symbol: "PNG",
-        decimals: 18
-      },
-      {
-        name: "OpenSwap",
-        address: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "Tether USD",
-        address: "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-        symbol: "USDT.e",
-        decimals: 6
-      },
-      {
-        name: "HakuSwap Token",
-        address: "0x2093f387FA92d3963A4Bc8Fd8E4f88cD82c0d14A",
-        symbol: "HAKU",
-        decimals: 18
-      },
-      {
-        name: "Snowball",
-        address: "0xF319e2f610462F846d6e93F51CdC862EEFF2a554",
-        symbol: "SNOB",
-        decimals: 18
-      },
-      {
-        name: "TEDDY",
-        address: "0x7B635b81920F2C9B7a217DD898BeC9F6D309470D",
-        symbol: "TEDDY",
-        decimals: 18
-      },
-      {
-        name: "AxialToken",
-        address: "0x57b8a194230ef402584130B1eD31d2C4682d7a71",
-        symbol: "AXIAL",
-        decimals: 18
-      },
-      {
-        name: "USDC",
-        address: "0xA269756ccf60766FB311BeE71c07F53Af1d15bDE",
-        symbol: "USDC",
-        decimals: 6
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/mumbai.json
-var require_mumbai = __commonJS({
-  "src/store/data/tokens/testnet/mumbai.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "USDT",
-        address: "0xF6Bf7c1213fdCe4AA92e7c91865cD586891B9cF6",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "OpenSwap",
-        address: "0xA9d603421e2777b8BEa685272611A01fF3bc6523",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "Wrapped MATIC",
-        address: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
-        symbol: "WMATIC",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "USDC",
-        address: "0x87a86a498E50D9cb81cE7B4682Db90eDB32A2A01",
-        symbol: "USDC",
-        decimals: 6
-      },
-      {
-        name: "Tidal Token",
-        address: "0xE4c020c5B74A44cf21549C36E8762Da77FAaf134",
-        symbol: "TIDAL",
-        decimals: 18
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/fantom-testnet.json
-var require_fantom_testnet = __commonJS({
-  "src/store/data/tokens/testnet/fantom-testnet.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0xf1277d1Ed8AD466beddF92ef448A132661956621",
-        decimals: 18,
-        name: "Wrapped Fantom",
-        symbol: "WFTM",
-        isWETH: true
-      },
-      {
-        name: "OpenSwap",
-        address: "0xDe0399014ED809e0E5976D391013dEd315c6B778",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/amino.json
-var require_amino = __commonJS({
-  "src/store/data/tokens/testnet/amino.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "USDT",
-        address: "0x28A6a9079fA8e041179cD13F4652af2B315b6fd8",
-        symbol: "USDT",
-        decimals: 18
-      },
-      {
-        name: "CAKE",
-        address: "0x8dc927D1c259A2EdA099712eAFB57509aD4164b7",
-        symbol: "CAKE",
-        decimals: 18
-      },
-      {
-        name: "BUSD",
-        address: "0x5d3e849B757afD8500b0F514933eEb55a92EB757",
-        symbol: "BUSD",
-        decimals: 18
-      },
-      {
-        name: "Wrapped ACT",
-        address: "0xBB04C4927A05Cf7d3e329E6333658D48A9313356",
-        symbol: "WACT",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/aminoX-testnet.json
-var require_aminoX_testnet = __commonJS({
-  "src/store/data/tokens/testnet/aminoX-testnet.json"(exports, module2) {
-    module2.exports = [
-      {
-        name: "OpenSwap",
-        address: "0xA0AF68AB35fa4618b57C1A7CFc07A8caa0cBf07E",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "Tether USD",
-        address: "0xFFfffffF8d2EE523a2206206994597c13D831EC7",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "DAI Stablecoin",
-        address: "0xFFFffffFE89094c44da98B954eEDEac495271D0f",
-        symbol: "DAI",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "Wrapped ACT",
-        address: "0xCb5e100fdF7d24f25865fa85673D9bD6Bb4674ab",
-        symbol: "WACT",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      }
-    ];
-  }
-});
-
-// src/store/data/tokens/testnet/cronos-testnet.json
-var require_cronos_testnet = __commonJS({
-  "src/store/data/tokens/testnet/cronos-testnet.json"(exports, module2) {
-    module2.exports = [
-      {
-        address: "0x6a3173618859C7cd40fAF6921b5E9eB6A76f1fD4",
-        name: "Wrapped CRO",
-        symbol: "WCRO",
-        decimals: 18,
-        isCommon: true,
-        isWETH: true
-      },
-      {
-        name: "WETH",
-        address: "0x796135E94527c38433e9c42f4Cd91ca931E5e6A6",
-        symbol: "WETH",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "WBTC",
-        address: "0xEE200f25d7B1B9518AC944fd60b113d39bee209c",
-        symbol: "WBTC",
-        decimals: 8,
-        isCommon: true
-      },
-      {
-        name: "USDC",
-        address: "0x25f0965F285F03d6F6B3B21c8EC3367412Fd0ef6",
-        symbol: "USDC",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "USDT",
-        address: "0xa144617Afd9205AF1ceDE3Cc671da1a409A82c5a",
-        symbol: "USDT",
-        decimals: 6,
-        isCommon: true
-      },
-      {
-        name: "DAI",
-        address: "0x8662A8111daEC7570a1bDF3dbd3E163d41563904",
-        symbol: "DAI",
-        decimals: 18,
-        isCommon: true
-      },
-      {
-        name: "OSWAP",
-        address: "0xA09d20Bac0A83b0d1454a2B3BA7A39D55ca00628",
-        symbol: "OSWAP",
-        decimals: 18,
-        isCommon: true
-      }
-    ];
-  }
-});
-
 // src/staking/index.tsx
 __export(exports, {
   StakingBlock: () => StakingBlock
 });
 
 // src/staking/staking.tsx
-var import_components5 = __toModule(require("@ijstech/components"));
-var import_global6 = __toModule(require("@staking/global"));
+var import_components6 = __toModule(require("@ijstech/components"));
+var import_global4 = __toModule(require("@staking/global"));
 var import_store5 = __toModule(require("@staking/store"));
 
 // src/staking-utils/API.ts
 var import_moment2 = __toModule(require_moment());
-var import_eth_wallet8 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
 var import_time_is_money_sdk = __toModule(require_lib());
-var import_sdk3 = __toModule(require("@openswap/sdk"));
+var import_sdk2 = __toModule(require("@openswap/sdk"));
 var import_chainlink_sdk = __toModule(require_lib2());
 var import_cross_chain_bridge = __toModule(require_lib4());
 
@@ -21280,28 +18885,138 @@ var ApprovalStatus;
   ApprovalStatus2[ApprovalStatus2["APPROVING"] = 1] = "APPROVING";
   ApprovalStatus2[ApprovalStatus2["NONE"] = 2] = "NONE";
 })(ApprovalStatus || (ApprovalStatus = {}));
+var ERC20ApprovalModel = class {
+  constructor(options) {
+    this.options = {
+      sender: null,
+      spenderAddress: "",
+      payAction: async () => {
+      },
+      onToBeApproved: async (token) => {
+      },
+      onToBePaid: async (token) => {
+      },
+      onApproving: async (token, receipt, data) => {
+      },
+      onApproved: async (token, data) => {
+      },
+      onPaying: async (receipt, data) => {
+      },
+      onPaid: async (data) => {
+      },
+      onApprovingError: async (token, err) => {
+      },
+      onPayingError: async (err) => {
+      }
+    };
+    this.checkAllowance = async (token, inputAmount) => {
+      let allowance = await getERC20Allowance(token, this.options.spenderAddress);
+      if (!allowance) {
+        await this.options.onToBePaid.bind(this.options.sender)(token);
+      } else if (new import_eth_wallet.BigNumber(inputAmount).gt(allowance)) {
+        await this.options.onToBeApproved.bind(this.options.sender)(token);
+      } else {
+        await this.options.onToBePaid.bind(this.options.sender)(token);
+      }
+    };
+    this.doApproveAction = async (token, inputAmount, data) => {
+      const txHashCallback = async (err, receipt) => {
+        if (err) {
+          await this.options.onApprovingError.bind(this.options.sender)(token, err);
+        } else {
+          await this.options.onApproving.bind(this.options.sender)(token, receipt, data);
+        }
+      };
+      const confirmationCallback = async (receipt) => {
+        await this.options.onApproved.bind(this.options.sender)(token, data);
+        await this.checkAllowance(token, inputAmount);
+      };
+      approveERC20Max(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
+    };
+    this.doPayAction = async (data) => {
+      const txHashCallback = async (err, receipt) => {
+        if (err) {
+          await this.options.onPayingError.bind(this.options.sender)(err);
+        } else {
+          await this.options.onPaying.bind(this.options.sender)(receipt, data);
+        }
+      };
+      const confirmationCallback = async (receipt) => {
+        await this.options.onPaid.bind(this.options.sender)(data);
+      };
+      registerSendTxEvents({
+        transactionHash: txHashCallback,
+        confirmation: confirmationCallback
+      });
+      await this.options.payAction.bind(this.options.sender)();
+    };
+    this.getAction = () => {
+      return {
+        doApproveAction: this.doApproveAction,
+        doPayAction: this.doPayAction,
+        checkAllowance: this.checkAllowance
+      };
+    };
+    this.options = options;
+  }
+  set spenderAddress(value) {
+    this.options.spenderAddress = value;
+  }
+};
 
 // src/global/utils/helper.ts
 var import_eth_wallet2 = __toModule(require("@ijstech/eth-wallet"));
 var import_moment = __toModule(require_moment());
 var SITE_ENV;
-(function(SITE_ENV3) {
-  SITE_ENV3["DEV"] = "dev";
-  SITE_ENV3["TESTNET"] = "testnet";
-  SITE_ENV3["MAINNET"] = "mainnet";
+(function(SITE_ENV2) {
+  SITE_ENV2["DEV"] = "dev";
+  SITE_ENV2["TESTNET"] = "testnet";
+  SITE_ENV2["MAINNET"] = "mainnet";
 })(SITE_ENV || (SITE_ENV = {}));
 
 // src/global/utils/common.ts
 var import_eth_wallet3 = __toModule(require("@ijstech/eth-wallet"));
 var import_sdk = __toModule(require("@openswap/sdk"));
-
-// src/global/interfaces/staking.ts
-var StakingType;
-(function(StakingType4) {
-  StakingType4[StakingType4["ERC20_Token"] = 0] = "ERC20_Token";
-  StakingType4[StakingType4["LP_Token"] = 1] = "LP_Token";
-  StakingType4[StakingType4["VAULT_Token"] = 2] = "VAULT_Token";
-})(StakingType || (StakingType = {}));
+var registerSendTxEvents = (sendTxEventHandlers) => {
+  const wallet = import_eth_wallet3.Wallet.getInstance();
+  wallet.registerSendTxEvents({
+    transactionHash: (error, receipt) => {
+      if (sendTxEventHandlers.transactionHash) {
+        sendTxEventHandlers.transactionHash(error, receipt);
+      }
+    },
+    confirmation: (receipt) => {
+      if (sendTxEventHandlers.confirmation) {
+        sendTxEventHandlers.confirmation(receipt);
+      }
+    }
+  });
+};
+var approveERC20Max = async (token, spenderAddress, callback, confirmationCallback) => {
+  let wallet = import_eth_wallet3.Wallet.getInstance();
+  let amount = new import_eth_wallet3.BigNumber(2).pow(256).minus(1);
+  let erc20 = new import_sdk.Contracts.ERC20(wallet, token.address);
+  registerSendTxEvents({
+    transactionHash: callback,
+    confirmation: confirmationCallback
+  });
+  let receipt = await erc20.approve({
+    spender: spenderAddress,
+    amount
+  });
+  return receipt;
+};
+var getERC20Allowance = async (token, spenderAddress) => {
+  if (!token.address)
+    return null;
+  let wallet = import_eth_wallet3.Wallet.getInstance();
+  let erc20 = new import_sdk.Contracts.ERC20(wallet, token.address);
+  let allowance = await erc20.allowance({
+    owner: wallet.account.address,
+    spender: spenderAddress
+  });
+  return allowance;
+};
 
 // src/global/index.ts
 var QueueType;
@@ -21333,656 +19048,48 @@ var EventId;
   EventId3["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
-// src/store/index.ts
-var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
-var import_global2 = __toModule(require("@staking/global"));
-var import_assets = __toModule(require("@staking/assets"));
-var import_sdk2 = __toModule(require("@openswap/sdk"));
-
-// src/store/wallet.ts
-var import_components = __toModule(require("@ijstech/components"));
-
-// src/store/walletList.ts
-var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
-var walletList = [
-  {
-    name: import_eth_wallet4.WalletPlugin.MetaMask,
-    displayName: "MetaMask",
-    iconFile: "metamask.png"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.BitKeepWallet,
-    displayName: "BitKeep Wallet",
-    iconFile: "BitKeep.png"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.ONTOWallet,
-    displayName: "ONTO Wallet",
-    iconFile: "ONTOWallet.jpg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.Coin98,
-    displayName: "Coin98 Wallet",
-    iconFile: "Coin98.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.TrustWallet,
-    displayName: "Trust Wallet",
-    iconFile: "trustwallet.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.BinanceChainWallet,
-    displayName: "Binance Chain Wallet",
-    iconFile: "binance-chain-wallet.svg"
-  },
-  {
-    name: import_eth_wallet4.WalletPlugin.WalletConnect,
-    displayName: "WalletConnect",
-    iconFile: "walletconnect.svg"
-  }
-];
-
-// src/store/wallet.ts
-var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
-function isWalletConnected() {
-  const wallet = import_eth_wallet5.Wallet.getInstance();
-  return wallet.isConnected;
-}
-
-// src/store/data/tokens/index.ts
-var Tokens_BSC = require_bsc();
-var Tokens_Ethereuem = require_ethereum();
-var Tokens_Polygon = require_polygon();
-var Tokens_Avalanche = require_avalanche();
-var Tokens_Fantom = require_fantom();
-var Tokens_Cronos = require_cronos();
-var Tokens_Kovan = require_kovan();
-var Tokens_BSC_Testnet = require_bsc_testnet();
-var Tokens_Fuji = require_fuji();
-var Tokens_Mumbai = require_mumbai();
-var Tokens_Fantom_Testnet = require_fantom_testnet();
-var Tokens_Amino = require_amino();
-var Tokens_AminoXTestnet = require_aminoX_testnet();
-var Tokens_Cronos_Testnet = require_cronos_testnet();
-var DefaultERC20Tokens = {
-  1: Tokens_Ethereuem,
-  25: Tokens_Cronos,
-  42: Tokens_Kovan,
-  56: Tokens_BSC,
-  97: Tokens_BSC_Testnet,
-  137: Tokens_Polygon,
-  338: Tokens_Cronos_Testnet,
-  31337: Tokens_Amino,
-  80001: Tokens_Mumbai,
-  43113: Tokens_Fuji,
-  43114: Tokens_Avalanche,
-  250: Tokens_Fantom,
-  4002: Tokens_Fantom_Testnet,
-  13370: Tokens_AminoXTestnet
-};
-var ChainNativeTokenByChainId = {
-  1: { address: void 0, decimals: 18, symbol: "ETH", name: "ETH", isNative: true },
-  25: { address: void 0, decimals: 18, symbol: "CRO", name: "CRO", isNative: true },
-  42: { address: void 0, decimals: 18, symbol: "ETH", name: "ETH", isNative: true },
-  56: { address: void 0, decimals: 18, symbol: "BNB", name: "BNB", isNative: true },
-  97: { address: void 0, decimals: 18, symbol: "BNB", name: "BNB", isNative: true },
-  137: { address: void 0, decimals: 18, symbol: "MATIC", name: "MATIC", isNative: true },
-  338: { address: void 0, decimals: 18, symbol: "TCRO", name: "TCRO", isNative: true },
-  31337: { address: void 0, decimals: 18, symbol: "ACT", name: "ACT", isNative: true },
-  80001: { address: void 0, decimals: 18, symbol: "MATIC", name: "MATIC", isNative: true },
-  43114: { address: void 0, decimals: 18, symbol: "AVAX", name: "AVAX", isNative: true },
-  43113: { address: void 0, decimals: 18, symbol: "AVAX", name: "AVAX", isNative: true },
-  250: { address: void 0, decimals: 18, symbol: "FTM", name: "FTM", isNative: true },
-  4002: { address: void 0, decimals: 18, symbol: "FTM", name: "FTM", isNative: true },
-  13370: { address: void 0, decimals: 18, symbol: "ACT", name: "ACT", isNative: true }
-};
-var WETHByChainId = Object.keys(DefaultERC20Tokens).reduce((result, key) => {
-  let weth = DefaultERC20Tokens[Number(key)].find((v) => v.isWETH);
-  if (!weth)
-    console.log(`No Default Wrapped Native Token on chain ${key}`);
-  result[Number(key)] = weth;
-  return result;
-}, {});
-var DefaultTokens = Object.keys(ChainNativeTokenByChainId).reduce((result, key) => {
-  result[Number(key)] = [...DefaultERC20Tokens[Number(key)], ChainNativeTokenByChainId[Number(key)]];
-  return result;
-}, {});
-var ToUSDPriceFeedAddressesMap = {
-  56: {
-    "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE",
-    "0x55d398326f99059ff775485246999027b3197955": "0xB97Ad0E74fa7d920791E90258A6E2085088b4320",
-    "0xe9e7cea3dedca5984780bafc599bd69add087d56": "0xcBb98864Ef56E9042e7d2efef76141f15731B82f"
-  },
-  97: {
-    "0xae13d989dac2f0debff460ac112a837c89baa7cd": "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526",
-    "0x29386b60e0a9a1a30e1488ada47256577ca2c385": "0xEca2605f0BCF2BA5966372C99837b1F182d3D620",
-    "0xde9334c157968320f26e449331d6544b89bbd00f": "0x9331b55D9830EF609A2aBCfAc0FBCE050A52fdEa",
-    "0xb78daa2f1a2de8270a5641f052fafc4b2b3ea3b1": "0x9331b55D9830EF609A2aBCfAc0FBCE050A52fdEa"
-  },
-  43113: {
-    "0xd00ae08403b9bbb9124bb305c09058e32c39a48c": "0x5498BB86BC934c8D34FDA08E81D444153d0D06aD",
-    "0xb9c31ea1d475c25e58a1be1a46221db55e5a7c6e": "0x7898AcCC83587C3C55116c5230C17a6Cd9C71bad"
-  },
-  43114: {
-    "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7": "0x0A77230d17318075983913bC2145DB16C7366156",
-    "0xc7198437980c041c805a1edcba50c1ce5db95118": "0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a",
-    "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664": "0xF096872672F44d6EBA71458D74fe67F9a77a23B9"
-  }
-};
-var tokenPriceAMMReference = {
-  56: {
-    "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93": "0x6AA3eC903176df556e8D8473A002b6A807399351",
-    "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": "0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16",
-    "0x0b15ddf19d47e6a86a56148fb4afffc6929bcb89": "0x71E6de81381eFE0Aa98f56b3B43eB3727D640715",
-    "0x416947e6fc78f158fd9b775fa846b72d768879c2": "0xe6A97E7B5EB2FA72A8B4BeDaaf4CdE85E015DAbf",
-    "0x31720b2276df3b3b757b55845d17eea184d4fc8f": "0x0DBCe9e7b634B5eAAAb483194CC3224Fde9624CF"
-  },
-  97: {
-    "0x45eee762aaea4e5ce317471bda8782724972ee19": "0xb0094FfE387da1739FB95bAbCAF01B105FD0D887",
-    "0xae13d989dac2f0debff460ac112a837c89baa7cd": "0x4A63235712c5F56796b8120DE9195626cf7496f1",
-    "0xc2c76387eb1cd15f2f55d2463b5aad6fca062eb1": "0xd2401ED7A6444CB96EE78424a222A51788E90060",
-    "0x52423b7f0769d0365ebdd79342ce167eb9c29ae2": "0x34aE455fC2d8C808471f7A6967eee858C61cc838",
-    "0xb79aa5c1730ad78dd958f05fd87022aef3e50721": "0x902d79f7Dc980D9b21D691F5F0737ce11f352eB9",
-    "0x8677048f3ed472610514ba6ef6ec2f03b550ebdb": "0x095307dEac764FDC521fE2E3cf8EDf0f40B00F17"
-  },
-  43113: {
-    "0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c": "0x239b4EaF1746051b1bED34dC2963f053c4649f88",
-    "0xd00ae08403B9bbb9124bB305C09058E32C39A48c": "0x0f98073122cc43596eF645Ae51FE085f355C487e"
-  },
-  43114: {
-    "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93": "0xBeaE5AaA6d76ABe711336801D590850e18cB3C6b"
-  }
-};
-
-// src/store/data/staking.ts
-var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
-var LockTokenType;
-(function(LockTokenType2) {
-  LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
-  LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
-  LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
-})(LockTokenType || (LockTokenType = {}));
-var StakingCampaignByChainId = {
-  56: [
-    {
-      customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
-      customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      getTokenURL: `https://www.openswap.xyz/#/swap`,
-      stakings: [
-        {
-          address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
-          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-          minLockTime: new import_eth_wallet6.BigNumber("1209600"),
-          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
-          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
-          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
-            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            multiplier: new import_eth_wallet6.BigNumber("0.03"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
-          }]
-        },
-        {
-          address: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
-          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-          minLockTime: new import_eth_wallet6.BigNumber("2592000"),
-          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
-          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
-          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
-            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            multiplier: new import_eth_wallet6.BigNumber("0.1"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
-          }]
-        }
-      ]
-    }
-  ]
-};
-var USDPeggedTokenAddressMap = {
-  56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
-  97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
-};
-
-// src/store/data/cross-chain.ts
-var VaultType;
-(function(VaultType2) {
-  VaultType2["Project"] = "Project";
-  VaultType2["Exchange"] = "Exchange";
-})(VaultType || (VaultType = {}));
-var BridgeVaultGroupList = [
-  {
-    "name": "USDT",
-    "vaultType": VaultType.Exchange,
-    "vaults": {
-      "42": {
-        "tokenAddress": "0xDcdAFd9461c2df544F6E2165481E8174e45fEbD8",
-        "vaultRegistryAddress": "0x9580C567daC0EC4D05bB64a078e6fCCDc2103B64",
-        "vaultAddress": "0x07578ec965a54bfBdAA83db7261F442d315eC6c2",
-        "softCap": 1e5
-      },
-      "56": {
-        "tokenAddress": "0x55d398326f99059fF775485246999027B3197955",
-        "vaultRegistryAddress": "0x1026deABF37C452F8aF8672cC9B9181fab709154",
-        "vaultAddress": "0xE9CAAFD124831562423FE129b02e938Cc33B45E2",
-        "vaultDecimals": 18,
-        "softCap": 1e5
-      },
-      "97": {
-        "tokenAddress": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-        "vaultRegistryAddress": "0xf2B6E0585282ffd10573a566C650f8b57cB7298F",
-        "vaultAddress": "0x5d2510192A6F6C46154603c1132499d800BB9785",
-        "softCap": 1e5
-      },
-      "43113": {
-        "tokenAddress": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-        "vaultRegistryAddress": "0x7076d6314aCe8830b07B66D716CceF581629E728",
-        "vaultAddress": "0xe9645952f275521875a11EB122E9eF2649162977",
-        "softCap": 1e5
-      },
-      "43114": {
-        "tokenAddress": "0xc7198437980c041c805A1EDcbA50c1Ce5db95118",
-        "vaultRegistryAddress": "0x2e102E6E9546433aB9c2a32ddd6eAFDfE987910B",
-        "vaultAddress": "0x55570d7EcAeFF86a6425815def25447A8b14A222",
-        "vaultDecimals": 18,
-        "softCap": 1e5
-      },
-      "80001": {
-        "tokenAddress": "0xF6Bf7c1213fdCe4AA92e7c91865cD586891B9cF6",
-        "vaultRegistryAddress": "0x8E5fcD46C6Dc74180C89572bAd8822cC0Eff3622",
-        "vaultAddress": "0x90Dd6EF27dBB77CD55Da6818414F3A3185f6a7f6",
-        "softCap": 1e5
-      }
-    }
-  },
-  {
-    "name": "OSWAP",
-    "vaultType": VaultType.Project,
-    "vaults": {
-      "42": {
-        "tokenAddress": "0x28A6a9079fA8e041179cD13F4652af2B315b6fd8",
-        "vaultRegistryAddress": "0x911567173f33377784a934DC071a999F1dA4bd0C",
-        "vaultAddress": "0x13c682d5F11927c24022a743B0510A7C23649667",
-        "softCap": 1e5
-      },
-      "56": {
-        "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        "vaultRegistryAddress": "0xd8f7a9E2cE096670A27238487a62e1e000334F81",
-        "vaultAddress": "0x65d6d677e102C2758224a797f7fb2b60DBeA8635",
-        "softCap": 1e5,
-        "vaultDecimals": 18
-      },
-      "97": {
-        "tokenAddress": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-        "vaultRegistryAddress": "0xA7d49e365C458324bB8F0dEcB9b7292EFAC397a7",
-        "vaultAddress": "0x64A3B88cf51d1cc4de145DCf3981B8D8072c3d06",
-        "softCap": 1e5
-      },
-      "43113": {
-        "tokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-        "vaultRegistryAddress": "0xc8fC05a8e9D6dA2FF6395202b28eEbA4e5B21004",
-        "vaultAddress": "0xc6bBF3DdC2eef54cCB667962Fa37733e0D3CE510",
-        "fixedStakingApr": "18.25",
-        "softCap": 1e5
-      },
-      "43114": {
-        "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        "vaultRegistryAddress": "0x39dfbdF2a8b4719D009F3CEE1d000899FeD8B00a",
-        "vaultAddress": "0x8Af3e8596acE65D9c1EDE6d5356a34eAb46a46f5",
-        "vaultDecimals": 18,
-        "softCap": 1e5
-      },
-      "80001": {
-        "tokenAddress": "0xA9d603421e2777b8BEa685272611A01fF3bc6523",
-        "vaultRegistryAddress": "0x4c0f2C0acb7a5728a75EE35820Ed14e98F24e8b9",
-        "vaultAddress": "0x2ED4CE8f09F606ea253bF57c45e83d8BD45Ce572",
-        "softCap": 1e5
-      }
-    }
-  },
-  {
-    "name": "OSWAP",
-    "deprecated": true,
-    "vaultType": VaultType.Project,
-    "vaults": {
-      "43113": {
-        "tokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-        "vaultRegistryAddress": "0xc8fC05a8e9D6dA2FF6395202b28eEbA4e5B21004",
-        "vaultAddress": "0x67565ACa8abcc5C94b3E934AdC5C6965b3ed7F89"
-      },
-      "43114": {
-        "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        "vaultRegistryAddress": "",
-        "vaultAddress": "0x547C8B68Cb36410FFDceE6Ad4bA0c64FD21085Bb"
-      }
-    }
-  }
-];
-var VaultOrderStatus;
-(function(VaultOrderStatus2) {
-  VaultOrderStatus2[VaultOrderStatus2["pending"] = 0] = "pending";
-  VaultOrderStatus2[VaultOrderStatus2["executed"] = 1] = "executed";
-  VaultOrderStatus2[VaultOrderStatus2["requestCancel"] = 2] = "requestCancel";
-  VaultOrderStatus2[VaultOrderStatus2["approvedCancel"] = 3] = "approvedCancel";
-  VaultOrderStatus2[VaultOrderStatus2["cancelled"] = 4] = "cancelled";
-  VaultOrderStatus2[VaultOrderStatus2["expired"] = 5] = "expired";
-})(VaultOrderStatus || (VaultOrderStatus = {}));
-var TrollType;
-(function(TrollType2) {
-  TrollType2[TrollType2["NotSpecified"] = 0] = "NotSpecified";
-  TrollType2[TrollType2["SuperTroll"] = 1] = "SuperTroll";
-  TrollType2[TrollType2["GeneralTroll"] = 2] = "GeneralTroll";
-})(TrollType || (TrollType = {}));
-var TrollStatus;
-(function(TrollStatus2) {
-  TrollStatus2[TrollStatus2["Active"] = 0] = "Active";
-  TrollStatus2[TrollStatus2["Inactive"] = 1] = "Inactive";
-})(TrollStatus || (TrollStatus = {}));
-var VaultActionType;
-(function(VaultActionType2) {
-  VaultActionType2[VaultActionType2["Stake"] = 0] = "Stake";
-  VaultActionType2[VaultActionType2["RequestUnstake"] = 1] = "RequestUnstake";
-  VaultActionType2[VaultActionType2["Unstake"] = 2] = "Unstake";
-})(VaultActionType || (VaultActionType = {}));
-var TrollManagementActionType;
-(function(TrollManagementActionType2) {
-  TrollManagementActionType2[TrollManagementActionType2["StakeNFT"] = 0] = "StakeNFT";
-  TrollManagementActionType2[TrollManagementActionType2["UnstakeNFT"] = 1] = "UnstakeNFT";
-  TrollManagementActionType2[TrollManagementActionType2["StakeBond"] = 2] = "StakeBond";
-  TrollManagementActionType2[TrollManagementActionType2["UnstakeBond"] = 3] = "UnstakeBond";
-})(TrollManagementActionType || (TrollManagementActionType = {}));
-
-// src/store/data/networks.ts
-var InfuraId = "adc596bf88b648e2a8902bc9093930c5";
-var Networks = [
-  {
-    "name": "Ethereum",
-    "chainId": 1,
-    "img": "img/network/ethereumNetwork.svg",
-    "rpc": `https://mainnet.infura.io/v3/${InfuraId}`,
-    "explorerName": "Etherscan",
-    "explorerTxUrl": "https://etherscan.io/tx/",
-    "explorerAddressUrl": "https://etherscan.io/address/"
-  },
-  {
-    "name": "Cronos Mainnet",
-    "chainId": 25,
-    "img": "img/network/cronosMainnet.svg",
-    "isDisabled": true
-  },
-  {
-    "name": "Kovan Test Network",
-    "chainId": 42,
-    "img": "img/network/ethereumNetwork.svg",
-    "rpc": `https://kovan.infura.io/v3/${InfuraId}`,
-    "isCrossChainSupported": true,
-    "explorerName": "Etherscan",
-    "explorerTxUrl": "https://kovan.etherscan.io/tx/",
-    "explorerAddressUrl": "https://kovan.etherscan.io/address/",
-    "isTestnet": true
-  },
-  {
-    "name": "Binance Smart Chain",
-    "chainId": 56,
-    "img": "img/network/bscMainnet.svg",
-    "rpc": "https://bsc-dataseed.binance.org/",
-    "isMainChain": true,
-    "isCrossChainSupported": true,
-    "explorerName": "BSCScan",
-    "explorerTxUrl": "https://bscscan.com/tx/",
-    "explorerAddressUrl": "https://bscscan.com/address/"
-  },
-  {
-    "name": "Polygon",
-    "chainId": 137,
-    "img": "img/network/polygon.svg",
-    "explorerName": "PolygonScan",
-    "explorerTxUrl": "https://polygonscan.com/tx/",
-    "explorerAddressUrl": "https://polygonscan.com/address/"
-  },
-  {
-    "name": "Fantom Opera",
-    "chainId": 250,
-    "img": "img/network/fantom-ftm-logo.svg",
-    "rpc": "https://rpc.ftm.tools/",
-    "explorerName": "FTMScan",
-    "explorerTxUrl": "https://ftmscan.com/tx/",
-    "explorerAddressUrl": "https://ftmscan.com/address/"
-  },
-  {
-    "name": "BSC Testnet",
-    "chainId": 97,
-    "img": "img/network/bscMainnet.svg",
-    "rpc": "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    "isCrossChainSupported": true,
-    "explorerName": "BSCScan",
-    "explorerTxUrl": "https://testnet.bscscan.com/tx/",
-    "explorerAddressUrl": "https://testnet.bscscan.com/address/",
-    "isTestnet": true
-  },
-  {
-    "name": "Cronos Mainnet",
-    "chainId": 338,
-    "img": "img/network/cronosMainnet.svg",
-    "isDisabled": true
-  },
-  {
-    "name": "Amino Testnet",
-    "chainId": 31337,
-    "img": "img/network/animoTestnet.svg",
-    "isDisabled": true,
-    "isTestnet": true
-  },
-  {
-    "name": "Mumbai",
-    "chainId": 80001,
-    "img": "img/network/polygon.svg",
-    "rpc": "https://matic-mumbai.chainstacklabs.com",
-    "isCrossChainSupported": true,
-    "explorerName": "PolygonScan",
-    "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
-    "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
-    "isTestnet": true
-  },
-  {
-    "name": "Avalanche FUJI C-Chain",
-    "chainId": 43113,
-    "img": "img/network/avax.svg",
-    "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
-    "isCrossChainSupported": true,
-    "isMainChain": true,
-    "explorerName": "SnowTrace",
-    "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
-    "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
-    "isTestnet": true
-  },
-  {
-    "name": "Avalanche Mainnet C-Chain",
-    "chainId": 43114,
-    "img": "img/network/avax.svg",
-    "rpc": "https://api.avax.network/ext/bc/C/rpc",
-    "isCrossChainSupported": true,
-    "explorerName": "SnowTrace",
-    "explorerTxUrl": "https://snowtrace.io/tx/",
-    "explorerAddressUrl": "https://snowtrace.io/address/"
-  },
-  {
-    "name": "Fantom Testnet",
-    "chainId": 4002,
-    "img": "img/network/fantom-ftm-logo.svg",
-    "rpc": "https://rpc.testnet.fantom.network/",
-    "explorerName": "FTMScan",
-    "explorerTxUrl": "https://testnet.ftmscan.com/tx/",
-    "explorerAddressUrl": "https://testnet.ftmscan.com/address/",
-    "isDisabled": true,
-    "isTestnet": true
-  },
-  {
-    "name": "AminoX Testnet",
-    "chainId": 13370,
-    "img": "img/network/aminoXTestnet.svg",
-    "isDisabled": true,
-    "explorerName": "AminoX Explorer",
-    "explorerTxUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/tx/",
-    "explorerAddressUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/address/",
-    "isTestnet": true
-  }
-];
-
-// src/store/index.ts
-var TOKENS = "oswap_user_tokens_";
-var getUserTokens = (chainId) => {
-  let tokens = localStorage[TOKENS + chainId];
-  if (tokens) {
-    tokens = JSON.parse(tokens);
-  } else {
-    tokens = [];
-  }
-  const userTokens = state.userTokens[chainId];
-  if (userTokens && userTokens.length) {
-    tokens = tokens.concat(userTokens);
-  }
-  return tokens.length ? tokens : null;
-};
-var getSiteEnv = () => {
-  return state.siteEnv;
-};
-function getChainId() {
-  return import_eth_wallet7.Wallet.getInstance().chainId;
-}
-function getWallet() {
-  return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId()).rpc);
-}
-var state = {
-  siteEnv: import_global2.SITE_ENV.TESTNET,
-  currentChainId: 0,
-  isExpertMode: false,
-  slippageTolerance: 0.5,
-  transactionDeadline: 30,
-  tokenBalances: {},
-  tokenMap: {},
-  userTokens: {},
-  infuraId: "",
-  networkMap: {}
-};
-var getDefaultChainId = () => {
-  switch (getSiteEnv()) {
-    case import_global2.SITE_ENV.TESTNET:
-      return 97;
-    case import_global2.SITE_ENV.DEV:
-    case import_global2.SITE_ENV.MAINNET:
-    default:
-      return 56;
-  }
-};
-var getNetworkInfo = (chainId) => {
-  return state.networkMap[chainId];
-};
-var getNetworkExplorerName = (chainId) => {
-  if (getNetworkInfo(chainId)) {
-    return getNetworkInfo(chainId).explorerName;
-  }
-  return "Unknown";
-};
-var getTokenMapData = () => {
-  let allTokensMap = {};
-  let chainId = getChainId();
-  if (DefaultTokens[chainId]) {
-    let defaultTokenList = DefaultTokens[chainId].sort((a, b) => {
-      if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
-        return -1;
-      }
-      if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
-        return 1;
-      }
-      return 0;
-    });
-    for (let i = 0; i < defaultTokenList.length; i++) {
-      let defaultTokenItem = defaultTokenList[i];
-      if (defaultTokenItem.address)
-        allTokensMap[defaultTokenItem.address.toLowerCase()] = defaultTokenItem;
-      else
-        allTokensMap[defaultTokenItem.symbol] = defaultTokenItem;
-    }
-    const userCustomTokens = getUserTokens(chainId);
-    if (userCustomTokens) {
-      userCustomTokens.forEach((v) => allTokensMap[v.address] = __spreadProps(__spreadValues({}, v), { isCustom: true }));
-    }
-  }
-  return allTokensMap;
-};
-var tokenMapChainId = 0;
-var getTokenMap = () => {
-  let chainId = getChainId();
-  if (tokenMapChainId != chainId) {
-    state.tokenMap = getTokenMapData();
-    tokenMapChainId = chainId;
-  }
-  return state.tokenMap;
-};
-var viewOnExplorerByTxHash = (chainId, txHash) => {
-  let network = getNetworkInfo(chainId);
-  if (network && network.explorerTxUrl) {
-    let url = `${network.explorerTxUrl}${txHash}`;
-    window.open(url);
-  }
-};
-
 // src/staking-utils/API.ts
+var import_store = __toModule(require("@staking/store"));
 var getTokenPrice = async (token) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let chainId = wallet.chainId;
   let tokenPrice;
-  let tokenPriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
+  let tokenPriceFeedAddress = import_store.ToUSDPriceFeedAddressesMap[chainId][token.toLowerCase()];
   if (tokenPriceFeedAddress) {
     let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, tokenPriceFeedAddress);
     let tokenLatestRoundData = await aggregator.latestRoundData();
     let tokenPriceFeedDecimals = await aggregator.decimals();
     return tokenLatestRoundData.answer.shiftedBy(-tokenPriceFeedDecimals).toFixed();
   }
-  let referencePair = tokenPriceAMMReference[chainId][token.toLowerCase()];
+  let referencePair = import_store.tokenPriceAMMReference[chainId][token.toLowerCase()];
   if (!referencePair)
     return null;
-  let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, referencePair);
+  let pair = new import_sdk2.Contracts.OSWAP_Pair(wallet, referencePair);
   let token0 = await pair.token0();
   let token1 = await pair.token1();
   let reserves = await pair.getReserves();
-  let token0PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][token0.toLowerCase()];
-  let token1PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][token1.toLowerCase()];
+  let token0PriceFeedAddress = import_store.ToUSDPriceFeedAddressesMap[chainId][token0.toLowerCase()];
+  let token1PriceFeedAddress = import_store.ToUSDPriceFeedAddressesMap[chainId][token1.toLowerCase()];
   if (token0PriceFeedAddress || token1PriceFeedAddress) {
     if (token0PriceFeedAddress) {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token0PriceFeedAddress);
       let token0LatestRoundData = await aggregator.latestRoundData();
       let token0PriceFeedDecimals = await aggregator.decimals();
-      let token0USDPrice = new import_eth_wallet8.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
-      if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
-        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
+      let token0USDPrice = new import_eth_wallet4.BigNumber(token0LatestRoundData.answer).shiftedBy(-token0PriceFeedDecimals).toFixed();
+      if (new import_eth_wallet4.BigNumber(token.toLowerCase()).lt(token0.toLowerCase())) {
+        tokenPrice = new import_eth_wallet4.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token0USDPrice).toFixed();
       } else {
-        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
+        tokenPrice = new import_eth_wallet4.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token0USDPrice).toFixed();
       }
     } else {
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, token1PriceFeedAddress);
       let token1LatestRoundData = await aggregator.latestRoundData();
       let token1PriceFeedDecimals = await aggregator.decimals();
-      let token1USDPrice = new import_eth_wallet8.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
-      if (new import_eth_wallet8.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
-        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
+      let token1USDPrice = new import_eth_wallet4.BigNumber(token1LatestRoundData.answer).shiftedBy(-token1PriceFeedDecimals).toFixed();
+      if (new import_eth_wallet4.BigNumber(token.toLowerCase()).lt(token1.toLowerCase())) {
+        tokenPrice = new import_eth_wallet4.BigNumber(reserves._reserve1).div(reserves._reserve0).times(token1USDPrice).toFixed();
       } else {
-        tokenPrice = new import_eth_wallet8.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
+        tokenPrice = new import_eth_wallet4.BigNumber(reserves._reserve0).div(reserves._reserve1).times(token1USDPrice).toFixed();
       }
     }
   } else {
@@ -21990,19 +19097,19 @@ var getTokenPrice = async (token) => {
       let token1Price = await getTokenPrice(token1);
       if (!token1Price)
         return null;
-      tokenPrice = new import_eth_wallet8.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
+      tokenPrice = new import_eth_wallet4.BigNumber(token1Price).times(reserves._reserve1).div(reserves._reserve0).toFixed();
     } else {
       let token0Price = await getTokenPrice(token0);
       if (!token0Price)
         return null;
-      tokenPrice = new import_eth_wallet8.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
+      tokenPrice = new import_eth_wallet4.BigNumber(token0Price).times(reserves._reserve0).div(reserves._reserve1).toFixed();
     }
   }
   return tokenPrice;
 };
 var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTime) => {
   try {
-    let rewardAddress = option.rewardAddress;
+    let rewardAddress = option.address;
     let isCommonStartDate = option.isCommonStartDate;
     let reward = "0";
     let claimSoFar = "0";
@@ -22012,10 +19119,10 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
         reward,
         claimSoFar,
         claimable,
-        multiplier: option.rate
+        multiplier: option.multiplier
       };
     }
-    let wallet = import_eth_wallet8.Wallet.getInstance();
+    let wallet = import_eth_wallet4.Wallet.getInstance();
     let rewardsContract;
     if (isCommonStartDate) {
       rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet, rewardAddress);
@@ -22026,9 +19133,9 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
       let rewardWei = await rewardsContract.reward();
       let unclaimedWei = await rewardsContract.unclaimed();
       let claimSoFarWei = await rewardsContract.claimSoFar(providerAddress);
-      reward = import_eth_wallet8.Utils.fromDecimals(rewardWei).toFixed();
-      claimSoFar = import_eth_wallet8.Utils.fromDecimals(claimSoFarWei).toFixed();
-      claimable = import_eth_wallet8.Utils.fromDecimals(unclaimedWei).toFixed();
+      reward = import_eth_wallet4.Utils.fromDecimals(rewardWei).toFixed();
+      claimSoFar = import_eth_wallet4.Utils.fromDecimals(claimSoFarWei).toFixed();
+      claimable = import_eth_wallet4.Utils.fromDecimals(unclaimedWei).toFixed();
     } catch (err) {
     }
     let vestingPeriod = (await rewardsContract.vestingPeriod()).toNumber();
@@ -22041,7 +19148,7 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
     }
     let vestingEnd = (0, import_moment2.default)(vestingStart).add(vestingPeriod, "seconds");
     let multiplierWei = await rewardsContract.multiplier();
-    let multiplier = import_eth_wallet8.Utils.fromDecimals(multiplierWei).toFixed();
+    let multiplier = import_eth_wallet4.Utils.fromDecimals(multiplierWei).toFixed();
     return {
       vestingPeriod,
       vestingStart,
@@ -22058,23 +19165,23 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
 };
 var getStakingOptionExtendedInfoByAddress = async (option) => {
   try {
-    let wallet = import_eth_wallet8.Wallet.getInstance();
-    let stakingAddress = option.stakingAddress;
-    let rewardOptions = option.rewardOptions;
+    let wallet = import_eth_wallet4.Wallet.getInstance();
+    let stakingAddress = option.address;
+    let rewardOptions = option.rewards;
     let decimalsOffset = option.decimalsOffset || 0;
     let currentAddress = wallet.address;
-    let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].rewardAddress;
+    let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].address;
     let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, stakingAddress);
     let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
     let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
     let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-    let totalCredit = import_eth_wallet8.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
-    let lockAmount = import_eth_wallet8.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
+    let totalCredit = import_eth_wallet4.Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
+    let lockAmount = import_eth_wallet4.Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
     let stakeQty = withdrawn ? "0" : lockAmount;
     let mode = "";
-    if (new import_eth_wallet8.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
+    if (new import_eth_wallet4.BigNumber(totalCredit).gt(0) && hasRewardAddress) {
       mode = "Claim";
-    } else if (new import_eth_wallet8.BigNumber(stakeQty).isZero()) {
+    } else if (new import_eth_wallet4.BigNumber(stakeQty).isZero()) {
       mode = "Stake";
     } else {
       mode = "Unlock";
@@ -22091,9 +19198,9 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
     let endOfEntryPeriod = (await timeIsMoney.endOfEntryPeriod()).toFixed();
     let perAddressCapWei = await timeIsMoney.perAddressCap();
     let lockedTime = releaseTime.minus(minimumLockTime);
-    let maxTotalLock = import_eth_wallet8.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
-    let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
-    let perAddressCap = import_eth_wallet8.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
+    let maxTotalLock = import_eth_wallet4.Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
+    let totalLocked = import_eth_wallet4.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+    let perAddressCap = import_eth_wallet4.Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
     let tokenAddress = await timeIsMoney.token();
     let obj = {
       mode,
@@ -22119,7 +19226,7 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
           try {
             let stakingRewardInfo = await getStakingRewardInfoByAddresses(option2, currentAddress, releaseTime.toNumber());
             if (stakingRewardInfo) {
-              let vestedReward = new import_eth_wallet8.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
+              let vestedReward = new import_eth_wallet4.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
               rewardsData.push(__spreadProps(__spreadValues(__spreadValues({}, option2), stakingRewardInfo), {
                 vestedReward,
                 index
@@ -22147,21 +19254,19 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
   for (let i = 0; i < stakingCampaignInfoList.length; i++) {
     let stakingCampaignInfo = stakingCampaignInfoList[i];
     let durationOptionsWithExtendedInfo = [];
-    let durationOptions = stakingCampaignInfo.options;
+    let durationOptions = stakingCampaignInfo.stakings;
     for (let j = 0; j < durationOptions.length; j++) {
       let durationOption = durationOptions[j];
       addDurationOption(durationOptionsWithExtendedInfo, durationOption);
     }
     let campaignObj = {
-      campaignName: stakingCampaignInfo.campaignName,
-      campaignDesc: stakingCampaignInfo.campaignDesc,
-      campaignPeriod: stakingCampaignInfo.campaignPeriod,
+      campaignName: stakingCampaignInfo.customName,
+      campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
       isSimplified: stakingCampaignInfo.isSimplified,
       getTokenURL: stakingCampaignInfo.getTokenURL,
       getTokenURL2: stakingCampaignInfo.getTokenURL2,
-      options: durationOptionsWithExtendedInfo,
-      decimalsOffset: stakingCampaignInfo.decimalsOffset
+      options: durationOptionsWithExtendedInfo
     };
     if (durationOptionsWithExtendedInfo.length > 0) {
       campaignObj = __spreadProps(__spreadValues({}, campaignObj), {
@@ -22173,19 +19278,19 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
   return campaigns;
 };
 var getAllCampaignsInfo = async (stakingInfo) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let chainId = wallet.chainId;
   let stakingCampaignInfoList = stakingInfo[chainId];
   if (!stakingCampaignInfoList)
     return [];
   let optionExtendedInfoMap = {};
-  let allCampaignOptions = stakingCampaignInfoList.flatMap((v) => v.options);
+  let allCampaignOptions = stakingCampaignInfoList.flatMap((v) => v.stakings);
   let promises = allCampaignOptions.map(async (option, index) => {
     return new Promise(async (resolve, reject) => {
       try {
         let optionExtendedInfo = await getStakingOptionExtendedInfoByAddress(option);
         if (optionExtendedInfo)
-          optionExtendedInfoMap[option.stakingAddress] = optionExtendedInfo;
+          optionExtendedInfoMap[option.address] = optionExtendedInfo;
       } catch (error) {
       }
       resolve();
@@ -22193,28 +19298,28 @@ var getAllCampaignsInfo = async (stakingInfo) => {
   });
   await Promise.all(promises);
   let campaigns = await composeCampaignInfoList(stakingCampaignInfoList, (options, defaultOption) => {
-    if (optionExtendedInfoMap[defaultOption.stakingAddress]) {
-      options.push(__spreadValues(__spreadValues({}, defaultOption), optionExtendedInfoMap[defaultOption.stakingAddress]));
+    if (defaultOption.address && optionExtendedInfoMap[defaultOption.address]) {
+      options.push(__spreadValues(__spreadValues({}, defaultOption), optionExtendedInfoMap[defaultOption.address]));
     }
   });
   return campaigns;
 };
 var getStakingTotalLocked = async (stakingAddress, decimalsOffset) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, stakingAddress);
   let totalLockedWei = await timeIsMoney.totalLocked();
-  let totalLocked = import_eth_wallet8.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+  let totalLocked = import_eth_wallet4.Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
   return totalLocked;
 };
 var getWETH = (wallet) => {
-  let wrappedToken = WETHByChainId[wallet.chainId];
+  let wrappedToken = import_store.WETHByChainId[wallet.chainId];
   return wrappedToken;
 };
 var getLPObject = async (pairAddress) => {
   try {
-    let wallet = import_eth_wallet8.Wallet.getInstance();
+    let wallet = import_eth_wallet4.Wallet.getInstance();
     const WETH = getWETH(wallet);
-    let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
+    let pair = new import_sdk2.Contracts.OSWAP_Pair(wallet, pairAddress);
     let getSymbol = await pair.symbol();
     let getName = await pair.name();
     let getDecimal = await pair.decimals();
@@ -22232,14 +19337,20 @@ var getLPObject = async (pairAddress) => {
     return null;
   }
 };
+var getLPBalance = async (pairAddress) => {
+  let wallet = import_eth_wallet4.Wallet.getInstance();
+  let pair = new import_sdk2.Contracts.OSWAP_Pair(wallet, pairAddress);
+  let balance = await pair.balanceOf(wallet.address);
+  return import_eth_wallet4.Utils.fromDecimals(balance).toFixed();
+};
 var getVaultObject = async (vaultAddress) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
   let symbol = await vault.symbol();
   let name = await vault.name();
   let decimals = await vault.decimals();
   let asset = await vault.asset();
-  let tokenMap = getTokenMap();
+  let tokenMap = (0, import_store.getTokenMap)();
   let assetToken = tokenMap[asset.toLowerCase()];
   return {
     address: vaultAddress.toLowerCase(),
@@ -22249,31 +19360,37 @@ var getVaultObject = async (vaultAddress) => {
     assetToken
   };
 };
+var getVaultBalance = async (vaultAddress) => {
+  let wallet = import_eth_wallet4.Wallet.getInstance();
+  let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultAddress);
+  let balance = await vault.balanceOf(wallet.address);
+  return import_eth_wallet4.Utils.fromDecimals(balance).toFixed();
+};
 var getERC20RewardCurrentAPR = async (rewardOption, lockedToken, lockedDays) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let chainId = wallet.chainId;
-  const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
+  const usdPeggedTokenAddress = import_store.USDPeggedTokenAddressMap[chainId];
   if (!usdPeggedTokenAddress)
     return "";
   let APR = "";
-  let rewardPrice = await getTokenPrice(rewardOption.tokenAddress);
+  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress);
   let lockedTokenPrice = await getTokenPrice(lockedToken.address);
   if (!rewardPrice || !lockedTokenPrice)
     return null;
-  APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
+  APR = new import_eth_wallet4.BigNumber(rewardOption.multiplier).times(new import_eth_wallet4.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet4.BigNumber(lockedTokenPrice).times(lockedDays)).toFixed();
   return APR;
 };
 var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let reserveObj;
-  let pair = new import_sdk3.Contracts.OSWAP_Pair(wallet, pairAddress);
+  let pair = new import_sdk2.Contracts.OSWAP_Pair(wallet, pairAddress);
   let reserves = await pair.getReserves();
   if (!tokenInAddress || !tokenOutAddress) {
     tokenInAddress = await pair.token0();
     tokenOutAddress = await pair.token1();
   }
   if (tokenInAddress && tokenOutAddress) {
-    if (new import_eth_wallet8.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
+    if (new import_eth_wallet4.BigNumber(tokenInAddress.toLowerCase()).lt(tokenOutAddress.toLowerCase())) {
       reserveObj = {
         reserveA: reserves._reserve0,
         reserveB: reserves._reserve1
@@ -22288,84 +19405,84 @@ var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => 
   return reserveObj;
 };
 var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address;
   let chainId = wallet.chainId;
-  const usdPeggedTokenAddress = USDPeggedTokenAddressMap[chainId];
+  const usdPeggedTokenAddress = import_store.USDPeggedTokenAddressMap[chainId];
   if (!usdPeggedTokenAddress)
     return "";
   let APR = "";
   if (lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() || lpObject.token1.toLowerCase() == usdPeggedTokenAddress.toLowerCase()) {
     let rewardPrice = "";
     if (rewardOption.APROption && rewardOption.APROption == 1) {
-      let WETH9PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
+      let WETH9PriceFeedAddress = import_store.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
       if (!WETH9PriceFeedAddress)
         return "";
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
       let WETH9LatestRoundData = await aggregator.latestRoundData();
       let WETH9PriceFeedDecimals = await aggregator.decimals();
-      let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
+      let WETH9USDPrice = new import_eth_wallet4.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves)
         return "";
-      rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+      rewardPrice = new import_eth_wallet4.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
     } else {
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.tokenAddress);
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, usdPeggedTokenAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves)
         return "";
-      rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
+      rewardPrice = new import_eth_wallet4.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).toFixed();
     }
     let lpTokenOut = lpObject.token0.toLowerCase() == usdPeggedTokenAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
     let lockedLPReserves = await getReservesByPair(lpObject.address, usdPeggedTokenAddress, lpTokenOut);
     if (!lockedLPReserves)
       return "";
-    let lockedLPPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
-    APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+    let lockedLPPrice = new import_eth_wallet4.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(2).toFixed();
+    APR = new import_eth_wallet4.BigNumber(rewardOption.multiplier).times(new import_eth_wallet4.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet4.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
   } else {
     if (!lpObject.token0 || !lpObject.token1 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() || lpObject.token1.toLowerCase() == WETHAddress.toLowerCase()) {
-      let WETH9PriceFeedAddress = ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
+      let WETH9PriceFeedAddress = import_store.ToUSDPriceFeedAddressesMap[chainId][WETHAddress.toLowerCase()];
       if (!WETH9PriceFeedAddress)
         return "";
       let aggregator = new import_chainlink_sdk.Contracts.EACAggregatorProxy(wallet, WETH9PriceFeedAddress);
       let WETH9LatestRoundData = await aggregator.latestRoundData();
       let WETH9PriceFeedDecimals = await aggregator.decimals();
-      let WETH9USDPrice = new import_eth_wallet8.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
-      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.tokenAddress);
+      let WETH9USDPrice = new import_eth_wallet4.BigNumber(WETH9LatestRoundData.answer).shiftedBy(-WETH9PriceFeedDecimals).toFixed();
+      let rewardReserves = await getReservesByPair(rewardOption.referencePair, WETHAddress, rewardOption.rewardTokenAddress);
       if (!rewardReserves)
         return "";
-      let rewardPrice = new import_eth_wallet8.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
+      let rewardPrice = new import_eth_wallet4.BigNumber(rewardReserves.reserveA).div(rewardReserves.reserveB).times(WETH9USDPrice).toFixed();
       let otherTokenAddress = !lpObject.token0 || lpObject.token0.toLowerCase() == WETHAddress.toLowerCase() ? lpObject.token1 : lpObject.token0;
       let lockedLPReserves = await getReservesByPair(lpObject.address, WETHAddress, otherTokenAddress);
       if (!lockedLPReserves)
         return "";
-      let otherTokenPrice = new import_eth_wallet8.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
-      let lockedLPPrice = new import_eth_wallet8.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet8.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
-      APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
+      let otherTokenPrice = new import_eth_wallet4.BigNumber(lockedLPReserves.reserveA).div(lockedLPReserves.reserveB).times(WETH9USDPrice).toFixed();
+      let lockedLPPrice = new import_eth_wallet4.BigNumber(otherTokenPrice).times(2).div(new import_eth_wallet4.BigNumber(otherTokenPrice).div(WETH9USDPrice).sqrt()).toFixed();
+      APR = new import_eth_wallet4.BigNumber(rewardOption.multiplier).times(new import_eth_wallet4.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet4.BigNumber(lockedLPPrice).times(lockedDays)).toFixed();
     }
   }
   return APR;
 };
 var getVaultRewardCurrentAPR = async (rewardOption, vaultObject, lockedDays) => {
   let APR = "";
-  let rewardPrice = await getTokenPrice(rewardOption.tokenAddress);
+  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress);
   let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
   if (!assetTokenPrice || !rewardPrice)
     return "";
-  let wallet = import_eth_wallet8.Wallet.getInstance();
+  let wallet = import_eth_wallet4.Wallet.getInstance();
   let vault = new import_cross_chain_bridge.Contracts.OSWAP_BridgeVault(wallet, vaultObject.address);
   let vaultTokenTotalSupply = await vault.totalSupply();
   let lpAssetBalance = await vault.lpAssetBalance();
-  let lpToAssetRatio = new import_eth_wallet8.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
-  let VaultTokenPrice = new import_eth_wallet8.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
-  APR = new import_eth_wallet8.BigNumber(rewardOption.rate).times(new import_eth_wallet8.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet8.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+  let lpToAssetRatio = new import_eth_wallet4.BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
+  let VaultTokenPrice = new import_eth_wallet4.BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed();
+  APR = new import_eth_wallet4.BigNumber(rewardOption.multiplier).times(new import_eth_wallet4.BigNumber(rewardPrice).times(365)).div(new import_eth_wallet4.BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
   return APR;
 };
 var withdrawToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
   try {
-    let wallet = import_eth_wallet8.Wallet.getInstance();
+    let wallet = import_eth_wallet4.Wallet.getInstance();
     let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
     let receipt = await timeIsMoney.withdraw(true);
     return receipt;
@@ -22379,7 +19496,7 @@ var claimToken = async (contractAddress, callback) => {
   if (!contractAddress)
     return;
   try {
-    let wallet = import_eth_wallet8.Wallet.getInstance();
+    let wallet = import_eth_wallet4.Wallet.getInstance();
     let rewards = new import_time_is_money_sdk.Contracts.Rewards(wallet, contractAddress);
     let receipt = await rewards.claim();
     return receipt;
@@ -22389,26 +19506,40 @@ var claimToken = async (contractAddress, callback) => {
     }
   }
 };
+var lockToken = async (token, amount, contractAddress) => {
+  if (!token)
+    return;
+  if (!contractAddress)
+    return;
+  let wallet = import_eth_wallet4.Wallet.getInstance();
+  let decimals = typeof token.decimals === "object" ? token.decimals.toNumber() : token.decimals;
+  let tokenAmount = import_eth_wallet4.Utils.toDecimals(amount, decimals);
+  let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet, contractAddress);
+  let receipt = await timeIsMoney.lock(tokenAmount);
+  return receipt;
+};
+var getApprovalModelAction = (contractAddress, options) => {
+  const approvalOptions = __spreadProps(__spreadValues({}, options), {
+    spenderAddress: contractAddress
+  });
+  const approvalModel = new ERC20ApprovalModel(approvalOptions);
+  let approvalModelAction = approvalModel.getAction();
+  return approvalModelAction;
+};
 
 // src/staking/common.ts
-var import_store3 = __toModule(require("@staking/store"));
-var StakingType2;
-(function(StakingType4) {
-  StakingType4[StakingType4["ERC20_Token"] = 0] = "ERC20_Token";
-  StakingType4[StakingType4["LP_Token"] = 1] = "LP_Token";
-  StakingType4[StakingType4["VAULT_Token"] = 2] = "VAULT_Token";
-})(StakingType2 || (StakingType2 = {}));
+var import_store2 = __toModule(require("@staking/store"));
 var getLockedTokenObject = (info, tokenInfo, tokenMap) => {
   if (info) {
-    if (info.stakingType == 0) {
+    if (info.lockTokenType == import_store2.LockTokenType.ERC20_Token) {
       if (!tokenMap) {
-        tokenMap = (0, import_store3.getTokenMap)();
+        tokenMap = (0, import_store2.getTokenMap)();
       }
       return tokenMap[tokenInfo.tokenAddress];
     }
-    if (info.stakingType == 1 && tokenInfo.lpToken) {
+    if (info.lockTokenType == import_store2.LockTokenType.LP_Token && tokenInfo.lpToken) {
       return tokenInfo.lpToken.object;
-    } else if (info.stakingType == 2 && tokenInfo.vaultToken) {
+    } else if (info.lockTokenType == import_store2.LockTokenType.VAULT_Token && tokenInfo.vaultToken) {
       return tokenInfo.vaultToken.object;
     }
   }
@@ -22416,13 +19547,13 @@ var getLockedTokenObject = (info, tokenInfo, tokenMap) => {
 };
 var getLockedTokenSymbol = (info, token) => {
   if (info) {
-    if (info.stakingType == 0) {
+    if (info.lockTokenType == import_store2.LockTokenType.ERC20_Token) {
       return token ? token.symbol : "";
     }
-    if (info.stakingType == 1) {
+    if (info.lockTokenType == import_store2.LockTokenType.LP_Token) {
       return "LP";
     }
-    if (info.stakingType == 2) {
+    if (info.lockTokenType == import_store2.LockTokenType.VAULT_Token) {
       return token ? `vt${token.assetToken.symbol}` : "";
     }
   }
@@ -22432,19 +19563,19 @@ var getLockedTokenIconPaths = (info, tokenObject, chainId, tokenMap) => {
   var _a;
   if (info && tokenObject) {
     if (!tokenMap) {
-      tokenMap = (0, import_store3.getTokenMap)();
+      tokenMap = (0, import_store2.getTokenMap)();
     }
-    if (info.stakingType == 0) {
-      return [(0, import_store3.getTokenIconPath)(tokenObject, chainId)];
+    if (info.lockTokenType == import_store2.LockTokenType.ERC20_Token) {
+      return [(0, import_store2.getTokenIconPath)(tokenObject, chainId)];
     }
-    if (info.stakingType == 1) {
-      const nativeToken = (_a = import_store3.DefaultTokens[chainId]) == null ? void 0 : _a.find((token) => token.isNative);
+    if (info.lockTokenType == import_store2.LockTokenType.LP_Token) {
+      const nativeToken = (_a = import_store2.DefaultTokens[chainId]) == null ? void 0 : _a.find((token) => token.isNative);
       const token0 = tokenMap[tokenObject.token0] || nativeToken;
       const token1 = tokenMap[tokenObject.token1] || nativeToken;
-      return [(0, import_store3.getTokenIconPath)(token0, chainId), (0, import_store3.getTokenIconPath)(token1, chainId)];
+      return [(0, import_store2.getTokenIconPath)(token0, chainId), (0, import_store2.getTokenIconPath)(token1, chainId)];
     }
-    if (info.stakingType == 2) {
-      return [(0, import_store3.getTokenIconPath)(tokenObject.assetToken, chainId)];
+    if (info.lockTokenType == import_store2.LockTokenType.VAULT_Token) {
+      return [(0, import_store2.getTokenIconPath)(tokenObject.assetToken, chainId)];
     }
   }
   return [];
@@ -22452,17 +19583,18 @@ var getLockedTokenIconPaths = (info, tokenObject, chainId, tokenMap) => {
 
 // src/staking/staking.tsx
 var import_assets4 = __toModule(require("@staking/assets"));
-var import_moment3 = __toModule(require_moment());
-var import_eth_wallet10 = __toModule(require("@ijstech/eth-wallet"));
+var import_moment4 = __toModule(require_moment());
+var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
 
 // src/result/result.tsx
-var import_components3 = __toModule(require("@ijstech/components"));
-var import_global4 = __toModule(require("@staking/global"));
+var import_components2 = __toModule(require("@ijstech/components"));
+var import_store3 = __toModule(require("@staking/store"));
+var import_global2 = __toModule(require("@staking/global"));
 
 // src/result/result.css.ts
-var import_components2 = __toModule(require("@ijstech/components"));
-var Theme = import_components2.Styles.Theme.ThemeVars;
-var result_css_default = import_components2.Styles.style({
+var import_components = __toModule(require("@ijstech/components"));
+var Theme = import_components.Styles.Theme.ThemeVars;
+var result_css_default = import_components.Styles.style({
   textAlign: "center",
   $nest: {
     "i-label > *": {
@@ -22517,8 +19649,8 @@ var result_css_default = import_components2.Styles.style({
 });
 
 // src/result/result.tsx
-var import_assets2 = __toModule(require("@staking/assets"));
-var Result = class extends import_components3.Module {
+var import_assets = __toModule(require("@staking/assets"));
+var Result = class extends import_components2.Module {
   get message() {
     return this._message;
   }
@@ -22555,13 +19687,13 @@ var Result = class extends import_components3.Module {
   }
   async buildLink() {
     if (this.message.txtHash) {
-      const chainId = await getWallet().getChainId();
-      viewOnExplorerByTxHash(chainId, this.message.txtHash);
+      const chainId = await (0, import_store3.getWallet)().getChainId();
+      (0, import_store3.viewOnExplorerByTxHash)(chainId, this.message.txtHash);
     }
   }
   async renderUI() {
     this.mainContent.innerHTML = "";
-    const mainSection = await import_components3.VStack.create({
+    const mainSection = await import_components2.VStack.create({
       horizontalAlignment: "center"
     });
     if (this.message.status === "warning") {
@@ -22579,20 +19711,20 @@ var Result = class extends import_components3.Module {
         verticalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-icon", {
         class: "i-loading-spinner_icon",
-        image: { url: import_assets2.default.fullPath("img/loading.svg"), width: 24, height: 24 }
+        image: { url: import_assets.default.fullPath("img/loading.svg"), width: 24, height: 24 }
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Loading...",
         font: { color: "#FD4A4C" },
         class: "i-loading-spinner_text"
       }))));
       mainSection.appendChild(loading);
-      const section = new import_components3.VStack();
+      const section = new import_components2.VStack();
       section.margin = { bottom: 20 };
       const captionList = ["Waiting For Confirmation", this.message.content || "", "Confirm this transaction in your wallet"];
       const classList = ["waiting-txt mb-1", "mb-1", "confirm-txt"];
       for (let i = 0; i < captionList.length; i++) {
         const caption = captionList[i];
-        const label = await import_components3.Label.create();
+        const label = await import_components2.Label.create();
         label.caption = caption;
         if (classList[i]) {
           const classes = classList[i].split(" ");
@@ -22603,38 +19735,38 @@ var Result = class extends import_components3.Module {
       ;
       mainSection.appendChild(section);
     } else if (this.message.status === "success") {
-      const chainId = await getWallet().getChainId();
-      const explorerName = getNetworkExplorerName(chainId);
-      const image = await import_components3.Image.create({
+      const chainId = await (0, import_store3.getWallet)().getChainId();
+      const explorerName = (0, import_store3.getNetworkExplorerName)(chainId);
+      const image = await import_components2.Image.create({
         width: "50px",
-        url: import_assets2.default.fullPath("img/success-icon.svg")
+        url: import_assets.default.fullPath("img/success-icon.svg")
       });
       image.classList.add("inline-block", "mb");
       mainSection.appendChild(image);
-      const label = await import_components3.Label.create();
+      const label = await import_components2.Label.create();
       label.caption = "Transaction Submitted";
       label.classList.add("waiting-txt");
       label.classList.add("mb");
       mainSection.appendChild(label);
-      const contentSection = await import_components3.Panel.create();
+      const contentSection = await import_components2.Panel.create();
       contentSection.id = "contentSection";
       mainSection.appendChild(contentSection);
-      const contentLabel = await import_components3.Label.create();
+      const contentLabel = await import_components2.Label.create();
       contentLabel.caption = this.message.content || "";
       contentSection.appendChild(contentLabel);
       if (this.message.txtHash) {
-        const section = new import_components3.VStack();
-        const label1 = await import_components3.Label.create({
+        const section = new import_components2.VStack();
+        const label1 = await import_components2.Label.create({
           caption: this.message.txtHash.substr(0, 33)
         });
         label1.classList.add("mb-1");
         section.appendChild(label1);
-        const label2 = await import_components3.Label.create({
+        const label2 = await import_components2.Label.create({
           caption: this.message.txtHash.substr(33, this.message.txtHash.length)
         });
         label2.classList.add("mb-1");
         section.appendChild(label2);
-        const link = await import_components3.Label.create({
+        const link = await import_components2.Label.create({
           caption: `View on ${explorerName}`
         });
         link.onClick = this.buildLink.bind(this);
@@ -22642,7 +19774,7 @@ var Result = class extends import_components3.Module {
         section.appendChild(link);
         contentSection.appendChild(section);
       }
-      const button = new import_components3.Button(mainSection, {
+      const button = new import_components2.Button(mainSection, {
         width: "100%",
         caption: "Close"
       });
@@ -22652,26 +19784,26 @@ var Result = class extends import_components3.Module {
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);
     } else {
-      const image = await import_components3.Image.create({
+      const image = await import_components2.Image.create({
         width: "50px",
-        url: import_assets2.default.fullPath("img/oswap_error.png")
+        url: import_assets.default.fullPath("img/oswap_error.png")
       });
       image.classList.add("inline-block", "mb");
       mainSection.appendChild(image);
-      const label = await import_components3.Label.create({
+      const label = await import_components2.Label.create({
         caption: "Transaction Rejected."
       });
       label.classList.add("waiting-txt", "mb");
       mainSection.appendChild(label);
-      const section = await import_components3.VStack.create();
+      const section = await import_components2.VStack.create();
       section.id = "contentSection";
-      const contentLabel = await import_components3.Label.create({
+      const contentLabel = await import_components2.Label.create({
         caption: await this.onErrMsgChanged()
       });
       contentLabel.classList.add("mb-1");
       section.appendChild(contentLabel);
       mainSection.appendChild(section);
-      const button = new import_components3.Button(mainSection, {
+      const button = new import_components2.Button(mainSection, {
         width: "100%",
         caption: "Cancel"
       });
@@ -22689,7 +19821,7 @@ var Result = class extends import_components3.Module {
     if (this.message.content.message && this.message.content.message.includes("Internal JSON-RPC error.")) {
       this.message.content.message = JSON.parse(this.message.content.message.replace("Internal JSON-RPC error.\n", "")).message;
     }
-    return await (0, import_global4.parseContractError)(this.message.content.message, this.message.obj);
+    return await (0, import_global2.parseContractError)(this.message.content.message, this.message.obj);
   }
   render() {
     return /* @__PURE__ */ this.$render("i-modal", {
@@ -22704,1236 +19836,89 @@ var Result = class extends import_components3.Module {
   }
 };
 Result = __decorateClass([
-  (0, import_components3.customElements)("staking-result")
+  (0, import_components2.customElements)("staking-result")
 ], Result);
 
 // src/config.ts
-var import_eth_wallet9 = __toModule(require("@ijstech/eth-wallet"));
-var import_global5 = __toModule(require("@staking/global"));
-var StakingCampaignInfoByChainId = {
-  1: [],
-  42: [],
-  56: [
-    {
-      campaignName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
-      campaignDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      campaignPeriod: "13 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/swap`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.03",
-            rateDesc: "1 OSWAP : 0.03 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.1",
-            rateDesc: "1 OSWAP : 0.1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "vtUSDT Bridge Vault\nFixed Staking",
-      campaignDesc: "Help fund OpenSwap Bridge Vault prior to mainnet release and earn lucrative rewards!",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x2Bd4b72E8643E804f5C0a2Bd2751c15028012480",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x4aE47FED2606AcfaEe74B822ea026eA76123BF1E",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "3.938",
-            rateDesc: "1 vtUSDT : 3.938 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x31a88b923730Ad5b67140C568593Be4BA3FF8bC9",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xe3b45691f4545319E3ac00382E57F671eB8b5547",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "9.453",
-            rateDesc: "1 vtUSDT : 9.453 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program BSC #1",
-      campaignDesc: "Stake vtOSWAP, Earn OSWAP",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0xC47eB8b2105e1a3Fc95c551e4858Ec93290a28Fb",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x4cbF6100346Dd614859A73EDFcc162f082DC7FDF",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0xD61bBE686CdF488c5Cc9D1c7E9EDE565F5448d6b",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x73Ebb51cAa593b89505303F3e34A61D8E29a2b2F",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Stake OAX, Earn OSWAP",
-      campaignDesc: "Stake OAX and earn $OSWAP rewards!",
-      campaignPeriod: "2 Months",
-      vestingPeriod: "",
-      isSimplified: true,
-      getTokenURL2: "https://www.bnbchain.world/en/bridge",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x0a05FA54c49ff751bBeB7BD69BdfF26dB8e838D5",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xaa40E2b744F0a8c2Dc28acdAbbF5754303b05410",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "0.25",
-            rateDesc: "4 OAX : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xb7e5d9cDddA645dDAb37a5F72D25cf492857a22F",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x7a5E13ed54e62aA0E1d6B851d5afF841b36d756E",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "1",
-            rateDesc: "1 OAX : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OAX Liquidity Booster Reward Program",
-      campaignDesc: "Stake OAX/BNB LP tokens and earn $OSWAP rewards!",
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: `https://openswap.xyz/#/pool/add`,
-      options: [{
-        duration: "14",
-        stakingAddress: "0x7106727266E46B8c8BD45C0b733187603Aa01946",
-        stakingDesc: "Stake OAX/BNB LP and Earn $OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [{
-          rewardAddress: "0x8c6162B0fA876941C9146708D8391dDA17caE5d0",
-          tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-          rate: "2",
-          rateDesc: "1 LP : 2 OSWAP",
-          referencePair: "0x0DBCe9e7b634B5eAAAb483194CC3224Fde9624CF"
-        }]
-      }]
-    },
-    {
-      campaignName: "Thanks IDIA for fueling our launch",
-      campaignDesc: "Stake IDIA/BUSD LP tokens and earn $IDIA and $OSWAP rewards!",
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: "https://swap.impossible.finance/#/add/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-      options: [{
-        duration: "14",
-        stakingAddress: "0x547C8B68Cb36410FFDceE6Ad4bA0c64FD21085Bb",
-        stakingDesc: "Stake IDIA/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0xe4Fee53a3ea02D0cd6B24D805E532330497f72B9",
-            tokenAddress: "0x0b15ddf19d47e6a86a56148fb4afffc6929bcb89",
-            rate: "0.044",
-            rateDesc: "1 LP : 0.044 IDIA",
-            referencePair: "0x154F8A1c77Cb1Bb9C3C1c6e6B15bbA8A23eC77bb"
-          },
-          {
-            rewardAddress: "0xb1Cb1EC68dF60E098Cda4e8aF6760033188101E2",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "0.17",
-            rateDesc: "1 LP : 0.17 OSWAP",
-            APROption: 1,
-            referencePair: "0x6aa3ec903176df556e8d8473a002b6a807399351"
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Happy Birthday $OSWAP",
-      campaignDesc: "Stake OSWAP/BNB LP tokens and earn $OSWAP rewards",
-      campaignPeriod: "6 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: `https://openswap.xyz/#/pool/add`,
-      options: [{
-        duration: "14",
-        stakingAddress: "0xBa235a0Cd029D7Ec8890CA4eC636d012aE8D65CA",
-        stakingDesc: "Stake OSWAP/BNB LP and Earn $OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0xB0a018FcB5cD780c209E58ba621bD48ED1657cF9",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "5",
-            rateDesc: "1 LP : 5 OSWAP",
-            referencePair: "0x6aa3ec903176df556e8d8473a002b6a807399351"
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Congrats Impossible! IF-BUSD Staking",
-      campaignDesc: 'To celebrate the IDIA launch, we are offering IDIA+OSWAP rewards for Liquidity Providers of the IF/BUSD pair on IFSwap <a href="https://swap.impossible.finance/" class="text-purple-200" target="_blank">(https://swap.impossible.finance/)</a>.',
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: "https://swap.impossible.finance/#/add/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/0xB0e1fc65C1a741b4662B813eB787d369b8614Af1",
-      options: [{
-        duration: "7",
-        stakingAddress: "0xD8C1c018DF55ca4A37975a0883A686876750348A",
-        stakingDesc: "Stake IF/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0x8Ae51f1A62c4Bc0715C367bFe812c53e583aEE2f",
-            tokenAddress: "0x0b15ddf19d47e6a86a56148fb4afffc6929bcb89",
-            rate: "0.227272727272727272",
-            rateDesc: "1 LP : 0.227 IDIA",
-            referencePair: "0x154F8A1c77Cb1Bb9C3C1c6e6B15bbA8A23eC77bb"
-          },
-          {
-            rewardAddress: "0xa083B9B2adE0B235176ee4227Bc50f459fD15700",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
-            rateDesc: "1 LP : 0.699 OSWAP",
-            claimStartTime: 1630416600
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Congrats Impossible! IDIA-BUSD Staking",
-      campaignDesc: 'To celebrate the IDIA launch, we are offering IDIA+OSWAP rewards for Liquidity Providers of the IDIA/BUSD pair on IFSwap <a href="https://swap.impossible.finance/" class="text-purple-200" target="_blank">(https://swap.impossible.finance/)</a>.',
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: "https://swap.impossible.finance/#/add/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-      options: [{
-        duration: "7",
-        stakingAddress: "0xcd3e984cdE988C24d5009296e4eDE14b89aE6e29",
-        stakingDesc: "Stake IDIA/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0x07C72F4ECfC3a5Abac8540a3E3000AD58403348D",
-            tokenAddress: "0x0b15ddf19d47e6a86a56148fb4afffc6929bcb89",
-            rate: "0.0193333333333333333",
-            rateDesc: "1 LP : 0.0193 IDIA",
-            referencePair: "0x154F8A1c77Cb1Bb9C3C1c6e6B15bbA8A23eC77bb"
-          },
-          {
-            rewardAddress: "0x84DD0bde1A040989dfC5C23C9644a691505880D3",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
-            rateDesc: "1 LP : 0.0595 OSWAP",
-            claimStartTime: 1630416600
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Thank you Impossible Finance",
-      campaignDesc: "Welcome campaign for Impossible Finance community.",
-      campaignPeriod: "29 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x77B34ceDe3214769F7A50db12F8489766E9F741c",
-          stakingDesc: "Stake IF, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x4710f86E0B87854F955295Eb555f8cd2a546365f",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
-            rateDesc: "3 IF : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xcD2A608Ec4B6526407D2830543dC944CF22cc663",
-          stakingDesc: "Stake IF, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x2b14c0Eab5b4Baa6f75FA9Afb3C07bfA1316Ff47",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "1",
-            rateDesc: "1 IF : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Thank you Coin98",
-      campaignDesc: "Welcome campaign for Coin98 community.",
-      campaignPeriod: "29 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0xAb8a4241FBF3A4CD1783400a3D9dD8f117CDCC46",
-          stakingDesc: "Stake C98, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xe935d589550B5fe6A4FBcb203fE1B0ab74441Eec",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(1).div(5).toFixed(),
-            rateDesc: "5 C98 : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xEfeAD058e3a16272FD61D978e54D6c7039ae828E",
-          stakingDesc: "Stake C98, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x174D975e3f99d865C5383F931F8eb84B0fA8Ed8e",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(3).div(5).toFixed(),
-            rateDesc: "5 C98 : 3 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "We Love OAX 3000",
-      campaignDesc: "Sweet campaign to show our sweet love to OAX.",
-      campaignPeriod: "29 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x823bE4d972ab2051ecCedd9787cA413a790B026f",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x646C5e3Ec40706372243accF2D457D9162553685",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
-            rateDesc: "3 OAX : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xb7CAd80FEf493B38f80179e54e212D2c4A188856",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x20148CA5ceCC521E4D952213Af53699bDdE9025f",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "1",
-            rateDesc: "1 OAX : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Thank You OAX",
-      campaignDesc: "Welcome campaign for new users.",
-      campaignPeriod: "30 Days",
-      vestingPeriod: "24 Months",
-      options: [
-        {
-          duration: "30",
-          stakingAddress: "0xfc78B1245C4D7995cAA3FEc41b7554D328c862Fc",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x739f0BBcdAd415127FE8d5d6ED053e9D817BdAdb",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "2",
-            rateDesc: "1 OAX : 2 OSWAP",
-            isCommonStartDate: true
-          }]
-        },
-        {
-          duration: "60",
-          stakingAddress: "0xCA883c07447305f5e6f0FE7eec1c4617414f97b2",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x629cF4235c0f6b9954698EF0aF779b9502e4853E",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "6",
-            rateDesc: "1 OAX : 6 OSWAP",
-            isCommonStartDate: true
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x6a2e8Dc9cA6a8e8b5da204d6fF69215C01EC7A95",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xb740f3B46e76f0Ccaa1f55056192263b2671E902",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "10",
-            rateDesc: "1 OAX : 10 OSWAP",
-            isCommonStartDate: true
-          }]
-        }
-      ]
-    }
-  ],
-  97: [
-    {
-      campaignName: "Stake OAX, Earn OSWAP",
-      campaignDesc: "Stake OAX and earn $OSWAP rewards!",
-      campaignPeriod: "2 Months",
-      vestingPeriod: "",
-      isSimplified: true,
-      getTokenURL2: "https://www.bnbchain.world/en/bridge",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x7124a5d45ABEd9649c749310C6b7392519b16391",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x5DF37c9DaE55B61F58797D1E0747242f09926209",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "0.25",
-            rateDesc: "4 OAX : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x51e3C86B8b5916e1A1f656C4C144d8FD756aac64",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x42A4B223748611df8dcc90D520d351bE98510cD5",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "1",
-            rateDesc: "1 OAX : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OAX Liquidity Booster Reward Program",
-      campaignDesc: "Stake OAX/BNB and earn $OSWAP rewards!",
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      options: [{
-        duration: "14",
-        stakingAddress: "0xC3aC5c30b64FFA3E33007350ef08d532a2743f02",
-        stakingDesc: "Stake OAX/BNB LP, Earn OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [{
-          rewardAddress: "0x9D5435a2891af7fECb355f87e4a834903B5cafd0",
-          tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-          rate: "2",
-          rateDesc: "1 LP : 2 OSWAP"
-        }]
-      }]
-    },
-    {
-      campaignName: "IDIA-BUSD Staking",
-      campaignDesc: "",
-      campaignPeriod: "6 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      getTokenURL: "https://swap.impossible.finance/#/add/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/0x0b15Ddf19D47E6a86A56148fb4aFFFc6929BcB89",
-      options: [{
-        duration: "14",
-        stakingAddress: "0xa1d58FBF715B824a85C6f6A59cA647d519a0c3Ce",
-        stakingDesc: "Stake IDIA/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0x3f12a06594614849E8A430BeB712a2622509d222",
-            tokenAddress: "0x52423b7f0769d0365ebdd79342ce167eb9c29ae2",
-            rate: "0.044",
-            rateDesc: "1 LP : 0.044 IDIA"
-          },
-          {
-            rewardAddress: "0xEDfB4a1AECbB864DD3862C5AC3EbF83ea1279760",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "0.17",
-            rateDesc: "1 LP : 0.17 OSWAP"
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "OSWAP/BNB Staking",
-      campaignDesc: "",
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      options: [{
-        duration: "7",
-        stakingAddress: "0xb092266b13969ab29d362c67c73a830b2f30148e",
-        stakingDesc: "Stake OSWAP/BNB LP, Earn OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0xfA70C3FE8Cc49521f4c713f2B150e32f79bA13ad",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "5",
-            rateDesc: "1 LP : 5 OSWAP",
-            referencePair: "0xb0094ffe387da1739fb95babcaf01b105fd0d887"
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Congrats Impossible! IF-BUSD Staking",
-      campaignDesc: 'To celebrate the IDIA launch, we are offering IDIA+OSWAP rewards for Liquidity Providers of the IF/BUSD pair on IFSwap <a href="https://swap.impossible.finance/" class="text-purple-200" target="_blank">(https://swap.impossible.finance/)</a>.',
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      options: [{
-        duration: "7",
-        stakingAddress: "0xAc969F404c61BBF369b61505AeF951dAf2827d7E",
-        stakingDesc: "Stake IF/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0x20a2F8F8db8D28b34E767EEA27776F1eDb27a249",
-            tokenAddress: "0x52423b7f0769d0365ebdd79342ce167eb9c29ae2",
-            rate: "0.227272727272727272",
-            rateDesc: "(50.09% APR) 1 LP : 0.227 IDIA",
-            rateTooltip: "APY is based on the token price as of August 19."
-          },
-          {
-            rewardAddress: "0x2Cf36cC2656993347c3280c95b232E7e8Eef7ed6",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(76.9).div(110).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
-            rateDesc: "1 LP : 0.699 OSWAP",
-            claimStartTime: 1630416600
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Congrats Impossible! IDIA-BUSD Staking",
-      campaignDesc: 'To celebrate the IDIA launch, we are offering IDIA+OSWAP rewards for Liquidity Providers of the IDIA/BUSD pair on IFSwap <a href="https://swap.impossible.finance/" class="text-purple-200" target="_blank">(https://swap.impossible.finance/)</a>.',
-      campaignPeriod: "7 Days",
-      vestingPeriod: "180 Days for OSWAP",
-      options: [{
-        duration: "7",
-        stakingAddress: "0x88D4eE8C76228Ae95c49Fd21bEA25666b02B8e6e",
-        stakingDesc: "Stake IDIA/BUSD LP, Earn IDIA and OSWAP",
-        stakingType: import_global5.StakingType.LP_Token,
-        rewardOptions: [
-          {
-            rewardAddress: "0x54f07B180E2aB18fCDED1BA60D90C2CC05454812",
-            tokenAddress: "0x52423b7f0769d0365ebdd79342ce167eb9c29ae2",
-            rate: "0.0193333333333333333",
-            rateDesc: "(51.03% APR) 1 LP : 0.0193 IDIA",
-            rateTooltip: "APY is based on the token price as of August 19."
-          },
-          {
-            rewardAddress: "0x0d92ec679BbaB83e0c1839e82fc4a400c2ee6E5F",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(89.2).div(1500).shiftedBy(18).dp(0, import_eth_wallet9.BigNumber.ROUND_DOWN).shiftedBy(-18).toFixed(),
-            rateDesc: "1 LP : 0.0595 OSWAP",
-            claimStartTime: 1630416600
-          }
-        ]
-      }]
-    },
-    {
-      campaignName: "Thank you Impossible Finance",
-      campaignDesc: "Welcome campaign for Impossible Finance community.",
-      campaignPeriod: "29 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x37CfDAD1DC43B2d558C78A073408228dd006Ca21",
-          stakingDesc: "Stake IF, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x6127A08a2Adc8ee56611c92Ff3f46A8b78C1C25F",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
-            rateDesc: "3 IF : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x824beA6bB0EB867e8383e4DD50D5eb315431f53a",
-          stakingDesc: "Stake IF, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xfA527c0FF45EcFD052944CbB7C9c431005274850",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "1",
-            rateDesc: "1 IF : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Thank you Coin98",
-      campaignDesc: "Welcome campaign for Coin98 community.",
-      campaignPeriod: "29 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0xF4c1FF0Bc4049694137098121df4830E4E32A7B9",
-          stakingDesc: "Stake C98, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xc51ab6Cf26E762Af0f0f9515352f3f4904948b12",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(1).div(5).toFixed(),
-            rateDesc: "5 C98 : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x1913D73eD3b5eF80669c132734cD23Aed2890B13",
-          stakingDesc: "Stake C98, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x25baBD786b14dc375baEC8a7AEcEE1226B08EfCd",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(3).div(5).toFixed(),
-            rateDesc: "5 C98 : 3 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "We Love OAX 3000",
-      campaignDesc: "Sweet campaign to show our sweet love to OAX.",
-      campaignPeriod: "30 Days",
-      vestingPeriod: "180 Days",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x4d45113786A4Db463D04d48D08f6c58E3201f9d9",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xEF4Faa48Ee32E2D47503a821eb7E8607D52489AC",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: new import_eth_wallet9.BigNumber(1).div(3).toFixed(),
-            rateDesc: "3 OAX : 1 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x0f8A454299E52CC8B68ad6cF63c7152851268D62",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x403dB269a2CeeD6B94905595fa28b40CdD1A2F87",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "1",
-            rateDesc: "1 OAX : 1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Thank You OAX",
-      campaignDesc: "Welcome campaign for new users.",
-      campaignPeriod: "30 Days",
-      vestingPeriod: "24 Months",
-      options: [
-        {
-          duration: "30",
-          stakingAddress: "0x4565945F050a60abA82Eee0aFE8ffe8201974303",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x70AdFB7eB23ce76Df6F5717d319A7c5D444808eC",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "2",
-            rateDesc: "1 OAX : 2 OSWAP",
-            isCommonStartDate: true
-          }]
-        },
-        {
-          duration: "60",
-          stakingAddress: "0x1936e51BfB42a9810fB6b53fa9aE5EA51e9DF7e2",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x226021E3582c89eF9a338be069dEcFD43acF0269",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "6",
-            rateDesc: "1 OAX : 6 OSWAP",
-            isCommonStartDate: true
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x10835a580a0DED282E442Fd9e40C7b9234295020",
-          stakingDesc: "Stake OAX, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x4849dd61138b6ddDCC5F400c8124c6A60Bbd65c2",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "10",
-            rateDesc: "1 OAX : 10 OSWAP",
-            isCommonStartDate: true
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Stake vtUSDT, Earn OSWAP",
-      campaignDesc: "Stake vtUSDT and earn $OSWAP rewards!",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x8A80257103D23eAd25CfE1A94E74297D8D595749",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x425170235Cb78C65204aA648C7842b6D72C43694",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "3.938",
-            rateDesc: "1 vtUSDT : 3.938 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xaA829366d41011C9Fe71FE2e3480F1506e504140",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x035648056FeC694e419354a0Fc9349b0CC9354b3",
-            tokenAddress: "0x45eee762aaea4e5ce317471bda8782724972ee19",
-            rate: "9.453",
-            rateDesc: "1 vtUSDT : 9.453 OSWAP"
-          }]
-        }
-      ]
-    }
-  ],
-  1337: [],
-  43113: [
-    {
-      campaignName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
-      campaignDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      campaignPeriod: "13 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/swap`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x8b57B7A5DA3a0f16928483222FAD5402Fb7cA2d2",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0xd7B24B5a4E9C97BF415A2B2B3BaC67A42bcEbf76",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.03",
-            rateDesc: "1 OSWAP : 0.03 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x3d22Ca8Ecc15C9aEb5Df75fd596D9c0FB6a7e33A",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x3dEaba228f1FF361CCDA2C31Cf7503CA59422a2B",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.1",
-            rateDesc: "1 OSWAP : 0.1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Upgraded OSWAP Vault",
-      campaignDesc: "Thanks for migrating your OSWAP to our upgraded bridge vault! Please help fund the new OSWAP vault prior to mainnet release and earn lucrative rewards.",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x96a4e389F4534B5B06e9BeF6cbfE25f2B13343eF",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xb4726C80A5dA7d45010C63Bf4e838c4105Fc7869",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0xD3a63AcBeB9E45DB42d6875fd4EA9B8264A03B48",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x495DAc474830823bE850bc2E30f73986895C0F43",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "vtUSDT Bridge Vault\nFixed Staking",
-      campaignDesc: "Help fund OpenSwap Bridge Vault prior to mainnet release and earn lucrative rewards!",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0xb0779f64Ef60572dcd74FE475BEAaD22F2B49fa7",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          decimalsOffset: 12,
-          rewardOptions: [{
-            rewardAddress: "0xb0779f64Ef60572dcd74FE475BEAaD22F2B49fa7",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "5.01",
-            rateDesc: "1 vtUSDT : 5.01 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0xb0779f64Ef60572dcd74FE475BEAaD22F2B49fa7",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          decimalsOffset: 12,
-          rewardOptions: [{
-            rewardAddress: "0x7Bb92118d75fE32A7c827A579F2141e37d42120B",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "12.027",
-            rateDesc: "1 vtUSDT : 12.027 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program 2",
-      campaignDesc: "Stake vtOSWAP, Earn OSWAP",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x62F70C0d57df2694F4D13bd7cF51668Dff3b3748",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x6403B9E4BADF3F96Cfe82cE19A0F97785ac458d5",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0xcDB0949130a3329Fa66553b3913081FC8E35ca7f",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xc32E2b332Cb5E77F02DDb95a051fE084a4D4a23F",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program 1",
-      campaignDesc: "Stake OSWAP Vault Token, Earn OSWAP",
-      campaignPeriod: "3 Days",
-      vestingPeriod: "180 Days",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "3",
-          stakingAddress: "0x7d78B00c89123613fe9226C80c131F565daAb7E6",
-          stakingDesc: "Stake OSWAP Vault Token, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xe25e8533FBe3E725B3baE172d3aBAB0887ccD63E",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.001",
-            rateDesc: "1 vtOSWAP : 0.001 OSWAP"
-          }]
-        },
-        {
-          duration: "7",
-          stakingAddress: "0x6562D7b754f695b1C70641fdcdb56615A363D394",
-          stakingDesc: "Stake OSWAP Vault Token, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x492448Df2a9c9163F0d72050E5De511c5CF19801",
-            tokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            rate: "0.003",
-            rateDesc: "1 vtOSWAP : 0.003 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Stake vtUSDC, Earn OSWAP",
-      campaignDesc: "Stake vtUSDC and earn $OSWAP rewards!",
-      campaignPeriod: "90 Days",
-      vestingPeriod: "",
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x32ADAa900DEd1f2D9d3ae2Ec4F6e27220A918C8F",
-          stakingDesc: "Stake vtUSDC, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x557EF6a7fc628eB9f399DAAe4b89EB2f8a443154",
-            tokenAddress: "0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c",
-            rate: `${new import_eth_wallet9.BigNumber("5010000000000").shiftedBy(18 - 6)}`,
-            rateDesc: "1 vtUSDC : 5.01 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x4b38037139Ddb05C3B091093646A9f63F6D85E28",
-          stakingDesc: "Stake vtUSDC, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xEB94cc393530b19B293b97b40dc97fD39072b6A6",
-            tokenAddress: "0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c",
-            rate: `${new import_eth_wallet9.BigNumber("12027000000000").shiftedBy(18 - 6)}`,
-            rateDesc: "1 vtUSDC : 12.027 OSWAP"
-          }]
-        }
-      ]
-    }
-  ],
-  43114: [
-    {
-      campaignName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
-      campaignDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      campaignPeriod: "13 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/swap`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x425c590c442d2E8bC3aB01dEA1db58f095466D92",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x4290566C6FF4b453aaeaEC58cd174B4146c86016",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.03",
-            rateDesc: "1 OSWAP : 0.03 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x4800b7705ba56d6Da4BB8EA26124A395c28DcAA1",
-          stakingDesc: "Stake OSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.ERC20_Token,
-          rewardOptions: [{
-            rewardAddress: "0x06C62Fc9F1EF0D3897A7263d9C4915ce2726FFb1",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.1",
-            rateDesc: "1 OSWAP : 0.1 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "Upgraded OSWAP Vault",
-      campaignDesc: "Thanks for migrating your OSWAP to our upgraded bridge vault! Please help fund the new OSWAP vault prior to mainnet release and earn lucrative rewards.",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x83F85C85518aDF02C5cc67c8059F6C60584d154D",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x96F8F857Fb1698a5ef569A142a4363275a8eB985",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x6D33E3f5dC830f34257308216ce9E6fFb7Ff2C85",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xAaBd6fd6c57bd5659d489A383DE268C1e1EBc55F",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "vtUSDT Bridge Vault\nFixed Staking",
-      campaignDesc: "Help fund OpenSwap Bridge Vault prior to mainnet release and earn lucrative rewards!",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: `https://openswap.xyz/#/cross-chain-bridge-vault`,
-      options: [
-        {
-          duration: "45",
-          stakingAddress: "0x57d69D4F9531F2606d48C7D03aF9EC698175cDC8",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          decimalsOffset: 12,
-          rewardOptions: [{
-            rewardAddress: "0xB2515Cd512931db70475735b87272eD292D13477",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "5.01",
-            rateDesc: "1 vtUSDT : 5.01 OSWAP"
-          }]
-        },
-        {
-          duration: "90",
-          stakingAddress: "0x65508E2609938dF346cbD7C8711B6a51f578A734",
-          stakingDesc: "Stake vtUSDT, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          decimalsOffset: 12,
-          rewardOptions: [{
-            rewardAddress: "0x0c5D5342CB1ecF1e9e2A110f40615657ae7Fb451",
-            tokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-            rate: "12.027",
-            rateDesc: "1 vtUSDT : 12.027 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program 3",
-      campaignDesc: "Stake vtOSWAP, Earn OSWAP",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: "https://www.openswap.xyz/#/cross-chain-bridge-vault",
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x3d4F9cA218E4cB5C8B7F6f0B0D84d62d7400788B",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xe1d8784d245D2d45e6F0dE05427B9b085C7CfC33",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x8c6162B0fA876941C9146708D8391dDA17caE5d0",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xe4Fee53a3ea02D0cd6B24D805E532330497f72B9",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program 2",
-      campaignDesc: "Stake vtOSWAP, Earn OSWAP",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "",
-      getTokenURL: "https://www.openswap.xyz/#/cross-chain-bridge-vault",
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0xB124679972Ef4B6CAB1280082C620F0Fd600F327",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xB072020c0ad2E961c8B819d3D42FFCc11D83FF4A",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x2c571239412Cc908106EDbC4851b87aaD4402acb",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0xF496F27f807FFC58a7E57e49018e8aA9459a1890",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    },
-    {
-      campaignName: "OSWAP Bridge Vault Program 1",
-      campaignDesc: "Stake vtOSWAP, Earn OSWAP",
-      campaignPeriod: "14 Days",
-      vestingPeriod: "180 Days",
-      getTokenURL: "https://www.openswap.xyz/#/cross-chain-bridge-vault",
-      options: [
-        {
-          duration: "14",
-          stakingAddress: "0x7106727266E46B8c8BD45C0b733187603Aa01946",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x0E1F5ae02eEEB1259f1DDb21D5091Ec22c2588eC",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.0058",
-            rateDesc: "1 vtOSWAP : 0.0058 OSWAP"
-          }]
-        },
-        {
-          duration: "30",
-          stakingAddress: "0x3945BD8beee8e88Ae8e1FEAf5AAb263581dA854B",
-          stakingDesc: "Stake vtOSWAP, Earn OSWAP",
-          stakingType: import_global5.StakingType.VAULT_Token,
-          rewardOptions: [{
-            rewardAddress: "0x7607650Bea995c11F081d001aa3ad67c1Ac78D5B",
-            tokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            rate: "0.015",
-            rateDesc: "1 vtOSWAP : 0.015 OSWAP"
-          }]
-        }
-      ]
-    }
-  ]
-};
+var baseUrl = "https://openswap.xyz/#";
+var tokenIcon = "img/swap/openswap.png";
+var getTokenUrl = `${baseUrl}/swap`;
+var manageStakeUrl = `${baseUrl}/staking/manage-stake?address=`;
 
 // src/staking/staking.css.ts
-var import_components4 = __toModule(require("@ijstech/components"));
-var import_assets3 = __toModule(require("@staking/assets"));
-var Theme2 = import_components4.Styles.Theme.ThemeVars;
-import_components4.Styles.Theme.darkTheme.background.default = "#0c1234";
-import_components4.Styles.Theme.darkTheme.background.paper = "#1f1e4f";
-import_components4.Styles.Theme.darkTheme.colors.primary.dark = "#F05E61";
-import_components4.Styles.Theme.darkTheme.colors.primary.light = "#f15e60e7";
-import_components4.Styles.Theme.darkTheme.colors.primary.main = "#f15e61";
-import_components4.Styles.Theme.darkTheme.colors.secondary.dark = "#f7d063";
-import_components4.Styles.Theme.darkTheme.colors.secondary.light = "#f7d063b6";
-import_components4.Styles.Theme.darkTheme.colors.secondary.main = "#f7d063";
-import_components4.Styles.Theme.darkTheme.text.secondary = "hsla(0, 0%, 100%, 0.55)";
-import_components4.Styles.Theme.darkTheme.typography.fontFamily = "Proxima Nova";
-import_components4.Styles.Theme.darkTheme.colors.warning.dark = "#f57c00";
-import_components4.Styles.Theme.darkTheme.colors.warning.light = "#F6C958";
-import_components4.Styles.Theme.darkTheme.colors.warning.main = "#ffa726";
-import_components4.Styles.Theme.darkTheme.divider = "#0E132E";
-import_components4.Styles.Theme.darkTheme.typography.fontSize = "16px";
+var import_components3 = __toModule(require("@ijstech/components"));
+var import_assets2 = __toModule(require("@staking/assets"));
+var Theme2 = import_components3.Styles.Theme.ThemeVars;
+import_components3.Styles.Theme.darkTheme.background.default = "#0c1234";
+import_components3.Styles.Theme.darkTheme.background.paper = "#1f1e4f";
+import_components3.Styles.Theme.darkTheme.colors.primary.dark = "#F05E61";
+import_components3.Styles.Theme.darkTheme.colors.primary.light = "#f15e60e7";
+import_components3.Styles.Theme.darkTheme.colors.primary.main = "#f15e61";
+import_components3.Styles.Theme.darkTheme.colors.secondary.dark = "#f7d063";
+import_components3.Styles.Theme.darkTheme.colors.secondary.light = "#f7d063b6";
+import_components3.Styles.Theme.darkTheme.colors.secondary.main = "#f7d063";
+import_components3.Styles.Theme.darkTheme.text.secondary = "hsla(0, 0%, 100%, 0.55)";
+import_components3.Styles.Theme.darkTheme.typography.fontFamily = "Proxima Nova";
+import_components3.Styles.Theme.darkTheme.colors.warning.dark = "#f57c00";
+import_components3.Styles.Theme.darkTheme.colors.warning.light = "#F6C958";
+import_components3.Styles.Theme.darkTheme.colors.warning.main = "#ffa726";
+import_components3.Styles.Theme.darkTheme.divider = "#0E132E";
+import_components3.Styles.Theme.darkTheme.typography.fontSize = "16px";
 var colorVar = {
   primaryButton: "transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box",
   primaryGradient: "linear-gradient(255deg,#f15e61,#b52082)",
   darkBg: "#181E3E 0% 0% no-repeat padding-box",
   primaryDisabled: "transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box"
 };
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBoldIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaBoldIt.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "italic"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaLight.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaLight.ttf")}") format("truetype")`,
   fontWeight: "300",
   fontStyle: "normal"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaLightIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaLightIt.ttf")}") format("truetype")`,
   fontWeight: "300",
   fontStyle: "italic"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaReg.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaReg.ttf")}") format("truetype")`,
   fontWeight: "normal",
   fontStyle: "normal"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaRegIt.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaRegIt.ttf")}") format("truetype")`,
   fontWeight: "normal",
   fontStyle: "italic"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
-  src: `url("${import_assets3.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/proxima_nova/ProximaNovaBold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
-import_components4.Styles.fontFace({
+import_components3.Styles.fontFace({
   fontFamily: "Apple SD Gothic Neo",
-  src: `url("${import_assets3.default.fullPath("fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf")}") format("truetype")`,
+  src: `url("${import_assets2.default.fullPath("fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf")}") format("truetype")`,
   fontWeight: "bold",
   fontStyle: "normal"
 });
-import_components4.Styles.cssRule(".staking-component", {
+import_components3.Styles.cssRule(".staking-component", {
   $nest: {
     ".overflow-inherit": {
       overflow: "inherit"
@@ -24372,20 +20357,819 @@ import_components4.Styles.cssRule(".staking-component", {
   }
 });
 
-// src/staking/staking.tsx
+// src/staking/manageStake/manage-stake.tsx
+var import_components5 = __toModule(require("@ijstech/components"));
+var import_global3 = __toModule(require("@staking/global"));
+var import_store4 = __toModule(require("@staking/store"));
+var import_assets3 = __toModule(require("@staking/assets"));
+var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
+
+// src/staking/manageStake/manage-stake.css.ts
+var import_components4 = __toModule(require("@ijstech/components"));
+var Theme3 = import_components4.Styles.Theme.ThemeVars;
+import_components4.Styles.cssRule(".manage-stake", {
+  $nest: {
+    "input": {
+      $nest: {
+        "&::-webkit-outer-spin-button": {
+          "-webkit-appearance": "none",
+          margin: "0"
+        },
+        "&::-webkit-inner-spin-button": {
+          "-webkit-appearance": "none",
+          margin: "0"
+        }
+      }
+    },
+    ".ml-auto": {
+      marginLeft: "auto"
+    },
+    ".cursor-pointer": {
+      cursor: "pointer"
+    },
+    ".manage-wrapper": {
+      width: "480px"
+    },
+    ".question-icon": {
+      border: `2px solid ${Theme3.text.primary}`,
+      borderRadius: "50%",
+      padding: "3px",
+      opacity: "0.8"
+    },
+    ".manage-header": {
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingBottom: "1rem",
+      marginBottom: "1rem",
+      borderBottom: "2px solid var(--divider)"
+    },
+    ".main-content": {
+      fontSize: ".875rem",
+      $nest: {
+        "i-label > *": {
+          color: Theme3.text.primary,
+          fontSize: "1rem",
+          wordBreak: "normal"
+        },
+        ".section-info": {
+          $nest: {
+            "i-panel": {
+              display: "flex",
+              flexWrap: "wrap"
+            },
+            "i-vstack": {
+              alignItems: "flex-start",
+              marginBottom: "2rem"
+            }
+          }
+        },
+        ".description": {
+          background: Theme3.background.gradient,
+          padding: "0.75rem 1rem",
+          marginBottom: "1rem",
+          $nest: {
+            "i-label": {
+              display: "block",
+              padding: "0.5rem 0"
+            }
+          }
+        },
+        ".input--token-box": {
+          border: `1px solid ${Theme3.text.primary}`,
+          borderRadius: "5px",
+          padding: "0.75rem"
+        },
+        ".input--token-box *": {
+          fontSize: "1rem"
+        },
+        ".img-token": {
+          marginRight: "0.25rem"
+        },
+        ".text-normal > *": {
+          fontWeight: "normal !important",
+          fontSize: "1rem !important"
+        },
+        ".btn-max": {
+          display: "flex",
+          alignItems: "center",
+          paddingInline: "0.5rem",
+          marginRight: "0.5rem"
+        },
+        ".btn-approve": {
+          padding: "1rem 0.25rem",
+          textAlign: "center",
+          marginBlock: ".25rem"
+        },
+        ".w-50": {
+          width: "50%"
+        },
+        ".w-100": {
+          width: "100%"
+        },
+        ".token-input > input": {
+          border: "none",
+          width: "100% !important",
+          backgroundColor: "transparent",
+          color: Theme3.text.primary,
+          fontSize: "1.25rem",
+          textAlign: "left"
+        }
+      }
+    },
+    ".text-yellow *": {
+      color: `${Theme3.text.third} !important`,
+      fontSize: "1.25rem !important",
+      fontWeight: "bold"
+    },
+    ".mr-025": {
+      marginRight: "0.25rem"
+    },
+    ".mb-025": {
+      marginBottom: "0.25rem"
+    },
+    ".mb-075": {
+      marginBottom: "0.75rem"
+    },
+    "#loadingElm.i-loading--active": {
+      marginTop: "2rem",
+      position: "initial",
+      $nest: {
+        ".i-loading-spinner": {
+          marginTop: "2rem"
+        }
+      }
+    },
+    ".stake-modal": {
+      $nest: {
+        ".i-modal_header": {
+          display: "none"
+        },
+        ".modal": {
+          background: Theme3.background.modal,
+          width: 480,
+          maxWidth: "100%",
+          borderRadius: "1rem",
+          padding: "1.5rem 1rem",
+          color: Theme3.text.primary
+        }
+      }
+    },
+    ".custom-modal": {
+      $nest: {
+        ".i-modal_header": {
+          display: "none"
+        },
+        ".modal": {
+          background: Theme3.background.modal,
+          width: 480,
+          maxWidth: "100%",
+          padding: "0.75rem 1rem",
+          borderRadius: "1rem",
+          color: Theme3.text.primary
+        },
+        ".manage-header": {
+          marginTop: "0.5rem",
+          marginBottom: 0,
+          paddingBottom: 0,
+          border: "none",
+          justifyContent: "flex-end",
+          $nest: {
+            "i-icon": {
+              fill: Theme3.colors.primary.main
+            }
+          }
+        },
+        "i-label > *": {
+          fontSize: ".875rem",
+          wordBreak: "normal"
+        },
+        ".i-modal_content": {
+          padding: "0 1rem 1rem"
+        },
+        ".description-time": {
+          display: "inline-block",
+          $nest: {
+            "i-label": {
+              marginRight: "0.25rem"
+            },
+            "i-label > *": {
+              color: Theme3.colors.primary.main,
+              display: "inherit"
+            }
+          }
+        },
+        ".group-btn": {
+          marginTop: "2rem"
+        },
+        "i-button": {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "150px",
+          height: "50px !important",
+          fontWeight: 600,
+          borderRadius: 5,
+          margin: "0.5rem"
+        },
+        ".btn-cancel": {
+          background: "#eaecef",
+          color: Theme3.background.default
+        },
+        ".btn-submit": {
+          textAlign: "center"
+        },
+        ".btn-submit > *": {
+          color: `${Theme3.text.primary} !important`
+        }
+      }
+    }
+  }
+});
+
+// src/staking/manageStake/manage-stake.tsx
+var import_moment3 = __toModule(require_moment());
+var Theme4 = import_components5.Styles.Theme.ThemeVars;
 import_components5.Styles.Theme.applyTheme(import_components5.Styles.Theme.darkTheme);
-var StakingBlock = class extends import_components5.Module {
+var CurrentMode;
+(function(CurrentMode2) {
+  CurrentMode2[CurrentMode2["STAKE"] = 0] = "STAKE";
+  CurrentMode2[CurrentMode2["UNLOCK"] = 1] = "UNLOCK";
+})(CurrentMode || (CurrentMode = {}));
+var ManageStake = class extends import_components5.Module {
+  constructor(parent, options) {
+    super(parent, options);
+    this.stakingInfo = {};
+    this.lockedTokenObject = {};
+    this.maxQty = 0;
+    this.availableQty = "0";
+    this.balance = "0";
+    this.perAddressCap = "0";
+    this.stakeQty = "0";
+    this.tokenSymbol = "";
+    this.currentMode = 0;
+    this.tokenBalances = {};
+    this.tokenMap = {};
+    this.showModal = async (data, actionKey) => {
+      this.address = data.address;
+      this.stakingInfo = data;
+      this.onSetupPage((0, import_store4.isWalletConnected)(), actionKey);
+      if (this.currentMode === 1) {
+        this.modalActions.visible = true;
+      } else {
+        this.modalStake.visible = true;
+      }
+    };
+    this.showResultMessage = (result, status, content) => {
+      if (!result)
+        return;
+      let params = { status };
+      if (status === "success") {
+        params.txtHash = content;
+      } else {
+        params.content = content;
+      }
+      result.message = __spreadValues({}, params);
+      result.showModal();
+    };
+    this.onApproveToken = async () => {
+      this.showResultMessage(this.stakingResult, "warning", `Approve ${this.tokenSymbol}`);
+      this.approvalModelAction.doApproveAction(this.lockedTokenObject, this.inputAmount.value);
+    };
+    this.onStake = async () => {
+      this.approvalModelAction.doPayAction();
+    };
+    this.onInputAmount = () => {
+      var _a;
+      (0, import_global3.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) == null ? void 0 : _a.decimals) || 18);
+      this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
+    };
+    this.setMaxBalance = () => {
+      var _a;
+      this.inputAmount.value = import_eth_wallet5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap).toFixed();
+      (0, import_global3.limitInputNumber)(this.inputAmount, ((_a = this.lockedTokenObject) == null ? void 0 : _a.decimals) || 18);
+      this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
+    };
+    this.renderStakingInfo = async (info) => {
+      if (!info || !Object.keys(info).length) {
+        clearInterval(this.timer);
+        this.lbDuration.caption = "-";
+        this.lbMaxQty.caption = "-";
+        this.lbAvailableQty.caption = "-";
+        this.lbMaturity.caption = "-";
+        this.colIndividualCap.visible = false;
+        this.colYourStakeQty.visible = false;
+        this.sectionEarnedQty.visible = false;
+        this.btnApprove.visible = false;
+        if (!(0, import_store4.isWalletConnected)()) {
+          this.lbBalance.caption = "Balance: 0";
+          this.btnMax.visible = false;
+        }
+        return;
+      }
+      ;
+      let lpTokenData = {};
+      let vaultTokenData = {};
+      const { tokenAddress, lockTokenType } = info;
+      if (tokenAddress) {
+        if (lockTokenType == import_store4.LockTokenType.LP_Token) {
+          lpTokenData = {
+            "object": await getLPObject(tokenAddress),
+            "balance": await getLPBalance(tokenAddress)
+          };
+        } else if (lockTokenType == import_store4.LockTokenType.VAULT_Token) {
+          vaultTokenData = {
+            "object": await getVaultObject(tokenAddress),
+            "balance": await getVaultBalance(tokenAddress)
+          };
+        }
+      }
+      const tokenInfo = {
+        tokenAddress,
+        lpToken: lpTokenData,
+        vaultToken: vaultTokenData
+      };
+      this.lockedTokenObject = getLockedTokenObject(info, tokenInfo, this.tokenMap);
+      const symbol = getLockedTokenSymbol(info, this.lockedTokenObject);
+      this.tokenSymbol = symbol;
+      this.lbDuration.caption = info.duration;
+      this.perAddressCap = info.perAddressCap;
+      this.maxQty = info.maxTotalLock;
+      this.stakeQty = info.stakeQty;
+      this.availableQty = new import_eth_wallet5.BigNumber(info.maxTotalLock).minus(info.totalLocked).toFixed();
+      this.lbMaxQty.caption = `${(0, import_global3.formatNumber)(this.maxQty)} ${symbol}`;
+      this.lbAvailableQty.caption = `${(0, import_global3.formatNumber)(this.availableQty)} ${symbol}`;
+      this.btnApprove.visible = false;
+      clearInterval(this.timer);
+      if (this.currentMode === 1) {
+        const totalCredit = new import_eth_wallet5.BigNumber(info.totalCredit);
+        if (totalCredit.isZero()) {
+          this.sectionUnlockMessage.visible = true;
+          this.btnStake.onClick = () => {
+            this.modalActions.visible = true;
+          };
+        } else {
+          this.btnStake.onClick = () => this.onStake();
+          this.sectionUnlockMessage.visible = false;
+        }
+        this.lbTitle.caption = "Manage Locked Staking";
+        this.colIndividualCap.visible = false;
+        this.colYourStakeQty.visible = true;
+        this.sectionEarnedQty.visible = true;
+        this.sectionTokenInput.visible = false;
+        this.colYourStakeQty.innerHTML = "";
+        this.colYourStakeQty.appendChild(/* @__PURE__ */ this.$render("i-label", {
+          caption: "Your Stake QTY"
+        }));
+        this.colYourStakeQty.appendChild(/* @__PURE__ */ this.$render("i-label", {
+          class: "text-yellow",
+          caption: `${(0, import_global3.formatNumber)(this.stakeQty)} ${symbol}`
+        }));
+        const maturity = (0, import_moment3.default)(info.releaseTime).format("YYYY-MM-DD HH:mm:ss");
+        this.lbMaturity.caption = maturity;
+        this.lbTimer.caption = `Please note that you will forfeit your rewards by unstaking. You are not eligible for rewards until <b>${maturity}</b>`;
+        this.sectionEarnedQty.innerHTML = "";
+        info.rewards.forEach((rewardOption) => {
+          var _a, _b;
+          const earnedQty = (0, import_global3.formatNumber)(totalCredit.times(rewardOption.rate));
+          const rewardSymbol = ((_b = this.tokenMap[(_a = rewardOption.tokenAddress) == null ? void 0 : _a.toLowerCase()]) == null ? void 0 : _b.symbol) || "";
+          this.sectionEarnedQty.appendChild(/* @__PURE__ */ this.$render("i-vstack", {
+            class: "w-50"
+          }, /* @__PURE__ */ this.$render("i-label", {
+            caption: "Your Earned QTY"
+          }), /* @__PURE__ */ this.$render("i-label", {
+            class: "text-yellow",
+            caption: `${earnedQty} ${rewardSymbol}`
+          })));
+        });
+        this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.stakeQty);
+      } else {
+        this.lbTitle.caption = "Create Locked Staking";
+        this.btnStake.onClick = () => this.onStake();
+        this.btnStake.caption = "Stake";
+        this.btnStake.enabled = false;
+        this.sectionUnlockMessage.visible = false;
+        this.colIndividualCap.visible = true;
+        this.colYourStakeQty.visible = false;
+        this.sectionEarnedQty.visible = false;
+        if (!!tokenAddress) {
+          const decimals = info.decimalsOffset || 0;
+          if (lockTokenType == import_store4.LockTokenType.ERC20_Token) {
+            let balances = (0, import_store4.getTokenBalances)();
+            if (!Object.keys(balances).length) {
+              await (0, import_store4.setTokenBalances)();
+              balances = (0, import_store4.getTokenBalances)();
+            }
+            this.tokenBalances = Object.keys(balances).reduce((accumulator, key) => {
+              accumulator[key.toLowerCase()] = balances[key];
+              return accumulator;
+            }, {});
+            this.balance = this.tokenBalances[tokenAddress] || "0";
+          } else if (lockTokenType == import_store4.LockTokenType.LP_Token) {
+            this.balance = new import_eth_wallet5.BigNumber(lpTokenData.balance || 0).shiftedBy(decimals).toFixed();
+          } else if (lockTokenType == import_store4.LockTokenType.VAULT_Token) {
+            this.balance = new import_eth_wallet5.BigNumber(vaultTokenData.balance || 0).shiftedBy(decimals).toFixed();
+          }
+          this.btnMax.visible = true;
+          this.btnMax.enabled = new import_eth_wallet5.BigNumber(this.balance).gt(0);
+          this.lbBalance.caption = `Balance: ${(0, import_global3.formatNumber)(this.balance)}`;
+          this.rowImgToken.innerHTML = "";
+          const lockedTokenIconPaths = getLockedTokenIconPaths(info, this.lockedTokenObject, this.chainId, this.tokenMap);
+          lockedTokenIconPaths.forEach((tokenPath) => {
+            this.rowImgToken.appendChild(/* @__PURE__ */ this.$render("i-image", {
+              width: 28,
+              class: "inline-block img-token",
+              url: import_assets3.default.fullPath(tokenPath)
+            }));
+          });
+          this.rowImgToken.appendChild(/* @__PURE__ */ this.$render("i-label", {
+            class: "text-yellow",
+            caption: symbol
+          }));
+          this.sectionTokenInput.visible = true;
+        } else {
+          this.sectionTokenInput.visible = false;
+        }
+        this.colIndividualCap.innerHTML = "";
+        this.colIndividualCap.appendChild(/* @__PURE__ */ this.$render("i-label", {
+          caption: "Individual Cap"
+        }));
+        this.colIndividualCap.appendChild(/* @__PURE__ */ this.$render("i-label", {
+          class: "text-yellow",
+          caption: `${(0, import_global3.formatNumber)(info.perAddressCap)} ${symbol}`
+        }));
+        const setMaturityText = () => {
+          const val = (0, import_moment3.default)().add(info.minLockTime, "seconds").format("YYYY-MM-DD HH:mm:ss");
+          this.lbMaturity.caption = val;
+        };
+        setMaturityText();
+        this.timer = setInterval(setMaturityText, 1e3);
+      }
+    };
+    this.onSetupPage = async (connected, actionKey) => {
+      if (!connected) {
+        this.btnStake.enabled = false;
+        this.btnApprove.visible = false;
+        this.inputAmount.enabled = false;
+        this.renderStakingInfo(null);
+        this.loadingElm.visible = false;
+        return;
+      }
+      this.loadingElm.visible = true;
+      this.inputAmount.enabled = true;
+      this.tokenMap = (0, import_store4.getTokenMap)();
+      this.chainId = (0, import_store4.getChainId)();
+      this.currentMode = CurrentMode[this.stakingInfo.mode.toUpperCase()];
+      await this.initApprovalModelAction(actionKey);
+      await this.renderStakingInfo(this.stakingInfo);
+      this.loadingElm.visible = false;
+    };
+    this.closeStakeModal = () => {
+      this.modalStake.visible = false;
+    };
+    this.closeModal = () => {
+      this.modalActions.visible = false;
+    };
+  }
+  async initApprovalModelAction(actionKey) {
+    this.approvalModelAction = getApprovalModelAction(this.address, {
+      sender: this,
+      payAction: async () => {
+        var _a;
+        if (this.modalActions.visible) {
+          this.modalActions.visible = false;
+        }
+        this.showResultMessage(this.stakingResult, "warning", `${this.currentMode === 0 ? "Stake" : "Unlock"} ${this.tokenSymbol}`);
+        if (this.currentMode === 0) {
+          const decimals = ((_a = this.stakingInfo) == null ? void 0 : _a.decimalsOffset) || 0;
+          const amount = new import_eth_wallet5.BigNumber(this.inputAmount.value).shiftedBy(-decimals).toFixed();
+          lockToken(this.lockedTokenObject, amount, this.address);
+        } else {
+          withdrawToken(this.address);
+        }
+      },
+      onToBeApproved: async (token) => {
+        if (new import_eth_wallet5.BigNumber(this.inputAmount.value).lte(import_eth_wallet5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
+          this.btnApprove.caption = `Approve ${token.symbol}`;
+          this.btnApprove.visible = true;
+          this.btnApprove.enabled = true;
+        } else {
+          this.btnApprove.visible = false;
+        }
+        this.btnStake.enabled = false;
+      },
+      onToBePaid: async (token) => {
+        this.btnApprove.visible = false;
+        if (this.currentMode === 0) {
+          const amount = new import_eth_wallet5.BigNumber(this.inputAmount.value);
+          if (amount.gt(this.balance)) {
+            this.btnStake.caption = "Insufficient Balance";
+            this.btnStake.enabled = false;
+            return;
+          }
+          this.btnStake.caption = "Stake";
+          if (amount.isNaN() || amount.lte(0) || amount.gt(import_eth_wallet5.BigNumber.min(this.availableQty, this.balance, this.perAddressCap))) {
+            this.btnStake.enabled = false;
+          } else {
+            this.btnStake.enabled = true;
+          }
+        } else {
+          this.btnStake.caption = "Unstake";
+          this.btnStake.enabled = new import_eth_wallet5.BigNumber(this.stakeQty).gt(0);
+        }
+      },
+      onApproving: async (token, receipt) => {
+        if (receipt) {
+          this.showResultMessage(this.stakingResult, "success", receipt);
+          this.btnApprove.caption = `Approving`;
+          this.btnApprove.enabled = false;
+          this.btnApprove.rightIcon.visible = true;
+          this.btnMax.enabled = false;
+          this.inputAmount.enabled = false;
+          (0, import_store4.setStakingStatus)(actionKey, true, "Approving");
+        }
+      },
+      onApproved: async (token) => {
+        this.btnApprove.rightIcon.visible = false;
+        this.btnApprove.visible = false;
+        this.btnMax.enabled = new import_eth_wallet5.BigNumber(this.balance).gt(0);
+        this.inputAmount.enabled = true;
+        (0, import_store4.setStakingStatus)(actionKey, false, "Stake");
+      },
+      onApprovingError: async (token, err) => {
+        this.showResultMessage(this.stakingResult, "error", err);
+        this.btnApprove.rightIcon.visible = false;
+        this.btnMax.enabled = new import_eth_wallet5.BigNumber(this.balance).gt(0);
+        this.inputAmount.enabled = true;
+        (0, import_store4.setStakingStatus)(actionKey, false, "Stake");
+      },
+      onPaying: async (receipt) => {
+        if (receipt) {
+          this.showResultMessage(this.stakingResult, "success", receipt);
+          this.inputAmount.enabled = false;
+          this.btnMax.enabled = false;
+          const caption = this.currentMode === 0 ? "Staking" : "Unstaking";
+          this.btnStake.caption = caption;
+          this.btnStake.enabled = false;
+          this.btnStake.rightIcon.visible = true;
+          (0, import_store4.setStakingStatus)(actionKey, true, caption);
+        }
+      },
+      onPaid: async () => {
+        if (this.onRefresh) {
+          await this.onRefresh();
+        }
+        this.inputAmount.value = "";
+        this.inputAmount.enabled = true;
+        this.btnMax.enabled = true;
+        const caption = this.currentMode === 0 ? "Stake" : "Unstake";
+        this.btnStake.caption = caption;
+        this.btnStake.rightIcon.visible = false;
+        this.modalActions.visible = false;
+        (0, import_store4.setStakingStatus)(actionKey, false, caption);
+      },
+      onPayingError: async (err) => {
+        this.inputAmount.enabled = true;
+        this.btnMax.enabled = true;
+        const caption = this.currentMode === 0 ? "Stake" : "Unstake";
+        this.btnStake.caption = caption;
+        this.btnStake.rightIcon.visible = false;
+        this.showResultMessage(this.stakingResult, "error", err);
+        (0, import_store4.setStakingStatus)(actionKey, false, caption);
+      }
+    });
+  }
+  init() {
+    super.init();
+    this.stakingResult = new Result();
+    this.appendChild(this.stakingResult);
+  }
+  render() {
+    return /* @__PURE__ */ this.$render("i-panel", {
+      class: "manage-stake"
+    }, /* @__PURE__ */ this.$render("i-modal", {
+      id: "modalStake",
+      class: "stake-modal",
+      closeIcon: { name: "times" }
+    }, /* @__PURE__ */ this.$render("i-panel", {
+      id: "containerStake"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      horizontalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      class: "manage-wrapper"
+    }, /* @__PURE__ */ this.$render("i-panel", {
+      class: "main-content"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      id: "loadingElm",
+      class: "i-loading-overlay",
+      background: { color: Theme4.background.modal }
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      class: "i-loading-spinner",
+      horizontalAlignment: "center",
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-icon", {
+      class: "i-loading-spinner_icon",
+      image: { url: import_assets3.default.fullPath("img/loading.svg"), width: 36, height: 36 }
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "Loading...",
+      font: { color: "#FD4A4C", size: "1.5em" },
+      class: "i-loading-spinner_text"
+    }))), /* @__PURE__ */ this.$render("i-panel", {
+      class: "manage-header"
+    }, /* @__PURE__ */ this.$render("i-icon", {
+      width: 20,
+      height: 20,
+      fill: "#fff",
+      class: "cursor-pointer pointer",
+      name: "arrow-left",
+      onClick: this.closeStakeModal
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbTitle",
+      caption: "Create Locked Staking",
+      class: "text-yellow"
+    }), /* @__PURE__ */ this.$render("i-icon", {
+      width: 20,
+      height: 20,
+      fill: "#fff",
+      class: "question-icon",
+      name: "question",
+      tooltip: {
+        content: "You can lock your stake for a certain period of time.",
+        placement: "bottom"
+      }
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      id: "sectionUnlockMessage",
+      visible: true,
+      class: "description"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Note that you will forfeit your rewards if you unstake before the maturity date."
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "By unlocking, you will lose your progress, are you sure?"
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      class: "section-info"
+    }, /* @__PURE__ */ this.$render("i-panel", {
+      visible: false
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      class: "w-100"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      class: "mr-025",
+      caption: "Duration (days)"
+    }), /* @__PURE__ */ this.$render("i-icon", {
+      width: 18,
+      height: 18,
+      fill: "#fff",
+      class: "question-icon",
+      name: "question",
+      tooltip: {
+        content: "You can lock your stake for a certain period of time.",
+        placement: "bottom"
+      }
+    })), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbDuration",
+      class: "text-yellow",
+      caption: "-"
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      class: "w-50"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Max QTY."
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbMaxQty",
+      class: "text-yellow",
+      caption: "-"
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      class: "w-50"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Available QTY."
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbAvailableQty",
+      class: "text-yellow",
+      caption: "-"
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      id: "colYourStakeQty",
+      class: "w-50"
+    }), /* @__PURE__ */ this.$render("i-panel", {
+      id: "sectionEarnedQty",
+      class: "w-100"
+    }), /* @__PURE__ */ this.$render("i-vstack", {
+      id: "colIndividualCap",
+      class: "w-50"
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      class: "w-100"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Maturity"
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbMaturity",
+      class: "text-yellow",
+      caption: "-"
+    }))), /* @__PURE__ */ this.$render("i-panel", {
+      id: "sectionTokenInput",
+      class: "input--token-box mb-1"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      class: "mb-075"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Input"
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbBalance",
+      class: "text-yellow text-normal w-100 text-right",
+      caption: "-"
+    })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-input", {
+      id: "inputAmount",
+      inputType: "number",
+      placeholder: "0.0",
+      class: "token-input w-100 mr-025",
+      width: "100%",
+      onChanged: () => this.onInputAmount()
+    }), /* @__PURE__ */ this.$render("i-button", {
+      id: "btnMax",
+      caption: "Max",
+      enabled: false,
+      class: "btn-os btn-max",
+      onClick: () => this.setMaxBalance()
+    }), /* @__PURE__ */ this.$render("i-hstack", {
+      id: "rowImgToken",
+      verticalAlignment: "center"
+    }))), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-button", {
+      id: "btnApprove",
+      caption: "Approve Token",
+      enabled: false,
+      visible: false,
+      width: "100%",
+      class: "btn-os btn-approve mb-075 mr-025",
+      rightIcon: { spin: true, visible: false },
+      onClick: () => this.onApproveToken()
+    }), /* @__PURE__ */ this.$render("i-button", {
+      id: "btnStake",
+      caption: "Stake",
+      enabled: false,
+      width: "100%",
+      rightIcon: { spin: true, visible: false },
+      class: "btn-os btn-approve mb-075"
+    }))))))), /* @__PURE__ */ this.$render("i-modal", {
+      id: "modalActions",
+      class: "custom-modal",
+      closeIcon: { name: "times" }
+    }, /* @__PURE__ */ this.$render("i-panel", {
+      class: "manage-header"
+    }, /* @__PURE__ */ this.$render("i-icon", {
+      width: 24,
+      height: 24,
+      name: "times",
+      class: "cursor-pointer",
+      onClick: () => this.closeModal()
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      class: "i-modal_content"
+    }, /* @__PURE__ */ this.$render("i-panel", {
+      class: "mt-1"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      verticalAlignment: "center",
+      horizontalAlignment: "center",
+      class: "mb-1"
+    }, /* @__PURE__ */ this.$render("i-image", {
+      width: 80,
+      height: 80,
+      url: import_assets3.default.fullPath("img/warning-icon.png")
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      class: "description-time"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      id: "lbTimer",
+      caption: "Please note that you will forfeit your rewards by unstaking. You are not eligible for rewards until"
+    })), /* @__PURE__ */ this.$render("i-hstack", {
+      verticalAlignment: "center",
+      horizontalAlignment: "center",
+      class: "group-btn"
+    }, /* @__PURE__ */ this.$render("i-button", {
+      caption: "Cancel",
+      class: "btn-os btn-cancel",
+      onClick: () => this.closeModal()
+    }), /* @__PURE__ */ this.$render("i-button", {
+      caption: "Proceed",
+      class: "btn-os btn-submit",
+      onClick: () => this.onStake()
+    }))))));
+  }
+};
+ManageStake = __decorateClass([
+  (0, import_components5.customElements)("manage-stake")
+], ManageStake);
+
+// src/staking/staking.tsx
+import_components6.Styles.Theme.applyTheme(import_components6.Styles.Theme.darkTheme);
+var StakingBlock = class extends import_components6.Module {
   constructor(parent, options) {
     super(parent, options);
     this.campaigns = [];
     this.listAprTimer = [];
     this.listActiveTimer = [];
-    this.tokenIcon = "img/swap/openswap.png";
+    this.tokenIcon = tokenIcon || "img/swap/openswap.png";
     this.tokenMap = {};
     this.registerEvent = () => {
-      this.$eventBus.register(this, import_global6.EventId.IsWalletConnected, this.onWalletConnect);
-      this.$eventBus.register(this, import_global6.EventId.IsWalletDisconnected, this.onWalletConnect);
-      this.$eventBus.register(this, import_global6.EventId.chainChanged, this.onChainChange);
+      this.$eventBus.register(this, import_global4.EventId.IsWalletConnected, this.onWalletConnect);
+      this.$eventBus.register(this, import_global4.EventId.IsWalletDisconnected, this.onWalletConnect);
+      this.$eventBus.register(this, import_global4.EventId.chainChanged, this.onChainChange);
+      this.$eventBus.register(this, import_global4.EventId.EmitButtonStatus, this.updateButtonStatus);
     };
     this.onWalletConnect = async (connected) => {
       this.onSetupPage(connected);
@@ -24401,9 +21185,9 @@ var StakingBlock = class extends import_components5.Module {
         (0, import_store5.setTokenMap)();
       };
       const selectedProvider = localStorage.getItem("walletProvider");
-      const isValidProvider = Object.values(import_eth_wallet10.WalletPlugin).includes(selectedProvider);
-      if (!import_eth_wallet10.Wallet.getInstance().chainId) {
-        import_eth_wallet10.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
+      const isValidProvider = Object.values(import_eth_wallet6.WalletPlugin).includes(selectedProvider);
+      if (!import_eth_wallet6.Wallet.getInstance().chainId) {
+        import_eth_wallet6.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
       }
       if ((0, import_store5.hasWallet)() && isValidProvider) {
         await (0, import_store5.connectWallet)(selectedProvider, {
@@ -24429,7 +21213,7 @@ var StakingBlock = class extends import_components5.Module {
         this.loadingElm.visible = false;
         return;
       }
-      this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
+      this.campaigns = await getAllCampaignsInfo(import_store5.StakingCampaignByChainId);
       await this.renderCampaigns(hideLoading);
       if (!hideLoading) {
         this.loadingElm.visible = false;
@@ -24447,16 +21231,16 @@ var StakingBlock = class extends import_components5.Module {
       result.message = __spreadValues({}, params);
       result.showModal();
     };
-    this.onStake = (stakingAddress) => {
-      if (this.manageStakeURL) {
-        window.location.assign(`${this.manageStakeURL}=${stakingAddress}`);
-      } else {
-        window.location.assign(`#/staking/manage-stake?address=${stakingAddress}`);
-      }
+    this.onStake = async (option) => {
+      const manageStake = new ManageStake();
+      manageStake.onRefresh = () => this.onSetupPage((0, import_store5.isWalletConnected)(), true);
+      this.manageStakeElm.clearInnerHTML();
+      this.manageStakeElm.appendChild(manageStake);
+      manageStake.showModal(option, `#btn-${option.address}`);
     };
     this.onUnstake = async (btnUnstake, data) => {
       if (data.option.mode !== "Claim") {
-        this.onStake(data.option.stakingAddress);
+        this.onStake(data.option);
       } else {
         this.showResultMessage(this.stakingResult, "warning", `Unstake ${data.lockedTokenSymbol}`);
         const callBack = async (err, reply) => {
@@ -24475,11 +21259,11 @@ var StakingBlock = class extends import_components5.Module {
           btnUnstake.rightIcon.visible = false;
           btnUnstake.enabled = true;
         };
-        (0, import_global6.registerSendTxEvents)({
+        (0, import_global4.registerSendTxEvents)({
           transactionHash: callBack,
           confirmation: confirmationCallBack
         });
-        withdrawToken(data.option.stakingAddress, callBack);
+        withdrawToken(data.option.address, callBack);
       }
     };
     this.onClaim = async (btnClaim, data) => {
@@ -24500,11 +21284,11 @@ var StakingBlock = class extends import_components5.Module {
         btnClaim.rightIcon.visible = false;
         btnClaim.enabled = true;
       };
-      (0, import_global6.registerSendTxEvents)({
+      (0, import_global4.registerSendTxEvents)({
         transactionHash: callBack,
         confirmation: confirmationCallBack
       });
-      claimToken(data.reward.rewardAddress, callBack);
+      claimToken(data.reward.address, callBack);
     };
     this.removeTimer = () => {
       for (const timer of this.listAprTimer) {
@@ -24523,7 +21307,7 @@ var StakingBlock = class extends import_components5.Module {
       if (campaign.getTokenURL) {
         window.open(campaign.getTokenURL);
       } else {
-        window.open(this.lpTokenURL ? this.lpTokenURL : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+        window.open(getTokenUrl ? getTokenUrl : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
       }
     };
     this.onLoad = () => {
@@ -24532,10 +21316,27 @@ var StakingBlock = class extends import_components5.Module {
     this.init = () => {
       super.init();
       this.stakingResult = new Result();
-      this.appendChild(this.stakingResult);
+      this.stakingComponent.appendChild(this.stakingResult);
       this.initWalletData();
       (0, import_store5.setDataFromSCConfig)(import_store5.Networks, import_store5.InfuraId);
       (0, import_store5.setCurrentChainId)((0, import_store5.getDefaultChainId)());
+    };
+    this.updateButtonStatus = async (data) => {
+      if (data) {
+        const { value, key, text } = data;
+        const elm = this.stakingElm.querySelector(key);
+        if (elm) {
+          elm.rightIcon.visible = value;
+          elm.caption = text;
+        }
+      }
+    };
+    this.getBtnText = (key, text) => {
+      const data = (0, import_store5.getStakingStatus)(key);
+      if (data.value) {
+        return data.text;
+      }
+      return text;
     };
     this.renderCampaigns = async (hideLoading) => {
       if (!hideLoading) {
@@ -24545,7 +21346,7 @@ var StakingBlock = class extends import_components5.Module {
       const chainId = (0, import_store5.getChainId)();
       const network = (0, import_store5.getNetworkInfo)(chainId);
       if (!this.noCampaignSection) {
-        this.noCampaignSection = await import_components5.Panel.create();
+        this.noCampaignSection = await import_components6.Panel.create();
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
           class: "no-campaign"
         }, /* @__PURE__ */ this.$render("i-image", {
@@ -24565,7 +21366,7 @@ var StakingBlock = class extends import_components5.Module {
       this.removeTimer();
       for (let idx = 0; idx < this.campaigns.length; idx++) {
         const campaign = this.campaigns[idx];
-        const containerSection = await import_components5.Panel.create();
+        const containerSection = await import_components6.Panel.create();
         containerSection.id = `campaign-${idx}`;
         containerSection.classList.add("container-custom");
         const options = campaign.options;
@@ -24573,11 +21374,11 @@ var StakingBlock = class extends import_components5.Module {
         let lpTokenData = {};
         let vaultTokenData = {};
         if (stakingInfo && stakingInfo.tokenAddress) {
-          if (stakingInfo.stakingType == StakingType2.LP_Token) {
+          if (stakingInfo.lockTokenType == import_store5.LockTokenType.LP_Token) {
             lpTokenData = {
               "object": await getLPObject(stakingInfo.tokenAddress)
             };
-          } else if (stakingInfo.stakingType == StakingType2.VAULT_Token) {
+          } else if (stakingInfo.lockTokenType == import_store5.LockTokenType.VAULT_Token) {
             vaultTokenData = {
               "object": await getVaultObject(stakingInfo.tokenAddress)
             };
@@ -24594,21 +21395,21 @@ var StakingBlock = class extends import_components5.Module {
         const isSimplified = campaign.isSimplified;
         const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
         const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-        let isStarted = (0, import_moment3.default)(activeStartTime).diff((0, import_moment3.default)()) <= 0;
-        let isClosed = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)()) <= 0;
+        let isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+        let isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
         let totalTokens = 0;
         let availableQty = 0;
         let totalLocked = {};
-        const totalTokensLabel = await import_components5.Label.create();
-        const availableQtyLabel = await import_components5.Label.create();
-        const activeTimerRow = await import_components5.VStack.create();
-        const endHours = await import_components5.Label.create();
-        const endDays = await import_components5.Label.create();
-        const endMins = await import_components5.Label.create();
-        const stickerSection = await import_components5.Panel.create();
-        const stickerLabel = await import_components5.Label.create();
-        const stickerIcon = await import_components5.Icon.create();
-        const simplifiedRow = await import_components5.VStack.create();
+        const totalTokensLabel = await import_components6.Label.create();
+        const availableQtyLabel = await import_components6.Label.create();
+        const activeTimerRow = await import_components6.VStack.create();
+        const endHours = await import_components6.Label.create();
+        const endDays = await import_components6.Label.create();
+        const endMins = await import_components6.Label.create();
+        const stickerSection = await import_components6.Panel.create();
+        const stickerLabel = await import_components6.Label.create();
+        const stickerIcon = await import_components6.Icon.create();
+        const simplifiedRow = await import_components6.VStack.create();
         stickerSection.classList.add("sticker");
         endHours.classList.add("timer-value");
         endDays.classList.add("timer-value");
@@ -24641,20 +21442,21 @@ var StakingBlock = class extends import_components5.Module {
           let _totalTokens = 0;
           let _availableQty = 0;
           for (const o of options) {
-            const _totalLocked = await getStakingTotalLocked(o.stakingAddress, o.decimalsOffset);
-            totalLocked[o.stakingAddress] = _totalLocked;
-            const optionQty = new import_eth_wallet10.BigNumber(o.maxTotalLock).minus(_totalLocked);
-            const lbOptionQty = document.querySelector(`#lb-${o.stakingAddress}`);
+            const _totalLocked = await getStakingTotalLocked(o.address, o.decimalsOffset);
+            totalLocked[o.address] = _totalLocked;
+            const optionQty = new import_eth_wallet6.BigNumber(o.maxTotalLock).minus(_totalLocked);
+            const lbOptionQty = document.querySelector(`#lb-${o.address}`);
             if (lbOptionQty) {
-              lbOptionQty.caption = `${(0, import_global6.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
+              lbOptionQty.caption = `${(0, import_global4.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
             }
-            const btnStake = document.querySelector(`#btn-${o.stakingAddress}`);
+            const btnStake = document.querySelector(`#btn-${o.address}`);
+            const isStaking = (0, import_store5.getStakingStatus)(`#btn-${o.address}`).value;
             if (btnStake && btnStake.caption === "Stake") {
-              btnStake.enabled = !(!isStarted || o.mode === "Stake" && (optionQty.lte(0) || isClosed));
+              btnStake.enabled = !isStaking && !(!isStarted || o.mode === "Stake" && (optionQty.lte(0) || isClosed));
             } else if (btnStake && btnStake.caption === "Unstake") {
-              btnStake.enabled = o.stakeQty != "0";
+              btnStake.enabled = !isStaking && o.stakeQty != "0";
             }
-            const stickerOption = document.querySelector(`#sticker-${o.stakingAddress}`);
+            const stickerOption = document.querySelector(`#sticker-${o.address}`);
             if (optionQty.lte(0) && stickerOption) {
               stickerOption.visible = true;
             }
@@ -24664,8 +21466,8 @@ var StakingBlock = class extends import_components5.Module {
           ;
           totalTokens = _totalTokens;
           availableQty = _availableQty;
-          totalTokensLabel.caption = `${(0, import_global6.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-          availableQtyLabel.caption = `${(0, import_global6.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+          totalTokensLabel.caption = `${(0, import_global4.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
+          availableQtyLabel.caption = `${(0, import_global4.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
           if (isClosed) {
             if (stickerLabel.caption !== "Closed") {
               stickerSection.classList.add("closed");
@@ -24687,8 +21489,8 @@ var StakingBlock = class extends import_components5.Module {
           }
         };
         const setEndRemainingTime = () => {
-          isStarted = (0, import_moment3.default)(activeStartTime).diff((0, import_moment3.default)()) <= 0;
-          isClosed = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)()) <= 0;
+          isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+          isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
           if (isStarted && !isClosed) {
             activeTimerRow.visible = true;
           } else {
@@ -24700,9 +21502,9 @@ var StakingBlock = class extends import_components5.Module {
               clearInterval(this.listActiveTimer[idx]);
             }
           } else {
-            const days = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "days");
-            const hours = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "hours") - days * 24;
-            const mins = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "minutes") - days * 24 * 60 - hours * 60;
+            const days = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "days");
+            const hours = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "hours") - days * 24;
+            const mins = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "minutes") - days * 24 * 60 - hours * 60;
             endDays.caption = `${days}`;
             endHours.caption = `${hours}`;
             endMins.caption = `${mins}`;
@@ -24734,8 +21536,8 @@ var StakingBlock = class extends import_components5.Module {
         }))));
         totalTokensLabel.classList.add("bold");
         availableQtyLabel.classList.add("bold");
-        totalTokensLabel.caption = `${(0, import_global6.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-        availableQtyLabel.caption = `${(0, import_global6.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+        totalTokensLabel.caption = `${(0, import_global4.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
+        availableQtyLabel.caption = `${(0, import_global4.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
         totalTokensLabel.classList.add("text-right");
         availableQtyLabel.classList.add("text-right");
         const rowItems = [
@@ -24755,7 +21557,7 @@ var StakingBlock = class extends import_components5.Module {
           },
           {
             title: "Campaign Start:",
-            value: (0, import_moment3.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
+            value: (0, import_moment4.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
             isHidden: isStarted || isSimplified,
             img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
           },
@@ -24827,9 +21629,9 @@ var StakingBlock = class extends import_components5.Module {
           height: "14",
           fill: "#fff"
         })), activeTimerRow)), await Promise.all(options.map(async (option) => {
-          const stickerOptionSection = await import_components5.Panel.create();
+          const stickerOptionSection = await import_components6.Panel.create();
           stickerOptionSection.classList.add("sticker", "sold-out", "hidden", "sticker-text");
-          stickerOptionSection.id = `sticker-${option.stakingAddress}`;
+          stickerOptionSection.id = `sticker-${option.address}`;
           stickerOptionSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
             class: "sticker-text"
           }, /* @__PURE__ */ this.$render("i-icon", {
@@ -24837,52 +21639,55 @@ var StakingBlock = class extends import_components5.Module {
           }), /* @__PURE__ */ this.$render("i-label", {
             caption: "Sold Out"
           })));
-          const btnStake = await import_components5.Button.create();
-          const btnUnstake = await import_components5.Button.create({
-            rightIcon: { spin: true, visible: false }
+          const key = `btn-${option.address}`;
+          const btnStake = await import_components6.Button.create({
+            caption: this.getBtnText(key, "Stake"),
+            rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
+          });
+          const btnUnstake = await import_components6.Button.create({
+            caption: this.getBtnText(key, "Unstake"),
+            rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
           });
           if (option.mode === "Stake") {
             btnUnstake.visible = false;
-            btnStake.id = `btn-${option.stakingAddress}`;
+            btnStake.id = key;
             btnStake.enabled = !isClosed;
-            btnStake.caption = "Stake";
             btnStake.classList.add("btn-os", "btn-stake");
-            btnStake.onClick = () => this.onStake(option.stakingAddress);
+            btnStake.onClick = () => this.onStake(option);
           } else {
             btnStake.visible = false;
-            btnUnstake.id = `btn-${option.stakingAddress}`;
-            btnUnstake.caption = "Unstake";
+            btnUnstake.id = key;
             btnUnstake.classList.add("btn-os", "btn-stake");
             btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
           }
           const isClaim = option.mode === "Claim";
-          const rewardOptions = !isClaim ? option.rewardOptions : [];
+          const rewardOptions = !isClaim ? option.rewards : [];
           const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {};
           const lpRewardTokenIconPath = !isClaim && rewardToken.address ? (0, import_store5.getTokenIconPath)(rewardToken, chainId) : "";
           let aprInfo = {};
-          const optionAvailableQtyLabel = await import_components5.Label.create();
+          const optionAvailableQtyLabel = await import_components6.Label.create();
           optionAvailableQtyLabel.classList.add("ml-auto");
-          optionAvailableQtyLabel.id = `lb-${option.stakingAddress}`;
-          optionAvailableQtyLabel.caption = `${(0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.maxTotalLock).minus(totalLocked[option.stakingAddress]))} ${lockedTokenSymbol}`;
-          const claimStakedRow = await import_components5.HStack.create();
+          optionAvailableQtyLabel.id = `lb-${option.address}`;
+          optionAvailableQtyLabel.caption = `${(0, import_global4.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]))} ${lockedTokenSymbol}`;
+          const claimStakedRow = await import_components6.HStack.create();
           claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
             class: "mr-025",
             caption: "You Staked:"
           }));
           claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
             class: "ml-auto",
-            caption: `${(0, import_global6.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
+            caption: `${(0, import_global4.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
           }));
-          const rowRewardsLocked = await import_components5.Panel.create();
-          const rowRewardsVesting = await import_components5.Panel.create();
-          const rowRewardsVestingEnd = await import_components5.Panel.create();
-          const rowRewardsClaimable = await import_components5.Panel.create();
-          const rowRewardsClaimBtn = await import_components5.Panel.create();
+          const rowRewardsLocked = await import_components6.Panel.create();
+          const rowRewardsVesting = await import_components6.Panel.create();
+          const rowRewardsVestingEnd = await import_components6.Panel.create();
+          const rowRewardsClaimable = await import_components6.Panel.create();
+          const rowRewardsClaimBtn = await import_components6.Panel.create();
           if (isClaim) {
             claimStakedRow.classList.add("mb-1");
             for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
               const reward = option.rewardsData[idx2];
-              const rewardToken2 = this.getRewardToken(reward.tokenAddress);
+              const rewardToken2 = this.getRewardToken(reward.rewardTokenAddress);
               const rewardSymbol = rewardToken2.symbol || "";
               rowRewardsLocked.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
@@ -24890,7 +21695,7 @@ var StakingBlock = class extends import_components5.Module {
                 caption: `${rewardSymbol} Locked:`
               }), /* @__PURE__ */ this.$render("i-label", {
                 class: "bold",
-                caption: `${(0, import_global6.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
+                caption: `${(0, import_global4.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
               })));
               rowRewardsVesting.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
@@ -24908,14 +21713,14 @@ var StakingBlock = class extends import_components5.Module {
                 class: "bold",
                 caption: reward.vestingEnd ? reward.vestingEnd.format("YYYY-MM-DD HH:mm:ss") : "TBC"
               })));
-              const passClaimStartTime = !(reward.claimStartTime && (0, import_moment3.default)().diff(import_moment3.default.unix(reward.claimStartTime)) < 0);
+              const passClaimStartTime = !(reward.claimStartTime && (0, import_moment4.default)().diff(import_moment4.default.unix(reward.claimStartTime)) < 0);
               let rewardClaimable = `0 ${rewardSymbol}`;
               if (passClaimStartTime) {
-                rewardClaimable = `${(0, import_global6.formatNumber)(reward.claimable)} ${rewardSymbol}`;
+                rewardClaimable = `${(0, import_global4.formatNumber)(reward.claimable)} ${rewardSymbol}`;
               }
               let startClaimingText = "";
               if (!(!reward.claimStartTime || passClaimStartTime)) {
-                const claimStart = import_moment3.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
+                const claimStart = import_moment4.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
                 startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
               }
               rowRewardsClaimable.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
@@ -24928,12 +21733,12 @@ var StakingBlock = class extends import_components5.Module {
               }), startClaimingText ? /* @__PURE__ */ this.$render("i-label", {
                 caption: startClaimingText
               }) : []));
-              const btnClaim = await import_components5.Button.create({
+              const btnClaim = await import_components6.Button.create({
                 rightIcon: { spin: true, visible: false },
                 caption: `Claim ${rewardSymbol}`,
-                enabled: !(!passClaimStartTime || new import_eth_wallet10.BigNumber(reward.claimable).isZero())
+                enabled: !(!passClaimStartTime || new import_eth_wallet6.BigNumber(reward.claimable).isZero())
               });
-              btnClaim.id = `btnClaim-${idx2}-${option.stakingAddress}`;
+              btnClaim.id = `btnClaim-${idx2}-${option.address}`;
               btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
               btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
               rowRewardsClaimBtn.appendChild(btnClaim);
@@ -24949,7 +21754,7 @@ var StakingBlock = class extends import_components5.Module {
           const rowOptionItems = !isClaim ? [
             {
               title: "Max. QTY",
-              value: `${(0, import_global6.formatNumber)(option.maxTotalLock)} ${lockedTokenSymbol}`,
+              value: `${(0, import_global4.formatNumber)(option.maxTotalLock)} ${lockedTokenSymbol}`,
               isHidden: isSimplified
             },
             {
@@ -24960,21 +21765,22 @@ var StakingBlock = class extends import_components5.Module {
             },
             {
               title: "Individual Cap",
-              value: `${(0, import_global6.formatNumber)(option.perAddressCap)} ${lockedTokenSymbol}`
+              value: `${(0, import_global4.formatNumber)(option.perAddressCap)} ${lockedTokenSymbol}`
             },
             {
               title: "Campaign Start Date",
-              value: (0, import_global6.formatDate)(option.startOfEntryPeriod, "DD MMM YYYY"),
+              value: (0, import_global4.formatDate)(option.startOfEntryPeriod, "DD MMM YYYY"),
               isHidden: !isSimplified
             }
           ] : [];
           const getAprValue = (rewardOption) => {
-            if (rewardOption && aprInfo && aprInfo[rewardOption.tokenAddress]) {
-              const apr = new import_eth_wallet10.BigNumber(aprInfo[rewardOption.tokenAddress]).times(100).toFormat(2, import_eth_wallet10.BigNumber.ROUND_DOWN);
+            if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+              const apr = new import_eth_wallet6.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, import_eth_wallet6.BigNumber.ROUND_DOWN);
               return `${apr}%`;
             }
             return "";
           };
+          const durationDays = option.minLockTime / (60 * 60 * 24);
           return /* @__PURE__ */ this.$render("i-vstack", {
             class: "column-custom"
           }, /* @__PURE__ */ this.$render("i-panel", {
@@ -24992,12 +21798,12 @@ var StakingBlock = class extends import_components5.Module {
             });
           }), /* @__PURE__ */ this.$render("i-label", {
             class: "bold",
-            caption: `${option.duration} Days`
+            caption: durationDays < 1 ? "< 1 Day" : `${durationDays} Days`
           })), /* @__PURE__ */ this.$render("i-label", {
-            caption: option.stakingDesc
+            caption: option.customDesc
           })), /* @__PURE__ */ this.$render("i-panel", {
             class: "img-custom"
-          }, option.stakingType === StakingType2.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {
+          }, option.lockTokenType === import_store5.LockTokenType.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {
             class: "group-img"
           }, /* @__PURE__ */ this.$render("i-image", {
             width: 75,
@@ -25018,26 +21824,27 @@ var StakingBlock = class extends import_components5.Module {
           })), /* @__PURE__ */ this.$render("i-panel", {
             class: "info-stake"
           }, btnStake, await Promise.all(rewardOptions.map(async (rewardOption) => {
-            const labelApr = await import_components5.Label.create();
+            const labelApr = await import_components6.Label.create();
             labelApr.classList.add("ml-auto");
+            const rateDesc = `1 ${(0, import_store5.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet6.BigNumber(rewardOption.multiplier).toFixed()} ${(0, import_store5.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
             const updateApr = async () => {
-              if (option.stakingType === StakingType2.ERC20_Token) {
-                const apr = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, option.duration);
+              if (option.lockTokenType === import_store5.LockTokenType.ERC20_Token) {
+                const apr = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
                 if (!isNaN(parseFloat(apr))) {
-                  aprInfo[rewardOption.tokenAddress] = apr;
+                  aprInfo[rewardOption.rewardTokenAddress] = apr;
                 }
-              } else if (option.stakingType === StakingType2.LP_Token) {
+              } else if (option.lockTokenType === import_store5.LockTokenType.LP_Token) {
                 if (rewardOption.referencePair) {
-                  aprInfo[rewardOption.tokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, option.duration);
+                  aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, durationDays);
                 }
               } else {
-                aprInfo[rewardOption.tokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, option.duration);
+                aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, durationDays);
               }
               const aprValue2 = getAprValue(rewardOption);
               if (isSimplified) {
                 labelApr.caption = aprValue2;
               } else {
-                labelApr.caption = aprValue2 ? `(${aprValue2} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
+                labelApr.caption = aprValue2 ? `(${aprValue2} APR) ${rateDesc}` : rateDesc;
               }
             };
             updateApr();
@@ -25052,13 +21859,13 @@ var StakingBlock = class extends import_components5.Module {
                 caption: "Rate"
               }), /* @__PURE__ */ this.$render("i-label", {
                 class: "bold",
-                caption: rewardOption.rateDesc
+                caption: rateDesc
               })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
                 class: "mr-025",
                 caption: "APR"
               }), labelApr));
             }
-            labelApr.caption = aprValue ? `(${aprValue} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
+            labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
             return /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
               class: "mr-025",
               caption: "Rate"
@@ -25075,8 +21882,8 @@ var StakingBlock = class extends import_components5.Module {
           }), /* @__PURE__ */ this.$render("i-panel", {
             class: isClaim ? "hidden" : "custom-divider"
           }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
-            const earnedQty = (0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.totalCredit).times(rewardOption.rate));
-            const earnedSymbol = this.getRewardToken(rewardOption.tokenAddress).symbol || "";
+            const earnedQty = (0, import_global4.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
+            const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
             return /* @__PURE__ */ this.$render("i-hstack", {
               horizontalAlignment: "space-between"
             }, /* @__PURE__ */ this.$render("i-label", {
@@ -25088,7 +21895,7 @@ var StakingBlock = class extends import_components5.Module {
           })), /* @__PURE__ */ this.$render("i-label", {
             class: "view-contract pointer",
             margin: { top: isClaim ? 0 : 16 },
-            onClick: () => (0, import_store5.viewOnExplorerByAddress)(chainId, option.stakingAddress)
+            onClick: () => (0, import_store5.viewOnExplorerByAddress)(chainId, option.address)
           }, /* @__PURE__ */ this.$render("i-label", {
             caption: "View Contract"
           }), /* @__PURE__ */ this.$render("i-icon", {
@@ -25104,7 +21911,7 @@ var StakingBlock = class extends import_components5.Module {
       this.stakingElm.clearInnerHTML();
       this.stakingElm.append(this.noCampaignSection, ...nodeItems);
     };
-    this.$eventBus = import_components5.application.EventBus;
+    this.$eventBus = import_components6.application.EventBus;
     this.registerEvent();
   }
   validateConfig() {
@@ -25128,6 +21935,7 @@ var StakingBlock = class extends import_components5.Module {
   }
   render() {
     return /* @__PURE__ */ this.$render("i-panel", {
+      id: "stakingComponent",
       class: "staking-component"
     }, /* @__PURE__ */ this.$render("i-panel", {
       class: "staking-layout"
@@ -25149,1267 +21957,14 @@ var StakingBlock = class extends import_components5.Module {
     }))), /* @__PURE__ */ this.$render("i-panel", {
       id: "stakingElm",
       class: "wrapper"
-    })));
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      id: "manageStakeElm"
+    }));
   }
 };
 StakingBlock = __decorateClass([
-  (0, import_components5.customElements)("i-section-staking")
+  (0, import_components6.customElements)("i-section-staking")
 ], StakingBlock);
-//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
-//! license : MIT
-//! moment.js
-//! momentjs.com
-//! version : 2.29.1
-pple SD Gothic Neo",
-    src: `url("${import_assets3.default.fullPath("fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf")}") format("truetype")`,
-    fontWeight: "bold",
-    fontStyle: "normal"
-  });
-  import_components4.Styles.cssRule(".staking-component", {
-    $nest: {
-      ".overflow-inherit": {
-        overflow: "inherit"
-      },
-      "::selection": {
-        color: "#fff",
-        background: "#1890ff"
-      },
-      ".btn-os": {
-        background: colorVar.primaryButton,
-        height: "auto !important",
-        color: "#fff",
-        transition: "background .3s ease",
-        fontSize: "1rem",
-        $nest: {
-          "i-icon.loading-icon": {
-            marginInline: "0.25rem",
-            width: "16px !important",
-            height: "16px !important"
-          }
-        }
-      },
-      ".btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus": {
-        background: colorVar.primaryGradient,
-        backgroundColor: "transparent",
-        boxShadow: "none",
-        opacity: 0.9
-      },
-      ".btn-os:not(.disabled):not(.is-spinning):focus": {
-        boxShadow: "0 0 0 0.2rem rgb(0 123 255 / 25%)"
-      },
-      ".btn-os.disabled, .btn-os.is-spinning": {
-        background: colorVar.primaryDisabled,
-        opacity: 1
-      },
-      ".dark-bg, .dark-modal > div > div": {
-        background: colorVar.darkBg,
-        borderRadius: 5
-      },
-      ".btn-transparent, .btn-transparent:not(.disabled):focus, .btn-transparent:not(.disabled):hover": {
-        background: "transparent",
-        boxShadow: "none",
-        backgroundColor: "transparent"
-      },
-      ".mr-0-5": {
-        marginRight: ".5rem"
-      },
-      ".ml-0-5": {
-        marginLeft: ".5rem"
-      },
-      ".mb-0-5": {
-        marginBottom: ".5rem"
-      },
-      ".hidden": {
-        display: "none !important"
-      },
-      ".no-wrap": {
-        whiteSpace: "nowrap"
-      },
-      ".flex-nowrap": {
-        flexWrap: "nowrap"
-      },
-      ".py-1": {
-        paddingTop: "1rem",
-        paddingBottom: "1rem"
-      },
-      ".px-1": {
-        paddingLeft: "1rem",
-        paddingRight: "1rem"
-      },
-      ".align-middle": {
-        alignItems: "center"
-      },
-      ".text-secondary *": {
-        color: Theme2.colors.secondary.dark
-      },
-      ".btn-default": {
-        background: "#eaecef",
-        height: "auto !important",
-        transition: "background .3s ease",
-        fontSize: "1rem",
-        color: Theme2.background.default
-      },
-      ".staking-layout": {
-        width: "100%",
-        maxWidth: "1420px",
-        minHeight: "calc(100vh - 10rem)",
-        margin: "1rem auto",
-        padding: "0 1rem"
-      },
-      "i-link": {
-        display: "flex",
-        $nest: {
-          "&:hover *": {
-            color: Theme2.text.primary,
-            opacity: 0.9
-          }
-        }
-      },
-      ".wrapper": {
-        $nest: {
-          "i-label > *": {
-            color: Theme2.text.primary,
-            fontSize: "0.875rem"
-          },
-          ".sticker": {
-            position: "absolute",
-            top: "-8px",
-            right: "-33px",
-            borderInline: "50px solid transparent",
-            borderBottom: "50px solid #20bf55",
-            transform: "rotate(45deg)",
-            $nest: {
-              "&.sold-out": {
-                borderBottomColor: "#ccc"
-              },
-              "&.closed": {
-                borderBottomColor: "#0c1234",
-                $nest: {
-                  "i-label > *": {
-                    color: "#f7d064 !important"
-                  },
-                  "i-icon": {
-                    fill: "#f7d064"
-                  }
-                }
-              },
-              ".sticker-text": {
-                position: "absolute",
-                right: "-1.6rem",
-                top: "0.75rem",
-                width: "50px",
-                lineHeight: "1rem"
-              },
-              "i-label": {
-                display: "flex",
-                justifyContent: "center"
-              },
-              "i-label > *": {
-                color: "#3f3f42 !important",
-                fontSize: "0.75rem"
-              },
-              "i-icon": {
-                width: "14px",
-                height: "14px",
-                display: "block",
-                margin: "auto"
-              }
-            }
-          },
-          ".banner": {
-            position: "relative",
-            height: "100%",
-            minHeight: "485px",
-            backgroundColor: "var(--colors-primary-main)",
-            borderTopLeftRadius: "26px",
-            borderBottomLeftRadius: "26px",
-            padding: "2.5rem 0.75rem"
-          },
-          ".campaign-name": {
-            $nest: {
-              "i-image": {
-                marginRight: "0.25rem"
-              },
-              "i-label > *": {
-                fontSize: "1.25rem",
-                fontWeight: "700"
-              }
-            }
-          },
-          ".campaign-description": {
-            display: "flex",
-            paddingBlock: "2.5rem"
-          },
-          ".row-item": {
-            marginBlock: "0.15rem"
-          },
-          ".col-item": {
-            display: "flex",
-            alignItems: "flex-start",
-            marginRight: "0.25rem",
-            width: "auto",
-            $nest: {
-              ".custom-icon": {
-                display: "flex",
-                width: "14px",
-                height: "14px",
-                marginRight: "0.15rem",
-                marginTop: "0.1rem"
-              }
-            }
-          },
-          ".simplified": {
-            marginTop: "0.5rem",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            $nest: {
-              ".simplified-description": {
-                display: "flex",
-                alignItems: "center",
-                marginInline: "auto",
-                $nest: {
-                  "i-image": {
-                    display: "flex",
-                    marginLeft: "0.25rem"
-                  }
-                }
-              },
-              ".simplified-link": {
-                textAlign: "center",
-                $nest: {
-                  "a": {
-                    color: Theme2.text.primary,
-                    fontWeight: "bold",
-                    fontFamily: Theme2.typography.fontFamily,
-                    marginInline: "0.25rem",
-                    textDecorationLine: "underline"
-                  }
-                }
-              }
-            }
-          },
-          ".get-token": {
-            cursor: "pointer",
-            justifyContent: "center",
-            marginBlock: "1rem",
-            marginInline: "auto",
-            width: "fit-content",
-            $nest: {
-              "i-label": {
-                marginRight: "0.25rem"
-              },
-              "i-image": {
-                marginRight: "0.25rem"
-              }
-            }
-          },
-          ".custom-timer": {
-            display: "flex",
-            $nest: {
-              ".timer-value": {
-                backgroundColor: "#b14781",
-                padding: "0.5rem",
-                borderRadius: "0.5rem",
-                fontWeight: "bold"
-              },
-              ".timer-unit": {
-                marginInline: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                fontWeight: "bold"
-              }
-            }
-          },
-          ".bg-color": {
-            background: "hsla(0,0%,100%,0.03) 0% 0% no-repeat padding-box",
-            color: Theme2.text.primary,
-            minHeight: "485px",
-            height: "100%",
-            borderRadius: "15px",
-            paddingBottom: "1rem",
-            position: "relative"
-          },
-          ".header-info": {
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            paddingTop: "1rem",
-            $nest: {
-              "i-hstack i-label > *": {
-                fontSize: "1.25rem",
-                marginLeft: "0.25rem",
-                lineHeight: "1.875rem",
-                color: "var(--colors-primary-main) !important"
-              }
-            }
-          },
-          ".container-custom": {
-            display: "flex",
-            alignItems: "stretch",
-            marginBottom: "1rem"
-          },
-          ".row-custom": {
-            margin: "1rem",
-            background: "hsla(0,0%,100%,0.15) 0% 0% no-repeat padding-box",
-            borderRadius: "26px",
-            width: "100%"
-          },
-          ".column-custom": {
-            width: "25%",
-            padding: "0 1rem",
-            height: "100%",
-            $nest: {
-              "&:first-child": {
-                marginLeft: "-30px"
-              }
-            }
-          },
-          ".img-custom": {
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: "1.5rem",
-            marginBottom: "0.75rem"
-          },
-          ".group-img": {
-            display: "flex",
-            justifyContent: "center",
-            $nest: {
-              "i-icon": {
-                margin: "auto 0.25rem",
-                fill: "var(--colors-primary-main)"
-              }
-            }
-          },
-          ".info-stake": {
-            width: "100%",
-            padding: "0.5rem 0.75rem",
-            $nest: {
-              "i-hstack": {
-                padding: "0.175rem 0"
-              },
-              "i-label:first-child": {
-                display: "flex"
-              },
-              "i-label:last-child": {
-                fontWeight: 700,
-                textAlign: "right"
-              }
-            }
-          },
-          ".custom-divider": {
-            borderTop: "2px solid var(--colors-primary-main)",
-            marginBlock: "1rem"
-          },
-          ".btn-stake": {
-            width: "100%",
-            padding: "0.625rem 0",
-            marginBottom: "25px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: 700
-          },
-          ".view-contract": {
-            fontWeight: "bold",
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "1rem",
-            $nest: {
-              "a": {
-                display: "flex",
-                alignItems: "center"
-              },
-              "i-label": {
-                marginRight: "0.25rem"
-              }
-            }
-          },
-          ".no-campaign": {
-            margin: "2rem 1rem",
-            padding: "3rem 2rem",
-            background: Theme2.background.modal,
-            borderRadius: "26px",
-            display: "flex",
-            flexDirection: "column",
-            textAlign: "center",
-            justifyContent: "center",
-            $nest: {
-              "i-label > *": {
-                fontSize: "1.5rem",
-                marginTop: "1rem"
-              }
-            }
-          }
-        }
-      },
-      ".ml-auto": {
-        marginLeft: "auto"
-      },
-      ".mr-025": {
-        marginRight: "0.25rem"
-      },
-      "#loadingElm.i-loading--active": {
-        marginTop: "2rem",
-        position: "initial",
-        $nest: {
-          "#stakingElm": {
-            display: "none !important"
-          },
-          ".i-loading-spinner": {
-            marginTop: "2rem"
-          }
-        }
-      },
-      ".connect-wallet": {
-        display: "block",
-        textAlign: "center",
-        paddingTop: "1rem"
-      },
-      "@media (max-width: 1240px)": {
-        $nest: {
-          ".wrapper": {
-            $nest: {
-              ".banner": {
-                borderRadius: "26px",
-                minHeight: "auto",
-                height: "auto"
-              },
-              ".row-custom": {
-                maxWidth: "520px",
-                margin: "1rem auto"
-              },
-              ".column-custom": {
-                width: "100%",
-                height: "auto",
-                margin: "1rem 0",
-                $nest: {
-                  "&:first-child": {
-                    margin: "0",
-                    padding: "0"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "@media (max-width: 992px)": {
-        $nest: {
-          ".header": {
-            flexDirection: "column"
-          }
-        }
-      }
-    }
-  });
-
-  // src/staking/staking.tsx
-  import_components5.Styles.Theme.applyTheme(import_components5.Styles.Theme.darkTheme);
-  var StakingBlock = class extends import_components5.Module {
-    constructor(parent, options) {
-      super(parent, options);
-      this.campaigns = [];
-      this.listAprTimer = [];
-      this.listActiveTimer = [];
-      this.tokenIcon = "img/swap/openswap.png";
-      this.tokenMap = {};
-      this.registerEvent = () => {
-        this.$eventBus.register(this, import_global6.EventId.IsWalletConnected, this.onWalletConnect);
-        this.$eventBus.register(this, import_global6.EventId.IsWalletDisconnected, this.onWalletConnect);
-        this.$eventBus.register(this, import_global6.EventId.chainChanged, this.onChainChange);
-      };
-      this.onWalletConnect = async (connected) => {
-        this.onSetupPage(connected);
-      };
-      this.onChainChange = () => {
-        this.onSetupPage((0, import_store5.isWalletConnected)());
-      };
-      this.initWalletData = async () => {
-        let accountsChangedEventHandler = async (account) => {
-          (0, import_store5.setTokenMap)();
-        };
-        let chainChangedEventHandler = async (hexChainId) => {
-          (0, import_store5.setTokenMap)();
-        };
-        const selectedProvider = localStorage.getItem("walletProvider");
-        const isValidProvider = Object.values(import_eth_wallet10.WalletPlugin).includes(selectedProvider);
-        if (!import_eth_wallet10.Wallet.getInstance().chainId) {
-          import_eth_wallet10.Wallet.getInstance().chainId = (0, import_store5.getDefaultChainId)();
-        }
-        if ((0, import_store5.hasWallet)() && isValidProvider) {
-          await (0, import_store5.connectWallet)(selectedProvider, {
-            "accountsChanged": accountsChangedEventHandler,
-            "chainChanged": chainChangedEventHandler
-          });
-        }
-      };
-      this.onSetupPage = async (connected, hideLoading) => {
-        if (!hideLoading) {
-          this.loadingElm.visible = true;
-        }
-        if (!connected) {
-          this.stakingElm.clearInnerHTML();
-          this.stakingElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-            width: "100%",
-            margin: { top: 100 },
-            verticalAlignment: "center",
-            horizontalAlignment: "center"
-          }, /* @__PURE__ */ this.$render("i-label", {
-            caption: "Please connect with your wallet!"
-          })));
-          this.loadingElm.visible = false;
-          return;
-        }
-        this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
-        await this.renderCampaigns(hideLoading);
-        if (!hideLoading) {
-          this.loadingElm.visible = false;
-        }
-      };
-      this.showResultMessage = (result, status, content) => {
-        if (!result)
-          return;
-        let params = { status };
-        if (status === "success") {
-          params.txtHash = content;
-        } else {
-          params.content = content;
-        }
-        result.message = __spreadValues({}, params);
-        result.showModal();
-      };
-      this.onStake = (stakingAddress) => {
-        if (this.manageStakeURL) {
-          window.location.assign(`${this.manageStakeURL}=${stakingAddress}`);
-        } else {
-          window.location.assign(`#/staking/manage-stake?address=${stakingAddress}`);
-        }
-      };
-      this.onUnstake = async (btnUnstake, data) => {
-        if (data.option.mode !== "Claim") {
-          this.onStake(data.option.stakingAddress);
-        } else {
-          this.showResultMessage(this.stakingResult, "warning", `Unstake ${data.lockedTokenSymbol}`);
-          const callBack = async (err, reply) => {
-            if (err) {
-              this.showResultMessage(this.stakingResult, "error", err);
-            } else {
-              this.showResultMessage(this.stakingResult, "success", reply);
-              btnUnstake.enabled = false;
-              btnUnstake.rightIcon.visible = true;
-            }
-          };
-          const confirmationCallBack = async (receipt) => {
-            await this.onSetupPage((0, import_store5.isWalletConnected)(), true);
-            if (!btnUnstake)
-              return;
-            btnUnstake.rightIcon.visible = false;
-            btnUnstake.enabled = true;
-          };
-          (0, import_global6.registerSendTxEvents)({
-            transactionHash: callBack,
-            confirmation: confirmationCallBack
-          });
-          withdrawToken(data.option.stakingAddress, callBack);
-        }
-      };
-      this.onClaim = async (btnClaim, data) => {
-        this.showResultMessage(this.stakingResult, "warning", `Claim ${data.rewardSymbol}`);
-        const callBack = async (err, reply) => {
-          if (err) {
-            this.showResultMessage(this.stakingResult, "error", err);
-          } else {
-            this.showResultMessage(this.stakingResult, "success", reply);
-            btnClaim.enabled = false;
-            btnClaim.rightIcon.visible = true;
-          }
-        };
-        const confirmationCallBack = async (receipt) => {
-          await this.onSetupPage((0, import_store5.isWalletConnected)(), true);
-          if (!btnClaim)
-            return;
-          btnClaim.rightIcon.visible = false;
-          btnClaim.enabled = true;
-        };
-        (0, import_global6.registerSendTxEvents)({
-          transactionHash: callBack,
-          confirmation: confirmationCallBack
-        });
-        claimToken(data.reward.rewardAddress, callBack);
-      };
-      this.removeTimer = () => {
-        for (const timer of this.listAprTimer) {
-          clearInterval(timer);
-        }
-        this.listAprTimer = [];
-        for (const timer of this.listActiveTimer) {
-          clearInterval(timer);
-        }
-        this.listActiveTimer = [];
-      };
-      this.getRewardToken = (tokenAddress) => {
-        return this.tokenMap[tokenAddress] || this.tokenMap[tokenAddress == null ? void 0 : tokenAddress.toLocaleLowerCase()] || {};
-      };
-      this.getLPToken = (campaign, token, chainId) => {
-        if (campaign.getTokenURL) {
-          window.open(campaign.getTokenURL);
-        } else {
-          window.open(this.lpTokenURL ? this.lpTokenURL : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
-        }
-      };
-      this.onLoad = () => {
-        this.onSetupPage((0, import_store5.isWalletConnected)());
-      };
-      this.init = () => {
-        super.init();
-        this.stakingResult = new Result();
-        this.appendChild(this.stakingResult);
-        this.initWalletData();
-        (0, import_store5.setDataFromSCConfig)(import_store5.Networks, import_store5.InfuraId);
-        (0, import_store5.setCurrentChainId)((0, import_store5.getDefaultChainId)());
-      };
-      this.renderCampaigns = async (hideLoading) => {
-        if (!hideLoading) {
-          this.stakingElm.clearInnerHTML();
-        }
-        this.tokenMap = (0, import_store5.getTokenMap)();
-        const chainId = (0, import_store5.getChainId)();
-        const network = (0, import_store5.getNetworkInfo)(chainId);
-        if (!this.noCampaignSection) {
-          this.noCampaignSection = await import_components5.Panel.create();
-          this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-            class: "no-campaign"
-          }, /* @__PURE__ */ this.$render("i-image", {
-            url: import_assets4.default.fullPath("img/staking/TrollTrooper.svg")
-          }), /* @__PURE__ */ this.$render("i-label", {
-            caption: "No Campaigns"
-          })));
-        }
-        this.noCampaignSection.visible = false;
-        if (this.campaigns && !this.campaigns.length) {
-          this.stakingElm.clearInnerHTML();
-          this.stakingElm.appendChild(this.noCampaignSection);
-          this.noCampaignSection.visible = true;
-          return;
-        }
-        let nodeItems = [];
-        this.removeTimer();
-        for (let idx = 0; idx < this.campaigns.length; idx++) {
-          const campaign = this.campaigns[idx];
-          const containerSection = await import_components5.Panel.create();
-          containerSection.id = `campaign-${idx}`;
-          containerSection.classList.add("container-custom");
-          const options = campaign.options;
-          const stakingInfo = options ? options[0] : null;
-          let lpTokenData = {};
-          let vaultTokenData = {};
-          if (stakingInfo && stakingInfo.tokenAddress) {
-            if (stakingInfo.stakingType == StakingType2.LP_Token) {
-              lpTokenData = {
-                "object": await getLPObject(stakingInfo.tokenAddress)
-              };
-            } else if (stakingInfo.stakingType == StakingType2.VAULT_Token) {
-              vaultTokenData = {
-                "object": await getVaultObject(stakingInfo.tokenAddress)
-              };
-            }
-          }
-          const tokenInfo = {
-            tokenAddress: campaign.tokenAddress,
-            lpToken: lpTokenData,
-            vaultToken: vaultTokenData
-          };
-          const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
-          const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
-          const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
-          const isSimplified = campaign.isSimplified;
-          const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
-          const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-          let isStarted = (0, import_moment3.default)(activeStartTime).diff((0, import_moment3.default)()) <= 0;
-          let isClosed = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)()) <= 0;
-          let totalTokens = 0;
-          let availableQty = 0;
-          let totalLocked = {};
-          const totalTokensLabel = await import_components5.Label.create();
-          const availableQtyLabel = await import_components5.Label.create();
-          const activeTimerRow = await import_components5.VStack.create();
-          const endHours = await import_components5.Label.create();
-          const endDays = await import_components5.Label.create();
-          const endMins = await import_components5.Label.create();
-          const stickerSection = await import_components5.Panel.create();
-          const stickerLabel = await import_components5.Label.create();
-          const stickerIcon = await import_components5.Icon.create();
-          const simplifiedRow = await import_components5.VStack.create();
-          stickerSection.classList.add("sticker");
-          endHours.classList.add("timer-value");
-          endDays.classList.add("timer-value");
-          endMins.classList.add("timer-value");
-          if (isSimplified) {
-            simplifiedRow.classList.add("simplified");
-            simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-              class: "simplified-description"
-            }, /* @__PURE__ */ this.$render("i-label", {
-              caption: `Don't have ${network == null ? void 0 : network.name} ${lockedTokenSymbol}?`
-            }), /* @__PURE__ */ this.$render("i-image", {
-              width: 25,
-              height: 25,
-              url: import_assets4.default.fullPath((network == null ? void 0 : network.img) || "")
-            })));
-            simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-              class: "simplified-link"
-            }, /* @__PURE__ */ this.$render("i-label", {
-              caption: `Flip ERC20 ${lockedTokenSymbol} to ${network == null ? void 0 : network.name} ${lockedTokenSymbol}`
-            }), /* @__PURE__ */ this.$render("i-label", {
-              link: { href: campaign.getTokenURL2 },
-              caption: "HERE"
-            }), /* @__PURE__ */ this.$render("i-label", {
-              caption: "now!"
-            })));
-          }
-          const setAvailableQty = async () => {
-            if (!(0, import_store5.isWalletConnected)())
-              return;
-            let _totalTokens = 0;
-            let _availableQty = 0;
-            for (const o of options) {
-              const _totalLocked = await getStakingTotalLocked(o.stakingAddress, o.decimalsOffset);
-              totalLocked[o.stakingAddress] = _totalLocked;
-              const optionQty = new import_eth_wallet10.BigNumber(o.maxTotalLock).minus(_totalLocked);
-              const lbOptionQty = document.querySelector(`#lb-${o.stakingAddress}`);
-              if (lbOptionQty) {
-                lbOptionQty.caption = `${(0, import_global6.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
-              }
-              const btnStake = document.querySelector(`#btn-${o.stakingAddress}`);
-              if (btnStake && btnStake.caption === "Stake") {
-                btnStake.enabled = !(!isStarted || o.mode === "Stake" && (optionQty.lte(0) || isClosed));
-              } else if (btnStake && btnStake.caption === "Unstake") {
-                btnStake.enabled = o.stakeQty != "0";
-              }
-              const stickerOption = document.querySelector(`#sticker-${o.stakingAddress}`);
-              if (optionQty.lte(0) && stickerOption) {
-                stickerOption.visible = true;
-              }
-              _totalTokens += parseFloat(o.maxTotalLock);
-              _availableQty += parseFloat(o.maxTotalLock) - parseFloat(_totalLocked);
-            }
-            ;
-            totalTokens = _totalTokens;
-            availableQty = _availableQty;
-            totalTokensLabel.caption = `${(0, import_global6.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-            availableQtyLabel.caption = `${(0, import_global6.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
-            if (isClosed) {
-              if (stickerLabel.caption !== "Closed") {
-                stickerSection.classList.add("closed");
-                stickerSection.classList.remove("sold-out");
-                stickerLabel.caption = "Closed";
-                stickerIcon.name = "check-square";
-              }
-            } else if (availableQty === 0) {
-              if (stickerLabel.caption !== "Sold Out") {
-                stickerLabel.caption = "Sold Out";
-                stickerIcon.name = "star";
-                stickerSection.classList.add("sold-out");
-              }
-            } else {
-              if (stickerLabel.caption !== "Active") {
-                stickerLabel.caption = "Active";
-                stickerIcon.name = "star";
-              }
-            }
-          };
-          const setEndRemainingTime = () => {
-            isStarted = (0, import_moment3.default)(activeStartTime).diff((0, import_moment3.default)()) <= 0;
-            isClosed = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)()) <= 0;
-            if (isStarted && !isClosed) {
-              activeTimerRow.visible = true;
-            } else {
-              activeTimerRow.visible = false;
-            }
-            if (activeEndTime == 0) {
-              endDays.caption = endHours.caption = endMins.caption = "0";
-              if (this.listActiveTimer[idx]) {
-                clearInterval(this.listActiveTimer[idx]);
-              }
-            } else {
-              const days = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "days");
-              const hours = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "hours") - days * 24;
-              const mins = (0, import_moment3.default)(activeEndTime).diff((0, import_moment3.default)(), "minutes") - days * 24 * 60 - hours * 60;
-              endDays.caption = `${days}`;
-              endHours.caption = `${hours}`;
-              endMins.caption = `${mins}`;
-            }
-          };
-          const setTimer = () => {
-            setEndRemainingTime();
-            setAvailableQty();
-          };
-          setTimer();
-          this.listActiveTimer.push(setInterval(setTimer, 2e3));
-          stickerSection.appendChild(/* @__PURE__ */ this.$render("i-vstack", {
-            class: "sticker-text"
-          }, stickerIcon, stickerLabel));
-          activeTimerRow.appendChild(/* @__PURE__ */ this.$render("i-vstack", null, /* @__PURE__ */ this.$render("i-label", {
-            caption: "Time until the staking campaign ends:"
-          }), /* @__PURE__ */ this.$render("i-panel", {
-            margin: { top: 4 },
-            class: "custom-timer"
-          }, endDays, /* @__PURE__ */ this.$render("i-label", {
-            caption: "D",
-            class: "timer-unit"
-          }), endHours, /* @__PURE__ */ this.$render("i-label", {
-            caption: "H",
-            class: "timer-unit"
-          }), endMins, /* @__PURE__ */ this.$render("i-label", {
-            caption: "M",
-            class: "timer-unit"
-          }))));
-          totalTokensLabel.classList.add("bold");
-          availableQtyLabel.classList.add("bold");
-          totalTokensLabel.caption = `${(0, import_global6.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-          availableQtyLabel.caption = `${(0, import_global6.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
-          totalTokensLabel.classList.add("text-right");
-          availableQtyLabel.classList.add("text-right");
-          const rowItems = [
-            {
-              title: "Total Tokens:",
-              value: totalTokensLabel.caption,
-              isHidden: isSimplified,
-              img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
-              elm: totalTokensLabel
-            },
-            {
-              title: "Available QTY:",
-              value: availableQtyLabel.caption,
-              isHidden: isSimplified,
-              img: import_assets4.default.fullPath("img/staking/dot-circle.svg"),
-              elm: availableQtyLabel
-            },
-            {
-              title: "Campaign Start:",
-              value: (0, import_moment3.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
-              isHidden: isStarted || isSimplified,
-              img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
-            },
-            {
-              title: "Vesting Period:",
-              value: campaign.vestingPeriod,
-              isHidden: !campaign.vestingPeriod || isSimplified,
-              img: import_assets4.default.fullPath("img/staking/stopwatch.svg")
-            }
-          ];
-          nodeItems.push(containerSection);
-          containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-            class: "row-custom",
-            width: "100%",
-            wrap: "wrap"
-          }, /* @__PURE__ */ this.$render("i-vstack", {
-            class: "column-custom"
-          }, /* @__PURE__ */ this.$render("i-vstack", {
-            class: "banner",
-            verticalAlignment: "space-between"
-          }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
-            verticalAlignment: "center",
-            class: "campaign-name"
-          }, /* @__PURE__ */ this.$render("i-image", {
-            width: "25px",
-            height: "25px",
-            url: import_assets4.default.fullPath(this.tokenIcon)
-          }), /* @__PURE__ */ this.$render("i-label", {
-            caption: campaign.campaignName
-          })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
-            class: "campaign-description",
-            caption: campaign.campaignDesc
-          })), /* @__PURE__ */ this.$render("i-panel", null, rowItems.filter((f) => !f.isHidden).map((v) => {
-            return /* @__PURE__ */ this.$render("i-hstack", {
-              verticalAlignment: "start",
-              horizontalAlignment: "space-between",
-              class: "row-item"
-            }, /* @__PURE__ */ this.$render("i-hstack", {
-              class: "col-item"
-            }, /* @__PURE__ */ this.$render("i-image", {
-              class: "custom-icon",
-              url: v.img
-            }), /* @__PURE__ */ this.$render("i-label", {
-              class: "no-wrap",
-              caption: v.title
-            })), /* @__PURE__ */ this.$render("i-vstack", {
-              width: "auto",
-              horizontalAlignment: "end"
-            }, v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
-              class: "bold text-right",
-              caption: v.value
-            })));
-          })), simplifiedRow, /* @__PURE__ */ this.$render("i-hstack", {
-            verticalAlignment: "center",
-            class: "get-token",
-            onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId)
-          }, /* @__PURE__ */ this.$render("i-label", {
-            class: "bold",
-            caption: `Get ${lockedTokenSymbol}`
-          }), lockedTokenIconPaths.map((v) => {
-            return /* @__PURE__ */ this.$render("i-image", {
-              width: 25,
-              height: 25,
-              url: import_assets4.default.fullPath(v)
-            });
-          }), /* @__PURE__ */ this.$render("i-icon", {
-            name: "external-link-alt",
-            width: "14",
-            height: "14",
-            fill: "#fff"
-          })), activeTimerRow)), await Promise.all(options.map(async (option) => {
-            const stickerOptionSection = await import_components5.Panel.create();
-            stickerOptionSection.classList.add("sticker", "sold-out", "hidden", "sticker-text");
-            stickerOptionSection.id = `sticker-${option.stakingAddress}`;
-            stickerOptionSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-              class: "sticker-text"
-            }, /* @__PURE__ */ this.$render("i-icon", {
-              name: "star"
-            }), /* @__PURE__ */ this.$render("i-label", {
-              caption: "Sold Out"
-            })));
-            const btnStake = await import_components5.Button.create();
-            const btnUnstake = await import_components5.Button.create({
-              rightIcon: { spin: true, visible: false }
-            });
-            if (option.mode === "Stake") {
-              btnUnstake.visible = false;
-              btnStake.id = `btn-${option.stakingAddress}`;
-              btnStake.enabled = !isClosed;
-              btnStake.caption = "Stake";
-              btnStake.classList.add("btn-os", "btn-stake");
-              btnStake.onClick = () => this.onStake(option.stakingAddress);
-            } else {
-              btnStake.visible = false;
-              btnUnstake.id = `btn-${option.stakingAddress}`;
-              btnUnstake.caption = "Unstake";
-              btnUnstake.classList.add("btn-os", "btn-stake");
-              btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
-            }
-            const isClaim = option.mode === "Claim";
-            const rewardOptions = !isClaim ? option.rewardOptions : [];
-            const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {};
-            const lpRewardTokenIconPath = !isClaim && rewardToken.address ? (0, import_store5.getTokenIconPath)(rewardToken, chainId) : "";
-            let aprInfo = {};
-            const optionAvailableQtyLabel = await import_components5.Label.create();
-            optionAvailableQtyLabel.classList.add("ml-auto");
-            optionAvailableQtyLabel.id = `lb-${option.stakingAddress}`;
-            optionAvailableQtyLabel.caption = `${(0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.maxTotalLock).minus(totalLocked[option.stakingAddress]))} ${lockedTokenSymbol}`;
-            const claimStakedRow = await import_components5.HStack.create();
-            claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
-              class: "mr-025",
-              caption: "You Staked:"
-            }));
-            claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
-              class: "ml-auto",
-              caption: `${(0, import_global6.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
-            }));
-            const rowRewardsLocked = await import_components5.Panel.create();
-            const rowRewardsVesting = await import_components5.Panel.create();
-            const rowRewardsVestingEnd = await import_components5.Panel.create();
-            const rowRewardsClaimable = await import_components5.Panel.create();
-            const rowRewardsClaimBtn = await import_components5.Panel.create();
-            if (isClaim) {
-              claimStakedRow.classList.add("mb-1");
-              for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
-                const reward = option.rewardsData[idx2];
-                const rewardToken2 = this.getRewardToken(reward.tokenAddress);
-                const rewardSymbol = rewardToken2.symbol || "";
-                rowRewardsLocked.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-                  horizontalAlignment: "space-between"
-                }, /* @__PURE__ */ this.$render("i-label", {
-                  caption: `${rewardSymbol} Locked:`
-                }), /* @__PURE__ */ this.$render("i-label", {
-                  class: "bold",
-                  caption: `${(0, import_global6.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
-                })));
-                rowRewardsVesting.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-                  horizontalAlignment: "space-between"
-                }, /* @__PURE__ */ this.$render("i-label", {
-                  caption: `${rewardSymbol} Vesting Start:`
-                }), /* @__PURE__ */ this.$render("i-label", {
-                  class: "bold",
-                  caption: reward.vestingStart ? reward.vestingStart.format("YYYY-MM-DD HH:mm:ss") : "TBC"
-                })));
-                rowRewardsVestingEnd.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-                  horizontalAlignment: "space-between"
-                }, /* @__PURE__ */ this.$render("i-label", {
-                  caption: `${rewardSymbol} Vesting End:`
-                }), /* @__PURE__ */ this.$render("i-label", {
-                  class: "bold",
-                  caption: reward.vestingEnd ? reward.vestingEnd.format("YYYY-MM-DD HH:mm:ss") : "TBC"
-                })));
-                const passClaimStartTime = !(reward.claimStartTime && (0, import_moment3.default)().diff(import_moment3.default.unix(reward.claimStartTime)) < 0);
-                let rewardClaimable = `0 ${rewardSymbol}`;
-                if (passClaimStartTime) {
-                  rewardClaimable = `${(0, import_global6.formatNumber)(reward.claimable)} ${rewardSymbol}`;
-                }
-                let startClaimingText = "";
-                if (!(!reward.claimStartTime || passClaimStartTime)) {
-                  const claimStart = import_moment3.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
-                  startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
-                }
-                rowRewardsClaimable.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-                  horizontalAlignment: "space-between"
-                }, /* @__PURE__ */ this.$render("i-label", {
-                  caption: `${rewardSymbol} Claimable:`
-                }), /* @__PURE__ */ this.$render("i-label", {
-                  class: "bold",
-                  caption: rewardClaimable
-                }), startClaimingText ? /* @__PURE__ */ this.$render("i-label", {
-                  caption: startClaimingText
-                }) : []));
-                const btnClaim = await import_components5.Button.create({
-                  rightIcon: { spin: true, visible: false },
-                  caption: `Claim ${rewardSymbol}`,
-                  enabled: !(!passClaimStartTime || new import_eth_wallet10.BigNumber(reward.claimable).isZero())
-                });
-                btnClaim.id = `btnClaim-${idx2}-${option.stakingAddress}`;
-                btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
-                btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-                rowRewardsClaimBtn.appendChild(btnClaim);
-              }
-              ;
-            } else {
-              rowRewardsLocked.visible = false;
-              rowRewardsVesting.visible = false;
-              rowRewardsVestingEnd.visible = false;
-              rowRewardsClaimable.visible = false;
-              rowRewardsClaimBtn.visible = false;
-            }
-            const rowOptionItems = !isClaim ? [
-              {
-                title: "Max. QTY",
-                value: `${(0, import_global6.formatNumber)(option.maxTotalLock)} ${lockedTokenSymbol}`,
-                isHidden: isSimplified
-              },
-              {
-                title: "Available QTY",
-                value: optionAvailableQtyLabel.caption,
-                isHidden: isSimplified,
-                elm: optionAvailableQtyLabel
-              },
-              {
-                title: "Individual Cap",
-                value: `${(0, import_global6.formatNumber)(option.perAddressCap)} ${lockedTokenSymbol}`
-              },
-              {
-                title: "Campaign Start Date",
-                value: (0, import_global6.formatDate)(option.startOfEntryPeriod, "DD MMM YYYY"),
-                isHidden: !isSimplified
-              }
-            ] : [];
-            const getAprValue = (rewardOption) => {
-              if (rewardOption && aprInfo && aprInfo[rewardOption.tokenAddress]) {
-                const apr = new import_eth_wallet10.BigNumber(aprInfo[rewardOption.tokenAddress]).times(100).toFormat(2, import_eth_wallet10.BigNumber.ROUND_DOWN);
-                return `${apr}%`;
-              }
-              return "";
-            };
-            return /* @__PURE__ */ this.$render("i-vstack", {
-              class: "column-custom"
-            }, /* @__PURE__ */ this.$render("i-panel", {
-              class: "bg-color"
-            }, stickerOptionSection, /* @__PURE__ */ this.$render("i-panel", {
-              class: "header-info"
-            }, /* @__PURE__ */ this.$render("i-hstack", {
-              verticalAlignment: "center",
-              horizontalAlignment: "center"
-            }, lockedTokenIconPaths.map((v) => {
-              return /* @__PURE__ */ this.$render("i-image", {
-                width: 25,
-                height: 25,
-                url: import_assets4.default.fullPath(v)
-              });
-            }), /* @__PURE__ */ this.$render("i-label", {
-              class: "bold",
-              caption: `${option.duration} Days`
-            })), /* @__PURE__ */ this.$render("i-label", {
-              caption: option.stakingDesc
-            })), /* @__PURE__ */ this.$render("i-panel", {
-              class: "img-custom"
-            }, option.stakingType === StakingType2.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {
-              class: "group-img"
-            }, /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets4.default.fullPath(lpRewardTokenIconPath)
-            }), /* @__PURE__ */ this.$render("i-icon", {
-              name: "plus",
-              width: 16,
-              height: 16
-            }), /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets4.default.fullPath(this.tokenIcon)
-            })) : /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets4.default.fullPath(this.tokenIcon)
-            })), /* @__PURE__ */ this.$render("i-panel", {
-              class: "info-stake"
-            }, btnStake, await Promise.all(rewardOptions.map(async (rewardOption) => {
-              const labelApr = await import_components5.Label.create();
-              labelApr.classList.add("ml-auto");
-              const updateApr = async () => {
-                if (option.stakingType === StakingType2.ERC20_Token) {
-                  const apr = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, option.duration);
-                  if (!isNaN(parseFloat(apr))) {
-                    aprInfo[rewardOption.tokenAddress] = apr;
-                  }
-                } else if (option.stakingType === StakingType2.LP_Token) {
-                  if (rewardOption.referencePair) {
-                    aprInfo[rewardOption.tokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, option.duration);
-                  }
-                } else {
-                  aprInfo[rewardOption.tokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, option.duration);
-                }
-                const aprValue2 = getAprValue(rewardOption);
-                if (isSimplified) {
-                  labelApr.caption = aprValue2;
-                } else {
-                  labelApr.caption = aprValue2 ? `(${aprValue2} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
-                }
-              };
-              updateApr();
-              this.listAprTimer.push(setInterval(updateApr, 1e4));
-              const aprValue = getAprValue(rewardOption);
-              if (isSimplified) {
-                labelApr.caption = aprValue;
-                return /* @__PURE__ */ this.$render("i-vstack", null, /* @__PURE__ */ this.$render("i-hstack", {
-                  horizontalAlignment: "space-between"
-                }, /* @__PURE__ */ this.$render("i-label", {
-                  class: "mr-025",
-                  caption: "Rate"
-                }), /* @__PURE__ */ this.$render("i-label", {
-                  class: "bold",
-                  caption: rewardOption.rateDesc
-                })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
-                  class: "mr-025",
-                  caption: "APR"
-                }), labelApr));
-              }
-              labelApr.caption = aprValue ? `(${aprValue} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
-              return /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: "Rate"
-              }), labelApr);
-            })), rowOptionItems.filter((f) => !f.isHidden).map((v) => {
-              return /* @__PURE__ */ this.$render("i-hstack", {
-                horizontalAlignment: "space-between"
-              }, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: v.title
-              }), v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
-                caption: v.value
-              }));
-            }), /* @__PURE__ */ this.$render("i-panel", {
-              class: isClaim ? "hidden" : "custom-divider"
-            }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
-              const earnedQty = (0, import_global6.formatNumber)(new import_eth_wallet10.BigNumber(option.totalCredit).times(rewardOption.rate));
-              const earnedSymbol = this.getRewardToken(rewardOption.tokenAddress).symbol || "";
-              return /* @__PURE__ */ this.$render("i-hstack", {
-                horizontalAlignment: "space-between"
-              }, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: "You Earned"
-              }), /* @__PURE__ */ this.$render("i-label", {
-                caption: `${earnedQty} ${earnedSymbol}`
-              }));
-            })), /* @__PURE__ */ this.$render("i-label", {
-              class: "view-contract pointer",
-              margin: { top: isClaim ? 0 : 16 },
-              onClick: () => (0, import_store5.viewOnExplorerByAddress)(chainId, option.stakingAddress)
-            }, /* @__PURE__ */ this.$render("i-label", {
-              caption: "View Contract"
-            }), /* @__PURE__ */ this.$render("i-icon", {
-              name: "external-link-alt",
-              width: "14",
-              height: "14",
-              fill: "#fff",
-              class: "inline-block"
-            }))));
-          }))));
-        }
-        ;
-        this.stakingElm.clearInnerHTML();
-        this.stakingElm.append(this.noCampaignSection, ...nodeItems);
-      };
-      this.$eventBus = import_components5.application.EventBus;
-      this.registerEvent();
-    }
-    validateConfig() {
-    }
-    async getData() {
-    }
-    async setData() {
-    }
-    async getTag() {
-      return this.tag;
-    }
-    async setTag(value) {
-    }
-    async edit() {
-    }
-    async confirm() {
-    }
-    async discard() {
-    }
-    async config() {
-    }
-    render() {
-      return /* @__PURE__ */ this.$render("i-panel", {
-        class: "staking-component"
-      }, /* @__PURE__ */ this.$render("i-panel", {
-        class: "staking-layout"
-      }, /* @__PURE__ */ this.$render("i-vstack", {
-        id: "loadingElm",
-        class: "i-loading-overlay",
-        minHeight: 500
-      }, /* @__PURE__ */ this.$render("i-vstack", {
-        class: "i-loading-spinner",
-        horizontalAlignment: "center",
-        verticalAlignment: "center"
-      }, /* @__PURE__ */ this.$render("i-icon", {
-        class: "i-loading-spinner_icon",
-        image: { url: import_assets4.default.fullPath("img/loading.svg"), width: 36, height: 36 }
-      }), /* @__PURE__ */ this.$render("i-label", {
-        caption: "Loading...",
-        font: { color: "#FD4A4C", size: "1.5em" },
-        class: "i-loading-spinner_text"
-      }))), /* @__PURE__ */ this.$render("i-panel", {
-        id: "stakingElm",
-        class: "wrapper"
-      })));
-    }
-  };
-  StakingBlock = __decorateClass([
-    (0, import_components5.customElements)("i-section-staking")
-  ], StakingBlock);
-
-  // src/demo/index.tsx
-  var StakingEarn = class extends import_components6.Module {
-    constructor(parent, options) {
-      super(parent, options);
-    }
-    async init() {
-      super.init();
-      const stakingUI = await StakingBlock.create({});
-      this.stakingElm.appendChild(stakingUI);
-    }
-    render() {
-      return /* @__PURE__ */ this.$render("i-panel", {
-        class: "staking-rewards"
-      }, /* @__PURE__ */ this.$render("i-panel", {
-        id: "stakingElm"
-      }));
-    }
-  };
-  StakingEarn = __decorateClass([
-    import_components6.customModule
-  ], StakingEarn);
-})();
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! moment.js

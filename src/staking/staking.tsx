@@ -1,6 +1,6 @@
 import { Styles, Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType, getStakingStatus, getNetworkExplorerName } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -13,7 +13,6 @@ import {
 	getAllCampaignsInfo,
 } from '@staking/staking-utils';
 import {
-	StakingType,
 	getLockedTokenObject,
 	getLockedTokenSymbol,
 	getLockedTokenIconPaths,
@@ -22,9 +21,10 @@ import Assets from '@staking/assets';
 import moment from 'moment';
 import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import { Result } from '../result';
-import { StakingCampaignInfoByChainId } from '../config';
+import { getTokenUrl, tokenIcon } from '../config';
 Styles.Theme.applyTheme(Styles.Theme.darkTheme);
 import './staking.css';
+import { ManageStake } from './manageStake';
 
 declare global {
 	namespace JSX {
@@ -43,15 +43,15 @@ export class StakingBlock extends Module implements PageBlock {
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaigns: any = [];
+	private stakingComponent: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
 	private stakingResult: Result;
+	private manageStakeElm: Panel;
 	private listAprTimer: any = [];
 	private listActiveTimer: any = [];
-	private tokenIcon: string = 'img/swap/openswap.png';
+	private tokenIcon = tokenIcon || 'img/swap/openswap.png';
 	private tokenMap: TokenMapType = {};
-	private lpTokenURL: string;
-	private manageStakeURL: string;
 
 	validateConfig() {
 
@@ -98,6 +98,7 @@ export class StakingBlock extends Module implements PageBlock {
 		this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
 		this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletConnect);
 		this.$eventBus.register(this, EventId.chainChanged, this.onChainChange);
+		this.$eventBus.register(this, EventId.EmitButtonStatus, this.updateButtonStatus);
 	}
 
 	private onWalletConnect = async (connected: boolean) => {
@@ -138,7 +139,7 @@ export class StakingBlock extends Module implements PageBlock {
 			this.loadingElm.visible = false;
 			return;
 		}
-		this.campaigns = await getAllCampaignsInfo(StakingCampaignInfoByChainId);
+		this.campaigns = await getAllCampaignsInfo(StakingCampaignByChainId);
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading) {
 			this.loadingElm.visible = false;
@@ -157,17 +158,17 @@ export class StakingBlock extends Module implements PageBlock {
 		result.showModal();
 	}
 
-	private onStake = (stakingAddress: string) => {
-		if (this.manageStakeURL) {
-			window.location.assign(`${this.manageStakeURL}=${stakingAddress}`);
-		} else {
-			window.location.assign(`#/staking/manage-stake?address=${stakingAddress}`);
-		}
+	private onStake = async (option: any) => {
+		const manageStake = new ManageStake();
+		manageStake.onRefresh = () => this.onSetupPage(isWalletConnected(), true);
+		this.manageStakeElm.clearInnerHTML();
+		this.manageStakeElm.appendChild(manageStake);
+		manageStake.showModal(option, `#btn-${option.address}`);
 	}
 
 	private onUnstake = async (btnUnstake: Button, data: any) => {
 		if (data.option.mode !== 'Claim') {
-			this.onStake(data.option.stakingAddress);
+			this.onStake(data.option);
 		} else {
 			this.showResultMessage(this.stakingResult, 'warning', `Unstake ${data.lockedTokenSymbol}`);
 			const callBack = async (err: any, reply: any) => {
@@ -192,7 +193,7 @@ export class StakingBlock extends Module implements PageBlock {
 				confirmation: confirmationCallBack
 			});
 
-			withdrawToken(data.option.stakingAddress, callBack);
+			withdrawToken(data.option.address, callBack);
 		}
 	}
 
@@ -220,7 +221,7 @@ export class StakingBlock extends Module implements PageBlock {
 			confirmation: confirmationCallBack
 		});
 
-		claimToken(data.reward.rewardAddress, callBack);
+		claimToken(data.reward.address, callBack);
 	}
 
 	private removeTimer = () => {
@@ -242,7 +243,7 @@ export class StakingBlock extends Module implements PageBlock {
 		if (campaign.getTokenURL) {
 			window.open(campaign.getTokenURL);
 		} else {
-			window.open(this.lpTokenURL ? this.lpTokenURL : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
+			window.open(getTokenUrl ? getTokenUrl : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
 		}
 	}
 
@@ -253,11 +254,30 @@ export class StakingBlock extends Module implements PageBlock {
 	init = () => {
 		super.init();
 		this.stakingResult = new Result();
-		this.appendChild(this.stakingResult);
+		this.stakingComponent.appendChild(this.stakingResult);
 		this.initWalletData();
 		setDataFromSCConfig(Networks, InfuraId);
 		setCurrentChainId(getDefaultChainId());
 	}
+
+	private updateButtonStatus = async (data: any) => {
+    if (data) {
+      const { value, key, text } = data;
+      const elm = this.stakingElm.querySelector(key) as Button;
+      if (elm) {
+        elm.rightIcon.visible = value;
+        elm.caption = text;
+      }
+    }
+  }
+
+	private getBtnText = (key: string, text: string) => {
+    const data = getStakingStatus(key);
+    if (data.value) {
+      return data.text;
+    }
+    return text;
+  }
 
 	private renderCampaigns = async (hideLoading?: boolean) => {
 		if (!hideLoading) {
@@ -295,11 +315,11 @@ export class StakingBlock extends Module implements PageBlock {
 			let lpTokenData: any = {};
 			let vaultTokenData: any = {};
 			if (stakingInfo && stakingInfo.tokenAddress) {
-				if (stakingInfo.stakingType == StakingType.LP_Token) {
+				if (stakingInfo.lockTokenType == LockTokenType.LP_Token) {
 					lpTokenData = {
 						'object': await getLPObject(stakingInfo.tokenAddress)
 					}
-				} else if (stakingInfo.stakingType == StakingType.VAULT_Token) {
+				} else if (stakingInfo.lockTokenType == LockTokenType.VAULT_Token) {
 					vaultTokenData = {
 						'object': await getVaultObject(stakingInfo.tokenAddress)
 					}
@@ -358,20 +378,21 @@ export class StakingBlock extends Module implements PageBlock {
 				let _totalTokens = 0;
 				let _availableQty = 0;
 				for (const o of options) {
-					const _totalLocked = await getStakingTotalLocked(o.stakingAddress, o.decimalsOffset);
-					totalLocked[o.stakingAddress] = _totalLocked;
+					const _totalLocked = await getStakingTotalLocked(o.address, o.decimalsOffset);
+					totalLocked[o.address] = _totalLocked;
 					const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked);
-					const lbOptionQty = document.querySelector(`#lb-${o.stakingAddress}`) as Label;
+					const lbOptionQty = document.querySelector(`#lb-${o.address}`) as Label;
 					if (lbOptionQty) {
 						lbOptionQty.caption = `${formatNumber(optionQty)} ${lockedTokenSymbol}`;
 					}
-					const btnStake = document.querySelector(`#btn-${o.stakingAddress}`) as Button;
+					const btnStake = document.querySelector(`#btn-${o.address}`) as Button;
+					const isStaking = getStakingStatus(`#btn-${o.address}`).value;
 					if (btnStake && btnStake.caption === 'Stake') {
-						btnStake.enabled = !(!isStarted || o.mode === 'Stake' && (optionQty.lte(0) || isClosed));
+						btnStake.enabled = !isStaking && !(!isStarted || o.mode === 'Stake' && (optionQty.lte(0) || isClosed));
 					} else if (btnStake && btnStake.caption === 'Unstake') {
-						btnStake.enabled = o.stakeQty != "0";
+						btnStake.enabled = !isStaking && o.stakeQty != "0";
 					}
-					const stickerOption = document.querySelector(`#sticker-${o.stakingAddress}`) as Panel;
+					const stickerOption = document.querySelector(`#sticker-${o.address}`) as Panel;
 					if (optionQty.lte(0) && stickerOption) {
 						stickerOption.visible = true;
 					}
@@ -535,7 +556,7 @@ export class StakingBlock extends Module implements PageBlock {
 						await Promise.all(options.map(async (option: any) => {
 							const stickerOptionSection = await Panel.create();
 							stickerOptionSection.classList.add('sticker', 'sold-out', 'hidden', 'sticker-text');
-							stickerOptionSection.id = `sticker-${option.stakingAddress}`;
+							stickerOptionSection.id = `sticker-${option.address}`;
 							stickerOptionSection.appendChild(
 								<i-panel class="sticker-text">
 									<i-icon name="star" />
@@ -543,36 +564,39 @@ export class StakingBlock extends Module implements PageBlock {
 								</i-panel>
 							)
 
-							const btnStake = await Button.create();
+							const key = `btn-${option.address}`;
+							const btnStake = await Button.create({
+								caption: this.getBtnText(key, 'Stake'),
+								rightIcon: { spin: true, visible: getStakingStatus(key).value }
+							});
 							const btnUnstake = await Button.create({
-								rightIcon: { spin: true, visible: false }
+								caption: this.getBtnText(key, 'Unstake'),
+								rightIcon: { spin: true, visible: getStakingStatus(key).value }
 							});
 							if (option.mode === 'Stake') {
 								btnUnstake.visible = false;
-								btnStake.id = `btn-${option.stakingAddress}`;
+								btnStake.id = key;
 								btnStake.enabled = !isClosed;
-								btnStake.caption = 'Stake';
 								btnStake.classList.add('btn-os', 'btn-stake');
-								btnStake.onClick = () => this.onStake(option.stakingAddress);
+								btnStake.onClick = () => this.onStake(option);
 							} else {
 								btnStake.visible = false;
-								btnUnstake.id = `btn-${option.stakingAddress}`;
-								btnUnstake.caption = 'Unstake';
+								btnUnstake.id = key;
 								btnUnstake.classList.add('btn-os', 'btn-stake');
 								btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
 							}
 
 							const isClaim = option.mode === 'Claim';
 
-							const rewardOptions = !isClaim ? option.rewardOptions : [];
+							const rewardOptions = !isClaim ? option.rewards : [];
 							const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {} as any;
 							const lpRewardTokenIconPath = !isClaim && rewardToken.address ? getTokenIconPath(rewardToken, chainId) : '';
 							let aprInfo: any = {};
 
 							const optionAvailableQtyLabel = await Label.create();
 							optionAvailableQtyLabel.classList.add('ml-auto');
-							optionAvailableQtyLabel.id = `lb-${option.stakingAddress}`;
-							optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.stakingAddress]))} ${lockedTokenSymbol}`;
+							optionAvailableQtyLabel.id = `lb-${option.address}`;
+							optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.address]))} ${lockedTokenSymbol}`;
 							const claimStakedRow = await HStack.create();
 							claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked:" />);
 							claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(option.stakeQty)} ${lockedTokenSymbol}`} />);
@@ -586,8 +610,8 @@ export class StakingBlock extends Module implements PageBlock {
 							if (isClaim) {
 								claimStakedRow.classList.add('mb-1');
 								for (let idx = 0; idx < option.rewardsData.length; idx++) {
-									const reward = option.rewardsData[idx]
-									const rewardToken = this.getRewardToken(reward.tokenAddress);
+									const reward = option.rewardsData[idx];
+									const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
 									const rewardSymbol = rewardToken.symbol || '';
 									rowRewardsLocked.appendChild(
 										<i-hstack horizontalAlignment="space-between">
@@ -629,7 +653,7 @@ export class StakingBlock extends Module implements PageBlock {
 										caption: `Claim ${rewardSymbol}`,
 										enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero())
 									})
-									btnClaim.id = `btnClaim-${idx}-${option.stakingAddress}`;
+									btnClaim.id = `btnClaim-${idx}-${option.address}`;
 									btnClaim.classList.add('btn-os', 'btn-stake', 'mt-1');
 									btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
 									rowRewardsClaimBtn.appendChild(btnClaim);
@@ -666,12 +690,14 @@ export class StakingBlock extends Module implements PageBlock {
 							] : [];
 
 							const getAprValue = (rewardOption: any) => {
-								if (rewardOption && aprInfo && aprInfo[rewardOption.tokenAddress]) {
-									const apr = new BigNumber(aprInfo[rewardOption.tokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
+								if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+									const apr = new BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
 									return `${apr}%`;
 								}
 								return '';
 							}
+
+							const durationDays = option.minLockTime / (60 * 60 * 24);
 
 							return <i-vstack class="column-custom">
 								<i-panel class="bg-color">
@@ -683,13 +709,13 @@ export class StakingBlock extends Module implements PageBlock {
 													return <i-image width={25} height={25} url={Assets.fullPath(v)} />
 												})
 											}
-											<i-label class="bold" caption={`${option.duration} Days`} />
+											<i-label class="bold" caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
 										</i-hstack >
-										<i-label caption={option.stakingDesc} />
+										<i-label caption={option.customDesc} />
 									</i-panel>
 									<i-panel class="img-custom">
 										{
-											(option.stakingType === StakingType.LP_Token && rewardOptions.length === 2)
+											(option.lockTokenType === LockTokenType.LP_Token && rewardOptions.length === 2)
 												?
 												<i-panel class="group-img">
 													<i-image width={75} height={75} url={Assets.fullPath(lpRewardTokenIconPath)} />
@@ -706,24 +732,25 @@ export class StakingBlock extends Module implements PageBlock {
 											await Promise.all(rewardOptions.map(async (rewardOption: any) => {
 												const labelApr = await Label.create();
 												labelApr.classList.add('ml-auto');
+												const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 												const updateApr = async () => {
-													if (option.stakingType === StakingType.ERC20_Token) {
-														const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, option.duration);
+													if (option.lockTokenType === LockTokenType.ERC20_Token) {
+														const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
 														if (!isNaN(parseFloat(apr))) {
-															aprInfo[rewardOption.tokenAddress] = apr;
+															aprInfo[rewardOption.rewardTokenAddress] = apr;
 														}
-													} else if (option.stakingType === StakingType.LP_Token) {
+													} else if (option.lockTokenType === LockTokenType.LP_Token) {
 														if (rewardOption.referencePair) {
-															aprInfo[rewardOption.tokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, option.duration);
+															aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, durationDays);
 														}
 													} else {
-														aprInfo[rewardOption.tokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, option.duration);
+														aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, durationDays);
 													}
 													const aprValue = getAprValue(rewardOption);
 													if (isSimplified) {
 														labelApr.caption = aprValue;
 													} else {
-														labelApr.caption = aprValue ? `(${aprValue} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
+														labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
 													}
 												}
 												updateApr();
@@ -734,7 +761,7 @@ export class StakingBlock extends Module implements PageBlock {
 													return <i-vstack>
 														<i-hstack horizontalAlignment="space-between">
 															<i-label class="mr-025" caption="Rate" />
-															<i-label class="bold" caption={rewardOption.rateDesc} />
+															<i-label class="bold" caption={rateDesc} />
 														</i-hstack>
 														<i-hstack>
 															<i-label class="mr-025" caption="APR" />
@@ -742,7 +769,7 @@ export class StakingBlock extends Module implements PageBlock {
 														</i-hstack>
 													</i-vstack>
 												}
-												labelApr.caption = aprValue ? `(${aprValue} APR) ${rewardOption.rateDesc}` : rewardOption.rateDesc;
+												labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
 												return <i-hstack>
 													<i-label class="mr-025" caption="Rate" />
 													{labelApr}
@@ -767,8 +794,8 @@ export class StakingBlock extends Module implements PageBlock {
 										{rowRewardsClaimBtn}
 										{
 											rewardOptions.map((rewardOption: any) => {
-												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(rewardOption.rate));
-												const earnedSymbol = this.getRewardToken(rewardOption.tokenAddress).symbol || '';
+												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(rewardOption.multiplier));
+												const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
 												return <i-hstack horizontalAlignment="space-between">
 													<i-label class="mr-025" caption="You Earned" />
 													<i-label caption={`${earnedQty} ${earnedSymbol}`} />
@@ -776,7 +803,7 @@ export class StakingBlock extends Module implements PageBlock {
 											})
 										}
 									</i-panel>
-									<i-label class="view-contract pointer" margin={{ top: isClaim ? 0 : 16 }} onClick={() => viewOnExplorerByAddress(chainId, option.stakingAddress)}>
+									<i-label class="view-contract pointer" margin={{ top: isClaim ? 0 : 16 }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
 										<i-label caption="View Contract" />
 										<i-icon name="external-link-alt" width="14" height="14" fill="#fff" class="inline-block" />
 									</i-label>
@@ -793,7 +820,7 @@ export class StakingBlock extends Module implements PageBlock {
 
 	render() {
 		return (
-			<i-panel class="staking-component">
+			<i-panel id="stakingComponent" class="staking-component">
 				<i-panel class="staking-layout">
 					<i-vstack id="loadingElm" class="i-loading-overlay" minHeight={500}>
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
@@ -809,6 +836,7 @@ export class StakingBlock extends Module implements PageBlock {
 					</i-vstack>
 					<i-panel id="stakingElm" class="wrapper" />
 				</i-panel>
+				<i-panel id="manageStakeElm" />
 			</i-panel>
 		)
 	}

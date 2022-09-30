@@ -1,23 +1,17 @@
-import { getTokenMap, getTokenIconPath, DefaultTokens } from '@staking/store';
-
-enum StakingType {
-  ERC20_Token,
-  LP_Token,
-  VAULT_Token
-}
+import { getTokenMap, getTokenIconPath, DefaultTokens, LockTokenType } from '@staking/store';
 
 const getLockedTokenObject = (info: any, tokenInfo: any, tokenMap?: any) => {
   if (info) {
-    if (info.stakingType == StakingType.ERC20_Token) {
+    if (info.lockTokenType == LockTokenType.ERC20_Token) {
       if (!tokenMap) {
         tokenMap = getTokenMap();
       }
       return tokenMap[tokenInfo.tokenAddress];
     }
-    if (info.stakingType == StakingType.LP_Token && tokenInfo.lpToken) {
+    if (info.lockTokenType == LockTokenType.LP_Token && tokenInfo.lpToken) {
       return tokenInfo.lpToken.object;
     }
-    else if (info.stakingType == StakingType.VAULT_Token && tokenInfo.vaultToken) {
+    else if (info.lockTokenType == LockTokenType.VAULT_Token && tokenInfo.vaultToken) {
       return tokenInfo.vaultToken.object;
     }
   }
@@ -26,13 +20,13 @@ const getLockedTokenObject = (info: any, tokenInfo: any, tokenMap?: any) => {
 
 const getLockedTokenSymbol = (info: any, token: any) => {
   if (info) {
-    if (info.stakingType == StakingType.ERC20_Token) {
+    if (info.lockTokenType == LockTokenType.ERC20_Token) {
       return token ? token.symbol : '';
     }
-    if (info.stakingType == StakingType.LP_Token) {
+    if (info.lockTokenType == LockTokenType.LP_Token) {
       return 'LP';
     }
-    if (info.stakingType == StakingType.VAULT_Token) {
+    if (info.lockTokenType == LockTokenType.VAULT_Token) {
       return token ? `vt${token.assetToken.symbol}` : '';
     }
   }
@@ -44,16 +38,16 @@ const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: number, t
     if (!tokenMap) {
       tokenMap = getTokenMap();
     }
-    if (info.stakingType == StakingType.ERC20_Token) {
+    if (info.lockTokenType == LockTokenType.ERC20_Token) {
       return [getTokenIconPath(tokenObject, chainId)];
     }
-    if (info.stakingType == StakingType.LP_Token) {
+    if (info.lockTokenType == LockTokenType.LP_Token) {
       const nativeToken = DefaultTokens[chainId]?.find((token) => token.isNative);
       const token0 = tokenMap[tokenObject.token0] || nativeToken;
       const token1 = tokenMap[tokenObject.token1] || nativeToken;
       return [getTokenIconPath(token0, chainId), getTokenIconPath(token1, chainId)];
     }
-    if (info.stakingType == StakingType.VAULT_Token) {
+    if (info.lockTokenType == LockTokenType.VAULT_Token) {
       return [getTokenIconPath(tokenObject.assetToken, chainId)];
     }
   }
@@ -61,7 +55,6 @@ const getLockedTokenIconPaths = (info: any, tokenObject: any, chainId: number, t
 }
 
 export {
-  StakingType,
   getLockedTokenObject,
   getLockedTokenSymbol,
   getLockedTokenIconPaths,

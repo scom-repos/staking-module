@@ -3730,7 +3730,6 @@ __export(exports, {
   EventId: () => EventId,
   QueueType: () => QueueType,
   SITE_ENV: () => SITE_ENV,
-  StakingType: () => StakingType,
   approveERC20Max: () => approveERC20Max,
   compareDate: () => compareDate,
   formatDate: () => formatDate,
@@ -4218,14 +4217,6 @@ var isAddressValid = async (address) => {
   const isValid = wallet.web3.utils.isAddress(address);
   return isValid;
 };
-
-// src/global/interfaces/staking.ts
-var StakingType;
-(function(StakingType2) {
-  StakingType2[StakingType2["ERC20_Token"] = 0] = "ERC20_Token";
-  StakingType2[StakingType2["LP_Token"] = 1] = "LP_Token";
-  StakingType2[StakingType2["VAULT_Token"] = 2] = "VAULT_Token";
-})(StakingType || (StakingType = {}));
 
 // src/global/index.ts
 var QueueType;

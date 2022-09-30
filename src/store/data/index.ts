@@ -11,9 +11,7 @@ export {
 
 export {CoreContractAddressesByChainId} from './core';
 
-export {
-  USDPeggedTokenAddressMap
-} from './staking';
+export * from './staking';
 
 export {
   baseRoute,

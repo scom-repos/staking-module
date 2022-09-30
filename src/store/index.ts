@@ -5,6 +5,7 @@ import {
   TokenMapType,
   getERC20Amount,
   INetwork,
+  EventId,
 } from '@staking/global';
 
 import Assets from '@staking/assets';
@@ -17,6 +18,7 @@ import {
   WETHByChainId,
   getTokenIconPath,
 } from './data';
+import { application } from '@ijstech/components';
 
 export {isWalletConnected, hasWallet, hasMetaMask, truncateAddress, switchNetwork, connectWallet, logoutWallet} from './wallet';
 export {walletList} from './walletList';
@@ -39,6 +41,11 @@ export {
   CoreContractAddressesByChainId,
   
   //staking
+  StakingCampaign,
+  Staking,
+  Reward,
+  LockTokenType,
+  StakingCampaignByChainId,
   USDPeggedTokenAddressMap,
   
   //cross-chain
@@ -213,7 +220,8 @@ export const state = {
   tokenMap: {} as TokenMapType,
   userTokens: {} as {[key: string]: ITokenObject[]},
   infuraId: "",
-  networkMap: {} as { [key: number]: INetwork }
+  networkMap: {} as { [key: number]: INetwork },
+  stakingStatusMap: {} as {[key: string]: {value: boolean, text: string}},
 }
 
 export const setDataFromSCConfig = (networkList: INetwork[], infuraId: string) => {
@@ -471,4 +479,13 @@ export const viewOnExplorerByAddress = (chainId: number, address: string) => {
     let url = `${network.explorerAddressUrl}${address}`;
     window.open(url);
   }
+}
+
+export const setStakingStatus = (key: string, value: boolean, text: string) => {
+  state.stakingStatusMap[key] = { value, text };
+  application.EventBus.dispatch(EventId.EmitButtonStatus, {key, value, text});
+}
+
+export const getStakingStatus = (key: string) => {
+  return state.stakingStatusMap[key] || { value : false, text: 'Stake' };
 }
