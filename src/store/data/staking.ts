@@ -16,6 +16,10 @@ interface StakingCampaign {
   vestingPeriod?: string,
   isSimplified?: boolean,
   getTokenURL2?: string,
+  customColorCampaign?: string, // 1 campaign main color
+  customColorBackground?: string, // 2 campign background
+  customColorText?: string, // 5 text
+  customColorTimeBackground?:string, //6 string end countdown background
 
   stakings: Staking[],
 }
@@ -34,6 +38,8 @@ interface Staking {
   customDesc?: string,
   lockTokenType: LockTokenType,
   decimalsOffset?: number,
+  customColorBackground?: string, // 3 staking background
+  customColorButton?: string, // 4 staking button
 
   rewards: Reward[]
 }
