@@ -19019,13 +19019,6 @@ var getERC20Allowance = async (token, spenderAddress) => {
 };
 
 // src/global/index.ts
-var QueueType;
-(function(QueueType2) {
-  QueueType2[QueueType2["PRIORITY_QUEUE"] = 0] = "PRIORITY_QUEUE";
-  QueueType2[QueueType2["RANGE_QUEUE"] = 1] = "RANGE_QUEUE";
-  QueueType2[QueueType2["GROUP_QUEUE"] = 2] = "GROUP_QUEUE";
-  QueueType2[QueueType2["PEGGED_QUEUE"] = 3] = "PEGGED_QUEUE";
-})(QueueType || (QueueType = {}));
 var EventId;
 (function(EventId3) {
   EventId3["ConnectWallet"] = "connectWallet";
@@ -19033,19 +19026,7 @@ var EventId;
   EventId3["IsWalletDisconnected"] = "IsWalletDisconnected";
   EventId3["Paid"] = "Paid";
   EventId3["chainChanged"] = "chainChanged";
-  EventId3["ShowExpertModal"] = "showExpertModal";
-  EventId3["ShowTransactionModal"] = "showTransactionModal";
-  EventId3["SlippageToleranceChanged"] = "slippageToleranceChanged";
-  EventId3["ExpertModeChanged"] = "expertModeChanged";
-  EventId3["ShowResult"] = "showResult";
-  EventId3["SetResultMessage"] = "setResultMessage";
-  EventId3["ShowBondModal"] = "ShowBondModal";
-  EventId3["ChangeSeletedImage"] = "ChangeSeletedImage";
-  EventId3["EmitFocusField"] = "emitFocusField";
-  EventId3["EmitFieldChange"] = "emitFieldChange";
-  EventId3["ShowActionQueueModal"] = "showActionQueueModal";
   EventId3["EmitButtonStatus"] = "emitButtonStatus";
-  EventId3["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/staking-utils/API.ts
@@ -19259,7 +19240,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
       let durationOption = durationOptions[j];
       addDurationOption(durationOptionsWithExtendedInfo, durationOption);
     }
-    let campaignObj = {
+    let campaignObj = __spreadProps(__spreadValues({}, stakingCampaignInfo), {
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
@@ -19267,7 +19248,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
       getTokenURL: stakingCampaignInfo.getTokenURL,
       getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo
-    };
+    });
     if (durationOptionsWithExtendedInfo.length > 0) {
       campaignObj = __spreadProps(__spreadValues({}, campaignObj), {
         tokenAddress: durationOptionsWithExtendedInfo[0].tokenAddress.toLowerCase()
@@ -19593,11 +19574,11 @@ var import_global2 = __toModule(require("@staking/global"));
 
 // src/result/result.css.ts
 var import_components = __toModule(require("@ijstech/components"));
-var Theme = import_components.Styles.Theme.ThemeVars;
 var result_css_default = import_components.Styles.style({
   textAlign: "center",
   $nest: {
     "i-label > *": {
+      color: "#fff",
       fontSize: ".875rem",
       wordBreak: "normal"
     },
@@ -19607,7 +19588,7 @@ var result_css_default = import_components.Styles.style({
       width: 455
     },
     ".i-modal-close svg": {
-      fill: Theme.colors.primary.dark
+      fill: "#F05E61"
     },
     ".i-modal_content": {
       padding: "0 2.563rem 3rem"
@@ -19616,7 +19597,7 @@ var result_css_default = import_components.Styles.style({
       borderBottom: "none !important"
     },
     ".waiting-txt > *": {
-      color: Theme.colors.warning.light,
+      color: "#F6C958",
       fontSize: "1.125rem"
     },
     ".confirm-txt > *": {
@@ -19848,27 +19829,11 @@ var manageStakeUrl = `${baseUrl}/staking/manage-stake?address=`;
 // src/staking/staking.css.ts
 var import_components3 = __toModule(require("@ijstech/components"));
 var import_assets2 = __toModule(require("@staking/assets"));
-var Theme2 = import_components3.Styles.Theme.ThemeVars;
-import_components3.Styles.Theme.darkTheme.background.default = "#0c1234";
-import_components3.Styles.Theme.darkTheme.background.paper = "#1f1e4f";
-import_components3.Styles.Theme.darkTheme.colors.primary.dark = "#F05E61";
-import_components3.Styles.Theme.darkTheme.colors.primary.light = "#f15e60e7";
-import_components3.Styles.Theme.darkTheme.colors.primary.main = "#f15e61";
-import_components3.Styles.Theme.darkTheme.colors.secondary.dark = "#f7d063";
-import_components3.Styles.Theme.darkTheme.colors.secondary.light = "#f7d063b6";
-import_components3.Styles.Theme.darkTheme.colors.secondary.main = "#f7d063";
-import_components3.Styles.Theme.darkTheme.text.secondary = "hsla(0, 0%, 100%, 0.55)";
-import_components3.Styles.Theme.darkTheme.typography.fontFamily = "Proxima Nova";
-import_components3.Styles.Theme.darkTheme.colors.warning.dark = "#f57c00";
-import_components3.Styles.Theme.darkTheme.colors.warning.light = "#F6C958";
-import_components3.Styles.Theme.darkTheme.colors.warning.main = "#ffa726";
-import_components3.Styles.Theme.darkTheme.divider = "#0E132E";
-import_components3.Styles.Theme.darkTheme.typography.fontSize = "16px";
 var colorVar = {
   primaryButton: "transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box",
   primaryGradient: "linear-gradient(255deg,#f15e61,#b52082)",
   darkBg: "#181E3E 0% 0% no-repeat padding-box",
-  primaryDisabled: "transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box"
+  primaryDisabled: "transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important"
 };
 import_components3.Styles.fontFace({
   fontFamily: "Proxima Nova",
@@ -19920,6 +19885,15 @@ import_components3.Styles.fontFace({
 });
 import_components3.Styles.cssRule(".staking-component", {
   $nest: {
+    "*": {
+      fontFamily: "Proxima Nova"
+    },
+    "#stakingElm": {
+      background: "#0c1234"
+    },
+    ".i-loading-overlay": {
+      background: "#0c1234"
+    },
     ".overflow-inherit": {
       overflow: "inherit"
     },
@@ -19992,36 +19966,26 @@ import_components3.Styles.cssRule(".staking-component", {
     ".align-middle": {
       alignItems: "center"
     },
-    ".text-secondary *": {
-      color: Theme2.colors.secondary.dark
-    },
-    ".btn-default": {
-      background: "#eaecef",
-      height: "auto !important",
-      transition: "background .3s ease",
-      fontSize: "1rem",
-      color: Theme2.background.default
-    },
     ".staking-layout": {
       width: "100%",
       maxWidth: "1420px",
       minHeight: "calc(100vh - 10rem)",
-      margin: "1rem auto",
-      padding: "0 1rem"
+      marginInline: "auto",
+      padding: "1rem"
     },
     "i-link": {
       display: "flex",
       $nest: {
         "&:hover *": {
-          color: Theme2.text.primary,
+          color: "#fff",
           opacity: 0.9
         }
       }
     },
     ".wrapper": {
       $nest: {
-        "i-label > *": {
-          color: Theme2.text.primary,
+        "i-label:not(.duration) > *": {
+          color: "#fff",
           fontSize: "0.875rem"
         },
         ".sticker": {
@@ -20073,7 +20037,6 @@ import_components3.Styles.cssRule(".staking-component", {
           position: "relative",
           height: "100%",
           minHeight: "485px",
-          backgroundColor: "var(--colors-primary-main)",
           borderTopLeftRadius: "26px",
           borderBottomLeftRadius: "26px",
           padding: "2.5rem 0.75rem"
@@ -20132,9 +20095,9 @@ import_components3.Styles.cssRule(".staking-component", {
               textAlign: "center",
               $nest: {
                 "a": {
-                  color: Theme2.text.primary,
+                  color: "#fff",
                   fontWeight: "bold",
-                  fontFamily: Theme2.typography.fontFamily,
+                  fontFamily: "Proxima Nova",
                   marginInline: "0.25rem",
                   textDecorationLine: "underline"
                 }
@@ -20161,7 +20124,6 @@ import_components3.Styles.cssRule(".staking-component", {
           display: "flex",
           $nest: {
             ".timer-value": {
-              backgroundColor: "#b14781",
               padding: "0.5rem",
               borderRadius: "0.5rem",
               fontWeight: "bold"
@@ -20175,8 +20137,9 @@ import_components3.Styles.cssRule(".staking-component", {
           }
         },
         ".bg-color": {
-          background: "hsla(0,0%,100%,0.03) 0% 0% no-repeat padding-box",
-          color: Theme2.text.primary,
+          display: "flex",
+          flexDirection: "column",
+          color: "#fff",
           minHeight: "485px",
           height: "100%",
           borderRadius: "15px",
@@ -20192,8 +20155,7 @@ import_components3.Styles.cssRule(".staking-component", {
             "i-hstack i-label > *": {
               fontSize: "1.25rem",
               marginLeft: "0.25rem",
-              lineHeight: "1.875rem",
-              color: "var(--colors-primary-main) !important"
+              lineHeight: "1.875rem"
             }
           }
         },
@@ -20204,7 +20166,6 @@ import_components3.Styles.cssRule(".staking-component", {
         },
         ".row-custom": {
           margin: "1rem",
-          background: "hsla(0,0%,100%,0.15) 0% 0% no-repeat padding-box",
           borderRadius: "26px",
           width: "100%"
         },
@@ -20251,7 +20212,7 @@ import_components3.Styles.cssRule(".staking-component", {
           }
         },
         ".custom-divider": {
-          borderTop: "2px solid var(--colors-primary-main)",
+          borderTop: "2px solid",
           marginBlock: "1rem"
         },
         ".btn-stake": {
@@ -20281,7 +20242,6 @@ import_components3.Styles.cssRule(".staking-component", {
         ".no-campaign": {
           margin: "2rem 1rem",
           padding: "3rem 2rem",
-          background: Theme2.background.modal,
           borderRadius: "26px",
           display: "flex",
           flexDirection: "column",
@@ -20366,7 +20326,6 @@ var import_eth_wallet5 = __toModule(require("@ijstech/eth-wallet"));
 
 // src/staking/manageStake/manage-stake.css.ts
 var import_components4 = __toModule(require("@ijstech/components"));
-var Theme3 = import_components4.Styles.Theme.ThemeVars;
 import_components4.Styles.cssRule(".manage-stake", {
   $nest: {
     "input": {
@@ -20391,7 +20350,7 @@ import_components4.Styles.cssRule(".manage-stake", {
       width: "480px"
     },
     ".question-icon": {
-      border: `2px solid ${Theme3.text.primary}`,
+      border: `2px solid #fff`,
       borderRadius: "50%",
       padding: "3px",
       opacity: "0.8"
@@ -20409,7 +20368,7 @@ import_components4.Styles.cssRule(".manage-stake", {
       fontSize: ".875rem",
       $nest: {
         "i-label > *": {
-          color: Theme3.text.primary,
+          color: "#fff",
           fontSize: "1rem",
           wordBreak: "normal"
         },
@@ -20426,7 +20385,7 @@ import_components4.Styles.cssRule(".manage-stake", {
           }
         },
         ".description": {
-          background: Theme3.background.gradient,
+          background: "linear-gradient(255deg,#f15e61,#b52082)",
           padding: "0.75rem 1rem",
           marginBottom: "1rem",
           $nest: {
@@ -20437,7 +20396,7 @@ import_components4.Styles.cssRule(".manage-stake", {
           }
         },
         ".input--token-box": {
-          border: `1px solid ${Theme3.text.primary}`,
+          border: `1px solid ${"#fff"}`,
           borderRadius: "5px",
           padding: "0.75rem"
         },
@@ -20472,14 +20431,14 @@ import_components4.Styles.cssRule(".manage-stake", {
           border: "none",
           width: "100% !important",
           backgroundColor: "transparent",
-          color: Theme3.text.primary,
+          color: "#fff",
           fontSize: "1.25rem",
           textAlign: "left"
         }
       }
     },
     ".text-yellow *": {
-      color: `${Theme3.text.third} !important`,
+      color: `#f6c958 !important`,
       fontSize: "1.25rem !important",
       fontWeight: "bold"
     },
@@ -20507,12 +20466,12 @@ import_components4.Styles.cssRule(".manage-stake", {
           display: "none"
         },
         ".modal": {
-          background: Theme3.background.modal,
+          background: "#192046",
           width: 480,
           maxWidth: "100%",
           borderRadius: "1rem",
           padding: "1.5rem 1rem",
-          color: Theme3.text.primary
+          color: "#fff"
         }
       }
     },
@@ -20522,12 +20481,12 @@ import_components4.Styles.cssRule(".manage-stake", {
           display: "none"
         },
         ".modal": {
-          background: Theme3.background.modal,
+          background: "#192046",
           width: 480,
           maxWidth: "100%",
           padding: "0.75rem 1rem",
           borderRadius: "1rem",
-          color: Theme3.text.primary
+          color: "#fff"
         },
         ".manage-header": {
           marginTop: "0.5rem",
@@ -20537,7 +20496,7 @@ import_components4.Styles.cssRule(".manage-stake", {
           justifyContent: "flex-end",
           $nest: {
             "i-icon": {
-              fill: Theme3.colors.primary.main
+              fill: "#f15e61"
             }
           }
         },
@@ -20555,7 +20514,7 @@ import_components4.Styles.cssRule(".manage-stake", {
               marginRight: "0.25rem"
             },
             "i-label > *": {
-              color: Theme3.colors.primary.main,
+              color: "#f15e61",
               display: "inherit"
             }
           }
@@ -20575,13 +20534,13 @@ import_components4.Styles.cssRule(".manage-stake", {
         },
         ".btn-cancel": {
           background: "#eaecef",
-          color: Theme3.background.default
+          color: "#0c1234"
         },
         ".btn-submit": {
           textAlign: "center"
         },
         ".btn-submit > *": {
-          color: `${Theme3.text.primary} !important`
+          color: `${"#fff"} !important`
         }
       }
     }
@@ -20590,8 +20549,6 @@ import_components4.Styles.cssRule(".manage-stake", {
 
 // src/staking/manageStake/manage-stake.tsx
 var import_moment3 = __toModule(require_moment());
-var Theme4 = import_components5.Styles.Theme.ThemeVars;
-import_components5.Styles.Theme.applyTheme(import_components5.Styles.Theme.darkTheme);
 var CurrentMode;
 (function(CurrentMode2) {
   CurrentMode2[CurrentMode2["STAKE"] = 0] = "STAKE";
@@ -20927,7 +20884,6 @@ var ManageStake = class extends import_components5.Module {
         this.btnStake.caption = caption;
         this.btnStake.rightIcon.visible = false;
         this.modalActions.visible = false;
-        (0, import_store4.setStakingStatus)(actionKey, false, caption);
       },
       onPayingError: async (err) => {
         this.inputAmount.enabled = true;
@@ -20963,7 +20919,7 @@ var ManageStake = class extends import_components5.Module {
     }, /* @__PURE__ */ this.$render("i-vstack", {
       id: "loadingElm",
       class: "i-loading-overlay",
-      background: { color: Theme4.background.modal }
+      background: { color: "#192046" }
     }, /* @__PURE__ */ this.$render("i-vstack", {
       class: "i-loading-spinner",
       horizontalAlignment: "center",
@@ -21156,7 +21112,6 @@ ManageStake = __decorateClass([
 ], ManageStake);
 
 // src/staking/staking.tsx
-import_components6.Styles.Theme.applyTheme(import_components6.Styles.Theme.darkTheme);
 var StakingBlock = class extends import_components6.Module {
   constructor(parent, options) {
     super(parent, options);
@@ -21346,7 +21301,8 @@ var StakingBlock = class extends import_components6.Module {
       if (!this.noCampaignSection) {
         this.noCampaignSection = await import_components6.Panel.create();
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-          class: "no-campaign"
+          class: "no-campaign",
+          background: { color: "#192046" }
         }, /* @__PURE__ */ this.$render("i-image", {
           url: import_assets4.default.fullPath("img/staking/TrollTrooper.svg")
         }), /* @__PURE__ */ this.$render("i-label", {
@@ -21367,6 +21323,15 @@ var StakingBlock = class extends import_components6.Module {
         const containerSection = await import_components6.Panel.create();
         containerSection.id = `campaign-${idx}`;
         containerSection.classList.add("container-custom");
+        if (campaign.customColorText) {
+          const style = document.createElement("style");
+          style.innerHTML = `
+					.wrapper i-label:not(.duration) > * {
+						color: ${campaign.customColorText} !important;
+					},
+				`;
+          containerSection.appendChild(style);
+        }
         const options = campaign.options;
         const stakingInfo = options ? options[0] : null;
         let lpTokenData = {};
@@ -21401,9 +21366,9 @@ var StakingBlock = class extends import_components6.Module {
         const totalTokensLabel = await import_components6.Label.create();
         const availableQtyLabel = await import_components6.Label.create();
         const activeTimerRow = await import_components6.VStack.create();
-        const endHours = await import_components6.Label.create();
-        const endDays = await import_components6.Label.create();
-        const endMins = await import_components6.Label.create();
+        const endHours = await import_components6.Label.create({ background: { color: campaign.customColorTimeBackground || "#b14781" } });
+        const endDays = await import_components6.Label.create({ background: { color: campaign.customColorTimeBackground || "#b14781" } });
+        const endMins = await import_components6.Label.create({ background: { color: campaign.customColorTimeBackground || "#b14781" } });
         const stickerSection = await import_components6.Panel.create();
         const stickerLabel = await import_components6.Label.create();
         const stickerIcon = await import_components6.Icon.create();
@@ -21569,12 +21534,14 @@ var StakingBlock = class extends import_components6.Module {
         nodeItems.push(containerSection);
         containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
           class: "row-custom",
+          background: { color: campaign.customColorBackground || "hsla(0,0%,100%,0.15)" },
           width: "100%",
           wrap: "wrap"
         }, /* @__PURE__ */ this.$render("i-vstack", {
           class: "column-custom"
         }, /* @__PURE__ */ this.$render("i-vstack", {
           class: "banner",
+          background: { color: campaign.customColorCampaign || "#f15e61" },
           verticalAlignment: "space-between"
         }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
           verticalAlignment: "center",
@@ -21625,7 +21592,7 @@ var StakingBlock = class extends import_components6.Module {
           name: "external-link-alt",
           width: "14",
           height: "14",
-          fill: "#fff"
+          fill: campaign.customColorText || "#fff"
         })), activeTimerRow)), await Promise.all(options.map(async (option) => {
           const stickerOptionSection = await import_components6.Panel.create();
           stickerOptionSection.classList.add("sticker", "sold-out", "hidden", "sticker-text");
@@ -21640,23 +21607,27 @@ var StakingBlock = class extends import_components6.Module {
           const key = `btn-${option.address}`;
           const btnStake = await import_components6.Button.create({
             caption: this.getBtnText(key, "Stake"),
-            rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
+            background: { color: `${option.customColorButton} !important` },
+            font: { color: campaign.customColorText || "#fff" },
+            rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: (0, import_store5.getStakingStatus)(key).value }
           });
           const btnUnstake = await import_components6.Button.create({
             caption: this.getBtnText(key, "Unstake"),
-            rightIcon: { spin: true, visible: (0, import_store5.getStakingStatus)(key).value }
+            background: { color: `${option.customColorButton} !important` },
+            font: { color: campaign.customColorText || "#fff" },
+            rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: (0, import_store5.getStakingStatus)(key).value }
           });
           if (option.mode === "Stake") {
             btnUnstake.visible = false;
             btnStake.id = key;
             btnStake.enabled = !isClosed;
             btnStake.classList.add("btn-os", "btn-stake");
-            btnStake.onClick = () => this.onStake(option);
+            btnStake.onClick = () => this.onStake(__spreadValues(__spreadValues({}, campaign), option));
           } else {
             btnStake.visible = false;
             btnUnstake.id = key;
             btnUnstake.classList.add("btn-os", "btn-stake");
-            btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
+            btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option: __spreadValues(__spreadValues({}, campaign), option), lockedTokenSymbol });
           }
           const isClaim = option.mode === "Claim";
           const rewardOptions = !isClaim ? option.rewards : [];
@@ -21732,8 +21703,10 @@ var StakingBlock = class extends import_components6.Module {
                 caption: startClaimingText
               }) : []));
               const btnClaim = await import_components6.Button.create({
-                rightIcon: { spin: true, visible: false },
+                rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: false },
                 caption: `Claim ${rewardSymbol}`,
+                background: { color: `${option.customColorButton} !important` },
+                font: { color: campaign.customColorText || "#fff" },
                 enabled: !(!passClaimStartTime || new import_eth_wallet6.BigNumber(reward.claimable).isZero())
               });
               btnClaim.id = `btnClaim-${idx2}-${option.address}`;
@@ -21782,7 +21755,8 @@ var StakingBlock = class extends import_components6.Module {
           return /* @__PURE__ */ this.$render("i-vstack", {
             class: "column-custom"
           }, /* @__PURE__ */ this.$render("i-panel", {
-            class: "bg-color"
+            class: "bg-color",
+            background: { color: option.customColorBackground || "hsla(0,0%,100%,0.03)" }
           }, stickerOptionSection, /* @__PURE__ */ this.$render("i-panel", {
             class: "header-info"
           }, /* @__PURE__ */ this.$render("i-hstack", {
@@ -21795,7 +21769,8 @@ var StakingBlock = class extends import_components6.Module {
               url: import_assets4.default.fullPath(v)
             });
           }), /* @__PURE__ */ this.$render("i-label", {
-            class: "bold",
+            class: "bold duration",
+            font: { color: campaign.customColorCampaign || "#f15e61" },
             caption: durationDays < 1 ? "< 1 Day" : `${durationDays} Days`
           })), /* @__PURE__ */ this.$render("i-label", {
             caption: option.customDesc
@@ -21878,7 +21853,8 @@ var StakingBlock = class extends import_components6.Module {
               caption: v.value
             }));
           }), /* @__PURE__ */ this.$render("i-panel", {
-            class: isClaim ? "hidden" : "custom-divider"
+            class: isClaim ? "hidden" : "custom-divider",
+            border: { top: { color: `${campaign.customColorCampaign || "#f15e61"} !important` } }
           }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
             const earnedQty = (0, import_global4.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
             const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
@@ -21891,8 +21867,9 @@ var StakingBlock = class extends import_components6.Module {
               caption: `${earnedQty} ${earnedSymbol}`
             }));
           })), /* @__PURE__ */ this.$render("i-label", {
+            visible: !!campaign.showContractLink,
             class: "view-contract pointer",
-            margin: { top: isClaim ? 0 : 16 },
+            margin: { top: isClaim ? 0 : "auto" },
             onClick: () => (0, import_store5.viewOnExplorerByAddress)(chainId, option.address)
           }, /* @__PURE__ */ this.$render("i-label", {
             caption: "View Contract"
@@ -21900,7 +21877,7 @@ var StakingBlock = class extends import_components6.Module {
             name: "external-link-alt",
             width: "14",
             height: "14",
-            fill: "#fff",
+            fill: campaign.customColorText || "#fff",
             class: "inline-block"
           }))));
         }))));

@@ -1,4 +1,4 @@
-import { Styles, Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
 import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType, getStakingStatus, getNetworkExplorerName } from '@staking/store';
 import {
@@ -22,7 +22,6 @@ import moment from 'moment';
 import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import { Result } from '../result';
 import { getTokenUrl, tokenIcon } from '../config';
-Styles.Theme.applyTheme(Styles.Theme.darkTheme);
 import './staking.css';
 import { ManageStake } from './manageStake';
 
@@ -62,6 +61,7 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async setData() {
+
 	}
 
 	async getTag() {
@@ -286,7 +286,7 @@ export class StakingBlock extends Module implements PageBlock {
 		if (!this.noCampaignSection) {
 			this.noCampaignSection = await Panel.create();
 			this.noCampaignSection.appendChild(
-				<i-panel class="no-campaign">
+				<i-panel class="no-campaign" background={{ color: '#192046' }}>
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
 					<i-label caption="No Campaigns" />
 				</i-panel>
@@ -307,6 +307,15 @@ export class StakingBlock extends Module implements PageBlock {
 			const containerSection = await Panel.create();
 			containerSection.id = `campaign-${idx}`;
 			containerSection.classList.add('container-custom');
+			if (campaign.customColorText) {
+				const style = document.createElement('style');
+				style.innerHTML = `
+					.wrapper i-label:not(.duration) > * {
+						color: ${campaign.customColorText} !important;
+					},
+				`;
+				containerSection.appendChild(style);
+			}
 			const options = campaign.options;
 			const stakingInfo = options ? options[0] : null;
 			let lpTokenData: any = {};
@@ -341,9 +350,9 @@ export class StakingBlock extends Module implements PageBlock {
 			const totalTokensLabel = await Label.create();
 			const availableQtyLabel = await Label.create();
 			const activeTimerRow = await VStack.create();
-			const endHours = await Label.create();
-			const endDays = await Label.create();
-			const endMins = await Label.create();
+			const endHours = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
+			const endDays = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
+			const endMins = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
 			const stickerSection = await Panel.create();
 			const stickerLabel = await Label.create();
 			const stickerIcon = await Icon.create();
@@ -510,9 +519,9 @@ export class StakingBlock extends Module implements PageBlock {
 
 			nodeItems.push(containerSection);
 			containerSection.appendChild(
-				<i-hstack class="row-custom" width="100%" wrap='wrap'>
+				<i-hstack class="row-custom" background={{ color: campaign.customColorBackground || 'hsla(0,0%,100%,0.15)' }} width="100%" wrap="wrap">
 					<i-vstack class="column-custom">
-						<i-vstack class="banner" verticalAlignment="space-between">
+						<i-vstack class="banner" background={{ color: campaign.customColorCampaign || '#f15e61' }} verticalAlignment="space-between">
 							{stickerSection}
 							<i-hstack verticalAlignment='center' class="campaign-name">
 								<i-image width="25px" height="25px" url={Assets.fullPath(this.tokenIcon)} />
@@ -544,7 +553,7 @@ export class StakingBlock extends Module implements PageBlock {
 										return <i-image width={25} height={25} url={Assets.fullPath(v)} />
 									})
 								}
-								<i-icon name="external-link-alt" width="14" height="14" fill="#fff" />
+								<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} />
 							</i-hstack >
 							{activeTimerRow}
 						</i-vstack>
@@ -564,23 +573,27 @@ export class StakingBlock extends Module implements PageBlock {
 							const key = `btn-${option.address}`;
 							const btnStake = await Button.create({
 								caption: this.getBtnText(key, 'Stake'),
-								rightIcon: { spin: true, visible: getStakingStatus(key).value }
+								background: { color: `${option.customColorButton} !important` },
+								font: { color: campaign.customColorText || '#fff' },
+								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
 							});
 							const btnUnstake = await Button.create({
 								caption: this.getBtnText(key, 'Unstake'),
-								rightIcon: { spin: true, visible: getStakingStatus(key).value }
+								background: { color: `${option.customColorButton} !important` },
+								font: { color: campaign.customColorText || '#fff' },
+								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
 							});
 							if (option.mode === 'Stake') {
 								btnUnstake.visible = false;
 								btnStake.id = key;
 								btnStake.enabled = !isClosed;
 								btnStake.classList.add('btn-os', 'btn-stake');
-								btnStake.onClick = () => this.onStake(option);
+								btnStake.onClick = () => this.onStake({...campaign, ...option});
 							} else {
 								btnStake.visible = false;
 								btnUnstake.id = key;
 								btnUnstake.classList.add('btn-os', 'btn-stake');
-								btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option, lockedTokenSymbol });
+								btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option: { ...campaign, ...option }, lockedTokenSymbol });
 							}
 
 							const isClaim = option.mode === 'Claim';
@@ -646,8 +659,10 @@ export class StakingBlock extends Module implements PageBlock {
 										</i-hstack>
 									);
 									const btnClaim = await Button.create({
-										rightIcon: { spin: true, visible: false },
+										rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: false },
 										caption: `Claim ${rewardSymbol}`,
+										background: { color: `${option.customColorButton} !important` },
+										font: { color: campaign.customColorText || '#fff' },
 										enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero())
 									})
 									btnClaim.id = `btnClaim-${idx}-${option.address}`;
@@ -697,7 +712,7 @@ export class StakingBlock extends Module implements PageBlock {
 							const durationDays = option.minLockTime / (60 * 60 * 24);
 
 							return <i-vstack class="column-custom">
-								<i-panel class="bg-color">
+								<i-panel class="bg-color" background={{ color: option.customColorBackground || 'hsla(0,0%,100%,0.03)' }}>
 									{stickerOptionSection}
 									<i-panel class="header-info">
 										<i-hstack verticalAlignment='center' horizontalAlignment="center">
@@ -706,7 +721,7 @@ export class StakingBlock extends Module implements PageBlock {
 													return <i-image width={25} height={25} url={Assets.fullPath(v)} />
 												})
 											}
-											<i-label class="bold" caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
+											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
 										</i-hstack >
 										<i-label caption={option.customDesc} />
 									</i-panel>
@@ -781,7 +796,7 @@ export class StakingBlock extends Module implements PageBlock {
 												</i-hstack>
 											})
 										}
-										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} />
+										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} border={{ top: { color: `${campaign.customColorCampaign || '#f15e61'} !important` }}} />
 										{claimStakedRow}
 										{btnUnstake}
 										{rowRewardsLocked}
@@ -800,9 +815,9 @@ export class StakingBlock extends Module implements PageBlock {
 											})
 										}
 									</i-panel>
-									<i-label class="view-contract pointer" margin={{ top: isClaim ? 0 : 16 }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+									<i-label visible={ !!campaign.showContractLink } class="view-contract pointer" margin={{ top: isClaim ? 0 : 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
 										<i-label caption="View Contract" />
-										<i-icon name="external-link-alt" width="14" height="14" fill="#fff" class="inline-block" />
+										<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
 									</i-label>
 								</i-panel>
 							</i-vstack>

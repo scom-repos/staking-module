@@ -1,10 +1,10 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
 
 export default Styles.style({
   textAlign: 'center',
   $nest: {
     'i-label > *': {
+      color: '#fff',
       fontSize: '.875rem',
       wordBreak: 'normal'
     },
@@ -14,7 +14,7 @@ export default Styles.style({
       width: 455
     },
     '.i-modal-close svg': {
-      fill: Theme.colors.primary.dark
+      fill: '#F05E61'
     },
     '.i-modal_content': {
       padding: '0 2.563rem 3rem'
@@ -23,7 +23,7 @@ export default Styles.style({
       borderBottom: 'none !important'
     },
     '.waiting-txt > *': {
-      color: Theme.colors.warning.light,
+      color: '#F6C958',
       fontSize: '1.125rem'
     },
     '.confirm-txt > *': {

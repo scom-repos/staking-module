@@ -12,6 +12,10 @@ export class StakingEarn extends Module {
   async init() {
     super.init();
     const stakingUI = await StakingBlock.create({});
+    const body = this.closest('body');
+    if (body) {
+      body.style.background = '#0c1234';
+    }
     this.stakingElm.appendChild(stakingUI);
   }
 

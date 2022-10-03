@@ -1,4 +1,4 @@
-import { Styles, Button, Label, Input, Modal, Container, VStack, HStack, Panel, customElements, ControlElement, Control, Module } from '@ijstech/components';
+import { Button, Label, Input, Modal, Container, VStack, HStack, Panel, customElements, ControlElement, Module } from '@ijstech/components';
 import { formatNumber, ITokenObject, IERC20ApprovalAction, limitInputNumber } from '@staking/global';
 import { getChainId, getTokenMap, getTokenBalances, isWalletConnected, setTokenBalances, LockTokenType, setStakingStatus } from '@staking/store';
 import { Result } from '../../result';
@@ -20,8 +20,6 @@ import Assets from '@staking/assets';
 import { BigNumber } from '@ijstech/eth-wallet';
 import './manage-stake.css';
 import moment from 'moment';
-const Theme = Styles.Theme.ThemeVars;
-Styles.Theme.applyTheme(Styles.Theme.darkTheme);
 
 enum CurrentMode {
   STAKE,
@@ -387,7 +385,6 @@ export class ManageStake extends Module {
         this.btnStake.caption = caption;
         this.btnStake.rightIcon.visible = false;
         this.modalActions.visible = false;
-        setStakingStatus(actionKey, false, caption);
       },
       onPayingError: async (err: Error) => {
         this.inputAmount.enabled = true;
@@ -419,7 +416,7 @@ export class ManageStake extends Module {
             <i-hstack horizontalAlignment="center">
               <i-vstack class="manage-wrapper">
                 <i-panel class="main-content">
-                  <i-vstack id="loadingElm" class="i-loading-overlay" background={{ color: Theme.background.modal }}>
+                  <i-vstack id="loadingElm" class="i-loading-overlay" background={{ color: '#192046' }}>
                     <i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
                       <i-icon
                         class="i-loading-spinner_icon"
