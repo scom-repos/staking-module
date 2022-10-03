@@ -21310,16 +21310,14 @@
           window.open(getTokenUrl ? getTokenUrl : `#/swap?chainId=${chainId}&fromToken=BNB&toToken=${token}&fromAmount=1&showOptimizedRoutes=false`);
         }
       };
-      this.onLoad = () => {
-        this.onSetupPage((0, import_store5.isWalletConnected)());
-      };
-      this.init = () => {
+      this.init = async () => {
         super.init();
         this.stakingResult = new Result();
         this.stakingComponent.appendChild(this.stakingResult);
-        this.initWalletData();
+        await this.initWalletData();
         (0, import_store5.setDataFromSCConfig)(import_store5.Networks, import_store5.InfuraId);
         (0, import_store5.setCurrentChainId)((0, import_store5.getDefaultChainId)());
+        this.onSetupPage((0, import_store5.isWalletConnected)());
       };
       this.updateButtonStatus = async (data) => {
         if (data) {
