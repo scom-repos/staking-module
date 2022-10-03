@@ -261,6 +261,7 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaign[
     }
 
     let campaignObj: any = {
+      ...stakingCampaignInfo,
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,

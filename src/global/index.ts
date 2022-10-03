@@ -12,13 +12,6 @@ export interface INetwork {
     isTestnet?: boolean;
 };
 
-export enum QueueType {
-    PRIORITY_QUEUE,
-    RANGE_QUEUE,
-    GROUP_QUEUE,
-    PEGGED_QUEUE
-}
-
 export const ABIKeys = {
     Factory: 'OAXDEX_Factory',
     Pair: 'OAXDEX_Pair',
@@ -63,19 +56,7 @@ export const enum EventId {
     IsWalletDisconnected = 'IsWalletDisconnected',
     Paid = 'Paid',
     chainChanged = 'chainChanged',
-    ShowExpertModal = 'showExpertModal',
-    ShowTransactionModal = 'showTransactionModal',
-    SlippageToleranceChanged = 'slippageToleranceChanged',
-    ExpertModeChanged = 'expertModeChanged',
-    ShowResult = 'showResult',
-    SetResultMessage = 'setResultMessage',
-    ShowBondModal = 'ShowBondModal',
-    ChangeSeletedImage = 'ChangeSeletedImage',
-    EmitFocusField = 'emitFocusField',
-    EmitFieldChange = 'emitFieldChange',
-    ShowActionQueueModal = 'showActionQueueModal',
     EmitButtonStatus = 'emitButtonStatus',
-    EmitNewToken = 'emitNewToken',
 }
 
 export interface ITokenObject {

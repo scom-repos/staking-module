@@ -19017,13 +19017,6 @@ var getERC20Allowance = async (token, spenderAddress) => {
 };
 
 // src/global/index.ts
-var QueueType;
-(function(QueueType2) {
-  QueueType2[QueueType2["PRIORITY_QUEUE"] = 0] = "PRIORITY_QUEUE";
-  QueueType2[QueueType2["RANGE_QUEUE"] = 1] = "RANGE_QUEUE";
-  QueueType2[QueueType2["GROUP_QUEUE"] = 2] = "GROUP_QUEUE";
-  QueueType2[QueueType2["PEGGED_QUEUE"] = 3] = "PEGGED_QUEUE";
-})(QueueType || (QueueType = {}));
 var EventId;
 (function(EventId2) {
   EventId2["ConnectWallet"] = "connectWallet";
@@ -19031,19 +19024,7 @@ var EventId;
   EventId2["IsWalletDisconnected"] = "IsWalletDisconnected";
   EventId2["Paid"] = "Paid";
   EventId2["chainChanged"] = "chainChanged";
-  EventId2["ShowExpertModal"] = "showExpertModal";
-  EventId2["ShowTransactionModal"] = "showTransactionModal";
-  EventId2["SlippageToleranceChanged"] = "slippageToleranceChanged";
-  EventId2["ExpertModeChanged"] = "expertModeChanged";
-  EventId2["ShowResult"] = "showResult";
-  EventId2["SetResultMessage"] = "setResultMessage";
-  EventId2["ShowBondModal"] = "ShowBondModal";
-  EventId2["ChangeSeletedImage"] = "ChangeSeletedImage";
-  EventId2["EmitFocusField"] = "emitFocusField";
-  EventId2["EmitFieldChange"] = "emitFieldChange";
-  EventId2["ShowActionQueueModal"] = "showActionQueueModal";
   EventId2["EmitButtonStatus"] = "emitButtonStatus";
-  EventId2["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/staking-utils/API.ts
@@ -19257,7 +19238,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
       let durationOption = durationOptions[j];
       addDurationOption(durationOptionsWithExtendedInfo, durationOption);
     }
-    let campaignObj = {
+    let campaignObj = __spreadProps(__spreadValues({}, stakingCampaignInfo), {
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
@@ -19265,7 +19246,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
       getTokenURL: stakingCampaignInfo.getTokenURL,
       getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo
-    };
+    });
     if (durationOptionsWithExtendedInfo.length > 0) {
       campaignObj = __spreadProps(__spreadValues({}, campaignObj), {
         tokenAddress: durationOptionsWithExtendedInfo[0].tokenAddress.toLowerCase()

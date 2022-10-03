@@ -6309,13 +6309,6 @@ var import_eth_wallet4 = __toModule(require("@ijstech/eth-wallet"));
 var import_sdk = __toModule(require("@openswap/sdk"));
 
 // src/global/index.ts
-var QueueType;
-(function(QueueType2) {
-  QueueType2[QueueType2["PRIORITY_QUEUE"] = 0] = "PRIORITY_QUEUE";
-  QueueType2[QueueType2["RANGE_QUEUE"] = 1] = "RANGE_QUEUE";
-  QueueType2[QueueType2["GROUP_QUEUE"] = 2] = "GROUP_QUEUE";
-  QueueType2[QueueType2["PEGGED_QUEUE"] = 3] = "PEGGED_QUEUE";
-})(QueueType || (QueueType = {}));
 var EventId;
 (function(EventId3) {
   EventId3["ConnectWallet"] = "connectWallet";
@@ -6323,19 +6316,7 @@ var EventId;
   EventId3["IsWalletDisconnected"] = "IsWalletDisconnected";
   EventId3["Paid"] = "Paid";
   EventId3["chainChanged"] = "chainChanged";
-  EventId3["ShowExpertModal"] = "showExpertModal";
-  EventId3["ShowTransactionModal"] = "showTransactionModal";
-  EventId3["SlippageToleranceChanged"] = "slippageToleranceChanged";
-  EventId3["ExpertModeChanged"] = "expertModeChanged";
-  EventId3["ShowResult"] = "showResult";
-  EventId3["SetResultMessage"] = "setResultMessage";
-  EventId3["ShowBondModal"] = "ShowBondModal";
-  EventId3["ChangeSeletedImage"] = "ChangeSeletedImage";
-  EventId3["EmitFocusField"] = "emitFocusField";
-  EventId3["EmitFieldChange"] = "emitFieldChange";
-  EventId3["ShowActionQueueModal"] = "showActionQueueModal";
   EventId3["EmitButtonStatus"] = "emitButtonStatus";
-  EventId3["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/store/wallet.ts

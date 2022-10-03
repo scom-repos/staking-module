@@ -1,28 +1,27 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
 import Assets from '@staking/assets';
 
-Styles.Theme.darkTheme.background.default = '#0c1234';
-Styles.Theme.darkTheme.background.paper = '#1f1e4f';
-Styles.Theme.darkTheme.colors.primary.dark = '#F05E61';
-Styles.Theme.darkTheme.colors.primary.light = '#f15e60e7';
-Styles.Theme.darkTheme.colors.primary.main = '#f15e61';
-Styles.Theme.darkTheme.colors.secondary.dark = '#f7d063';
-Styles.Theme.darkTheme.colors.secondary.light = '#f7d063b6';
-Styles.Theme.darkTheme.colors.secondary.main = '#f7d063';
-Styles.Theme.darkTheme.text.secondary = 'hsla(0, 0%, 100%, 0.55)';
-Styles.Theme.darkTheme.typography.fontFamily = 'Proxima Nova';
-Styles.Theme.darkTheme.colors.warning.dark = '#f57c00';
-Styles.Theme.darkTheme.colors.warning.light = '#F6C958';
-Styles.Theme.darkTheme.colors.warning.main = '#ffa726';
-Styles.Theme.darkTheme.divider = '#0E132E';
-Styles.Theme.darkTheme.typography.fontSize = '16px';
+// Styles.Theme.darkTheme.background.default = '#0c1234';
+// Styles.Theme.darkTheme.background.paper = '#1f1e4f';
+// Styles.Theme.darkTheme.colors.primary.dark = '#F05E61';
+// Styles.Theme.darkTheme.colors.primary.light = '#f15e60e7';
+// Styles.Theme.darkTheme.colors.primary.main = '#f15e61';
+// Styles.Theme.darkTheme.colors.secondary.dark = '#f7d063';
+// Styles.Theme.darkTheme.colors.secondary.light = '#f7d063b6';
+// Styles.Theme.darkTheme.colors.secondary.main = '#f7d063';
+// Styles.Theme.darkTheme.text.secondary = 'hsla(0, 0%, 100%, 0.55)';
+// Styles.Theme.darkTheme.typography.fontFamily = 'Proxima Nova';
+// Styles.Theme.darkTheme.colors.warning.dark = '#f57c00';
+// Styles.Theme.darkTheme.colors.warning.light = '#F6C958';
+// Styles.Theme.darkTheme.colors.warning.main = '#ffa726';
+// Styles.Theme.darkTheme.divider = '#0E132E';
+// Styles.Theme.darkTheme.typography.fontSize = '16px';
 
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
   darkBg: '#181E3E 0% 0% no-repeat padding-box',
-  primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box'
+  primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
 }
 
 Styles.fontFace({
@@ -83,6 +82,15 @@ Styles.fontFace({
 
 Styles.cssRule('.staking-component', {
   $nest: {
+    '*': {
+      fontFamily: 'Proxima Nova',
+    },
+    '#stakingElm': {
+      background: '#0c1234',
+    },
+    '.i-loading-overlay': {
+      background: '#0c1234',
+    },
     '.overflow-inherit': {
       overflow: 'inherit',
     },
@@ -155,36 +163,26 @@ Styles.cssRule('.staking-component', {
     '.align-middle': {
       alignItems: 'center'
     },
-    '.text-secondary *': {
-      color: Theme.colors.secondary.dark
-    },
-    '.btn-default': {
-      background: '#eaecef',
-      height: 'auto !important',
-      transition: 'background .3s ease',
-      fontSize: '1rem',
-      color: Theme.background.default
-    },
     '.staking-layout': {
       width: '100%',
       maxWidth: '1420px',
       minHeight: 'calc(100vh - 10rem)',
-      margin: '1rem auto',
-      padding: '0 1rem',
+      marginInline: 'auto',
+      padding: '1rem',
     },
     'i-link': {
       display: 'flex',
       $nest: {
         '&:hover *': {
-          color: Theme.text.primary,
+          color: '#fff',
           opacity: 0.9,
         },
       },
     },
     '.wrapper': {
       $nest: {
-        'i-label > *': {
-          color: Theme.text.primary,
+        'i-label:not(.duration) > *': {
+          color: '#fff',
           fontSize: '0.875rem',
         },
         '.sticker': {
@@ -236,7 +234,6 @@ Styles.cssRule('.staking-component', {
           position: 'relative',
           height: '100%',
           minHeight: '485px',
-          backgroundColor: 'var(--colors-primary-main)',
           borderTopLeftRadius: '26px',
           borderBottomLeftRadius: '26px',
           padding: '2.5rem 0.75rem',
@@ -295,9 +292,9 @@ Styles.cssRule('.staking-component', {
               textAlign: 'center',
               $nest: {
                 'a': {
-                  color: Theme.text.primary,
+                  color: '#fff',
                   fontWeight: 'bold',
-                  fontFamily: Theme.typography.fontFamily,
+                  fontFamily: 'Proxima Nova',
                   marginInline: '0.25rem',
                   textDecorationLine: 'underline',
                 },
@@ -324,7 +321,6 @@ Styles.cssRule('.staking-component', {
           display: 'flex',
           $nest: {
             '.timer-value': {
-              backgroundColor: '#b14781',
               padding: '0.5rem',
               borderRadius: '0.5rem',
               fontWeight: 'bold',
@@ -338,8 +334,9 @@ Styles.cssRule('.staking-component', {
           },
         },
         '.bg-color': {
-          background: 'hsla(0,0%,100%,0.03) 0% 0% no-repeat padding-box',
-          color: Theme.text.primary,
+          display: 'flex',
+          flexDirection: 'column',
+          color: '#fff',
           minHeight: '485px',
           height: '100%',
           borderRadius: '15px',
@@ -356,7 +353,6 @@ Styles.cssRule('.staking-component', {
               fontSize: '1.25rem',
               marginLeft: '0.25rem',
               lineHeight: '1.875rem',
-              color: 'var(--colors-primary-main) !important',
             },
           },
         },
@@ -367,7 +363,6 @@ Styles.cssRule('.staking-component', {
         },
         '.row-custom': {
           margin: '1rem',
-          background: 'hsla(0,0%,100%,0.15) 0% 0% no-repeat padding-box',
           borderRadius: '26px',
           width: '100%',
         },
@@ -414,7 +409,7 @@ Styles.cssRule('.staking-component', {
           },
         },
         '.custom-divider': {
-          borderTop: '2px solid var(--colors-primary-main)',
+          borderTop: '2px solid',
           marginBlock: '1rem',
         },
         '.btn-stake': {
@@ -444,7 +439,6 @@ Styles.cssRule('.staking-component', {
         '.no-campaign': {
           margin: '2rem 1rem',
           padding: '3rem 2rem',
-          background: Theme.background.modal,
           borderRadius: '26px',
           display: 'flex',
           flexDirection: 'column',

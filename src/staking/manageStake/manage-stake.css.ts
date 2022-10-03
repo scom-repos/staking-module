@@ -1,5 +1,4 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.manage-stake', {
   $nest: {
@@ -25,7 +24,7 @@ Styles.cssRule('.manage-stake', {
       width: '480px',
     },
     '.question-icon': {
-      border: `2px solid ${Theme.text.primary}`,
+      border: `2px solid #fff`,
       borderRadius: '50%',
       padding: '3px',
       opacity: '0.8'
@@ -43,7 +42,7 @@ Styles.cssRule('.manage-stake', {
       fontSize: '.875rem',
       $nest: {
         'i-label > *': {
-          color: Theme.text.primary,
+          color: '#fff',
           fontSize: '1rem',
           wordBreak: 'normal'
         },
@@ -60,7 +59,7 @@ Styles.cssRule('.manage-stake', {
           },
         },
         '.description': {
-          background: Theme.background.gradient,
+          background: 'linear-gradient(255deg,#f15e61,#b52082)',
           padding: '0.75rem 1rem',
           marginBottom: '1rem',
           $nest: {
@@ -71,7 +70,7 @@ Styles.cssRule('.manage-stake', {
           }
         },
         '.input--token-box': {
-          border: `1px solid ${Theme.text.primary}`,
+          border: `1px solid ${'#fff'}`,
           borderRadius: '5px',
           padding: '0.75rem',
         },
@@ -106,14 +105,14 @@ Styles.cssRule('.manage-stake', {
           border: 'none',
           width: '100% !important',
           backgroundColor: 'transparent',
-          color: Theme.text.primary,
+          color: '#fff',
           fontSize: '1.25rem',
           textAlign: 'left'
         },
       }
     },
     '.text-yellow *': {
-      color: `${Theme.text.third} !important`,
+      color: `#f6c958 !important`,
       fontSize: '1.25rem !important',
       fontWeight: 'bold',
     },
@@ -141,12 +140,12 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
-          background: Theme.background.modal,
+          background: '#192046',
           width: 480,
           maxWidth: '100%',
           borderRadius: '1rem',
           padding: '1.5rem 1rem',
-          color: Theme.text.primary
+          color: '#fff'
         },
       }
     },
@@ -156,12 +155,12 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
-          background: Theme.background.modal,
+          background: '#192046',
           width: 480,
           maxWidth: '100%',
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
-          color: Theme.text.primary
+          color: '#fff'
         },
         '.manage-header': {
           marginTop: '0.5rem',
@@ -171,7 +170,7 @@ Styles.cssRule('.manage-stake', {
           justifyContent: 'flex-end',
           $nest: {
             'i-icon': {
-              fill: Theme.colors.primary.main,
+              fill: '#f15e61',
             },
           },
         },
@@ -189,7 +188,7 @@ Styles.cssRule('.manage-stake', {
               marginRight: '0.25rem',
             },
             'i-label > *': {
-              color: Theme.colors.primary.main,
+              color: '#f15e61',
               display: 'inherit',
             }
           },
@@ -209,13 +208,13 @@ Styles.cssRule('.manage-stake', {
         },
         '.btn-cancel': {
           background: '#eaecef',
-          color: Theme.background.default,
+          color: '#0c1234',
         },
         '.btn-submit': {
           textAlign: 'center',
         },
         '.btn-submit > *': {
-          color: `${Theme.text.primary} !important`,
+          color: `${'#fff'} !important`,
         },
       }
     },
