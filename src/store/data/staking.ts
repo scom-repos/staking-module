@@ -16,6 +16,7 @@ interface StakingCampaign {
   vestingPeriod?: string,
   isSimplified?: boolean,
   getTokenURL2?: string,
+  showContractLink?: boolean,
   customColorCampaign?: string, // 1 campaign main color
   customColorBackground?: string, // 2 campign background
   customColorText?: string, // 5 text
