@@ -247,37 +247,34 @@ export class StakingBlock extends Module implements PageBlock {
 		}
 	}
 
-	onLoad = () => {
-		this.onSetupPage(isWalletConnected());
-	}
-
-	init = () => {
+	init = async () => {
 		super.init();
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
-		this.initWalletData();
+		await this.initWalletData();
 		setDataFromSCConfig(Networks, InfuraId);
 		setCurrentChainId(getDefaultChainId());
+		this.onSetupPage(isWalletConnected());
 	}
 
 	private updateButtonStatus = async (data: any) => {
-    if (data) {
-      const { value, key, text } = data;
-      const elm = this.stakingElm.querySelector(key) as Button;
-      if (elm) {
-        elm.rightIcon.visible = value;
-        elm.caption = text;
-      }
-    }
-  }
+		if (data) {
+			const { value, key, text } = data;
+			const elm = this.stakingElm.querySelector(key) as Button;
+			if (elm) {
+				elm.rightIcon.visible = value;
+				elm.caption = text;
+			}
+		}
+	}
 
 	private getBtnText = (key: string, text: string) => {
-    const data = getStakingStatus(key);
-    if (data.value) {
-      return data.text;
-    }
-    return text;
-  }
+		const data = getStakingStatus(key);
+		if (data.value) {
+			return data.text;
+		}
+		return text;
+	}
 
 	private renderCampaigns = async (hideLoading?: boolean) => {
 		if (!hideLoading) {
