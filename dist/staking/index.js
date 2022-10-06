@@ -4214,7 +4214,6 @@ import_components3.Styles.cssRule(".staking-component", {
     },
     ".staking-layout": {
       width: "100%",
-      maxWidth: "1420px",
       marginInline: "auto",
       padding: "1rem"
     },
@@ -6956,7 +6955,7 @@ var StakingBlock = class extends import_components13.Module {
         this.stakingElm.clearInnerHTML();
         this.stakingElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
           width: "100%",
-          margin: { top: 100 },
+          minHeight: 500,
           verticalAlignment: "center",
           horizontalAlignment: "center"
         }, /* @__PURE__ */ this.$render("i-label", {
@@ -7730,11 +7729,11 @@ var StakingBlock = class extends import_components13.Module {
     }, /* @__PURE__ */ this.$render("i-panel", {
       id: "stakingLayout",
       visible: false,
-      class: "staking-layout"
+      class: "staking-layout",
+      minHeight: 500
     }, /* @__PURE__ */ this.$render("i-vstack", {
       id: "loadingElm",
-      class: "i-loading-overlay",
-      minHeight: 500
+      class: "i-loading-overlay"
     }, /* @__PURE__ */ this.$render("i-vstack", {
       class: "i-loading-spinner",
       horizontalAlignment: "center",

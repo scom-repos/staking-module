@@ -151,7 +151,7 @@ export class StakingBlock extends Module implements PageBlock {
 		}
 		if (!connected) {
 			this.stakingElm.clearInnerHTML();
-			this.stakingElm.appendChild(<i-hstack width="100%" margin={{ top: 100 }} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
+			this.stakingElm.appendChild(<i-hstack width="100%" minHeight={500} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
 			this.loadingElm.visible = false;
 			return;
 		}
@@ -854,8 +854,8 @@ export class StakingBlock extends Module implements PageBlock {
 	render() {
 		return (
 			<i-panel id="stakingComponent" class="staking-component">
-				<i-panel id="stakingLayout" visible={false} class="staking-layout">
-					<i-vstack id="loadingElm" class="i-loading-overlay" minHeight={500}>
+				<i-panel id="stakingLayout" visible={false} class="staking-layout" minHeight={500}>
+					<i-vstack id="loadingElm" class="i-loading-overlay">
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 							<i-icon
 								class="i-loading-spinner_icon"
