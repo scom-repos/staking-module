@@ -9,6 +9,7 @@ export {
   limitDecimals,
   limitInputNumber,
   isInvalidInput,
+  isValidNumber,
   toWeiInv,
   numberToBytes32,
   getParamsFromUrl,

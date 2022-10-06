@@ -1,0 +1,1 @@
+export { ModalConfig } from './modal-config';

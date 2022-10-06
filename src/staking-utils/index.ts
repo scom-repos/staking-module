@@ -11,5 +11,6 @@ export {
   withdrawToken,
   claimToken,
   lockToken,
-  getApprovalModelAction
+  getApprovalModelAction,
+  deployCampaign,
 } from './API';

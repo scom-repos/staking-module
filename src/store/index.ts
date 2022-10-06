@@ -45,7 +45,7 @@ export {
   Staking,
   Reward,
   LockTokenType,
-  StakingCampaignByChainId,
+  LockTokenTypeList,
   USDPeggedTokenAddressMap,
   
   //cross-chain

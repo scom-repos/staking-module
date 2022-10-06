@@ -84,13 +84,18 @@ export const formatNumberWithSeparators = (value: number, precision?: number) =>
   }
 }
 
+export const isValidNumber = (value: string | number) => {
+  const val = new BigNumber(value);
+  return val.gte(0);
+}
+
 export const isInvalidInput = (val: any) => {
   const value = new BigNumber(val);
   if (value.lt(0)) return true;
   return (val || '').toString().substring(0, 2) === '00' || val === '-';
 };
 
-export const limitInputNumber = (input: any, decimals: number) => {
+export const limitInputNumber = (input: any, decimals?: number) => {
   const amount = input.value;
   if (isInvalidInput(amount)) {
     input.value = '0';

@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Wallet, BigNumber, Utils } from "@ijstech/eth-wallet";
+import { Wallet, BigNumber, Utils, Erc20 } from "@ijstech/eth-wallet";
 import { Contracts as TimeIsMoneyContracts } from '@validapp/time-is-money-sdk';
 import { Contracts } from "@openswap/sdk";
 import { Contracts as UtilsContracts } from "@validapp/chainlink-sdk";
@@ -17,7 +17,8 @@ import {
   tokenPriceAMMReference,
   StakingCampaign,
   Staking,
-  Reward
+  Reward,
+  getWallet,
 } from "@staking/store";
 
 export const getTokenPrice = async (token: string) => { // in USD value
@@ -265,9 +266,7 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaign[
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
-      isSimplified: stakingCampaignInfo.isSimplified,
       getTokenURL: stakingCampaignInfo.getTokenURL,
-      getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo,
     }
     if (durationOptionsWithExtendedInfo.length > 0) {
@@ -549,6 +548,53 @@ const getApprovalModelAction = (contractAddress: string, options: IERC20Approval
   return approvalModelAction;
 }
 
+const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
+  try {
+    let wallet = getWallet();
+    let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
+    let rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);
+    let result: StakingCampaign = { ...campaign, stakings: [] };
+    for (const staking of campaign.stakings) {
+      let stakingResult: Staking;
+      const { lockTokenAddress, maxTotalLock, minLockTime, entryStart, entryEnd, perAddressCap } = staking;
+      let timeIsMoneyToken = new Erc20(wallet, lockTokenAddress);
+      let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
+      const stakingAddress = await timeIsMoney.deploy({
+        token: lockTokenAddress,
+        maximumTotalLock: Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
+        minimumLockTime: minLockTime,
+        startOfEntryPeriod: entryStart,
+        endOfEntryPeriod: entryEnd,
+        perAddressCap: Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals),
+      });
+      let rewardResult: Reward[] = [];
+      for (const reward of staking.rewards) {
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, claimDeadline, admin } = reward;
+        let rewardToken = new Erc20(wallet, rewardTokenAddress);
+        let rewardTokenDecimals = await rewardToken.decimals;
+        const rewardAddress = await rewardsContract.deploy({
+          timeIsMoney: timeIsMoney.address,
+          token: rewardTokenAddress,
+          multiplier: Utils.toDecimals(multiplier, rewardTokenDecimals),
+          initialReward: Utils.toDecimals(initialReward, rewardTokenDecimals),
+          vestingPeriod,
+          claimDeadline,
+          admin,
+        });
+        rewardResult.push({ ...reward, address: rewardAddress });
+      };
+      stakingResult = { ...staking, address: stakingAddress, rewards: rewardResult };
+      result.stakings.push(stakingResult);
+    }
+    return result;
+  } catch (error) {
+    if (callback) {
+      callback(error, null);
+    }
+    return null;
+  }
+}
+
 export {
   getAllCampaignsInfo,
   getStakingTotalLocked,
@@ -562,5 +608,6 @@ export {
   withdrawToken,
   claimToken,
   lockToken,
-  getApprovalModelAction
+  getApprovalModelAction,
+  deployCampaign,
 }

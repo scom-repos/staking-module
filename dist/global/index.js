@@ -3745,6 +3745,7 @@ __export(exports, {
   isAddressValid: () => isAddressValid,
   isInvalidInput: () => isInvalidInput,
   isTransactionConfirmed: () => isTransactionConfirmed,
+  isValidNumber: () => isValidNumber,
   limitDecimals: () => limitDecimals,
   limitInputNumber: () => limitInputNumber,
   numberToBytes32: () => numberToBytes32,
@@ -3911,6 +3912,10 @@ var formatNumberWithSeparators = (value, precision) => {
   } else {
     return value.toLocaleString("en-US");
   }
+};
+var isValidNumber = (value) => {
+  const val = new import_eth_wallet2.BigNumber(value);
+  return val.gte(0);
 };
 var isInvalidInput = (val) => {
   const value = new import_eth_wallet2.BigNumber(val);
@@ -4246,6 +4251,7 @@ var EventId;
   EventId2["Paid"] = "Paid";
   EventId2["chainChanged"] = "chainChanged";
   EventId2["EmitButtonStatus"] = "emitButtonStatus";
+  EventId2["EmitInput"] = "emitInput";
 })(EventId || (EventId = {}));
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT

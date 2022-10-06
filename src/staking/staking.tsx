@@ -1,6 +1,6 @@
 import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, StakingCampaignByChainId, tokenSymbol, LockTokenType, getStakingStatus, getNetworkExplorerName } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -24,6 +24,7 @@ import { Result } from '../result';
 import { getTokenUrl, tokenIcon } from '../config';
 import './staking.css';
 import { ManageStake } from './manageStake';
+import { ModalConfig } from './modalConfig';
 
 declare global {
 	namespace JSX {
@@ -35,14 +36,17 @@ declare global {
 
 @customElements('i-section-staking')
 export class StakingBlock extends Module implements PageBlock {
+	private data: any;
 	readonly onEdit: () => Promise<void>;
 	readonly onConfirm: () => Promise<void>;
 	readonly onDiscard: () => Promise<void>;
 
+	private mdConfig: ModalConfig;
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaigns: any = [];
 	private stakingComponent: Panel;
+	private stakingLayout: Panel;
 	private stakingElm: Panel;
 	private noCampaignSection: Panel;
 	private stakingResult: Result;
@@ -57,11 +61,14 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async getData() {
-
+		return this.data;
 	}
 
-	async setData() {
-
+	async setData(value: any) {
+		this.data = value;
+		this.mdConfig.closeModal();
+		this.stakingLayout.visible = true;
+		this.onSetupPage(isWalletConnected());
 	}
 
 	async getTag() {
@@ -69,7 +76,7 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async setTag(value: any) {
-
+		this.tag = value;
 	}
 
 	async edit() {
@@ -77,7 +84,7 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async confirm() {
-
+		this.setData(this.data);
 	}
 
 	async discard() {
@@ -85,7 +92,15 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async config() {
+		this.stakingLayout.visible = false;
+		this.mdConfig.showModal();
+	}
 
+	async onConfigSave(campaign: StakingCampaign) {
+		this.data = campaign;
+		this.mdConfig.closeModal();
+		this.stakingLayout.visible = true;
+		this.onSetupPage(isWalletConnected());
 	}
 
 	constructor(parent?: Container, options?: ControlElement) {
@@ -130,6 +145,7 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
+		if (!this.data) return;
 		if (!hideLoading) {
 			this.loadingElm.visible = true;
 		}
@@ -139,7 +155,7 @@ export class StakingBlock extends Module implements PageBlock {
 			this.loadingElm.visible = false;
 			return;
 		}
-		this.campaigns = await getAllCampaignsInfo(StakingCampaignByChainId);
+		this.campaigns = await getAllCampaignsInfo(this.data);
 		await this.renderCampaigns(hideLoading);
 		if (!hideLoading) {
 			this.loadingElm.visible = false;
@@ -249,12 +265,16 @@ export class StakingBlock extends Module implements PageBlock {
 
 	init = async () => {
 		super.init();
+		this.mdConfig = new ModalConfig();
+		this.mdConfig.onConfigSave = (campaign: StakingCampaign) => this.onConfigSave(campaign);
+		this.stakingComponent.appendChild(this.mdConfig);
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
-		await this.initWalletData();
+		this.initWalletData();
 		setDataFromSCConfig(Networks, InfuraId);
 		setCurrentChainId(getDefaultChainId());
-		this.onSetupPage(isWalletConnected());
+		// For testing
+		// setTimeout(() => this.mdConfig.showModal(), 1000)
 	}
 
 	private updateButtonStatus = async (data: any) => {
@@ -350,9 +370,10 @@ export class StakingBlock extends Module implements PageBlock {
 			const totalTokensLabel = await Label.create();
 			const availableQtyLabel = await Label.create();
 			const activeTimerRow = await VStack.create();
-			const endHours = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
-			const endDays = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
-			const endMins = await Label.create({ background: { color: campaign.customColorTimeBackground || '#b14781' }});
+			const bg = { color: campaign.customColorTimeBackground || '#b14781' };
+			const endHours = await Label.create({ background: bg });
+			const endDays = await Label.create({ background: bg });
+			const endMins = await Label.create({ background: bg });
 			const stickerSection = await Panel.create();
 			const stickerLabel = await Label.create();
 			const stickerIcon = await Icon.create();
@@ -528,7 +549,7 @@ export class StakingBlock extends Module implements PageBlock {
 								<i-label caption={campaign.campaignName} />
 							</i-hstack>
 							<i-hstack>
-								<i-label class="campaign-description" caption={campaign.campaignDesc} />
+								<i-label class="campaign-description" caption={campaign.campaignDesc || ''} />
 							</i-hstack>
 							<i-panel>
 								{
@@ -573,13 +594,13 @@ export class StakingBlock extends Module implements PageBlock {
 							const key = `btn-${option.address}`;
 							const btnStake = await Button.create({
 								caption: this.getBtnText(key, 'Stake'),
-								background: { color: `${option.customColorButton} !important` },
+								background: { color: `${campaign.customColorButton} !important` },
 								font: { color: campaign.customColorText || '#fff' },
 								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
 							});
 							const btnUnstake = await Button.create({
 								caption: this.getBtnText(key, 'Unstake'),
-								background: { color: `${option.customColorButton} !important` },
+								background: { color: `${campaign.customColorButton} !important` },
 								font: { color: campaign.customColorText || '#fff' },
 								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
 							});
@@ -588,7 +609,7 @@ export class StakingBlock extends Module implements PageBlock {
 								btnStake.id = key;
 								btnStake.enabled = !isClosed;
 								btnStake.classList.add('btn-os', 'btn-stake');
-								btnStake.onClick = () => this.onStake({...campaign, ...option});
+								btnStake.onClick = () => this.onStake({ ...campaign, ...option });
 							} else {
 								btnStake.visible = false;
 								btnUnstake.id = key;
@@ -661,7 +682,7 @@ export class StakingBlock extends Module implements PageBlock {
 									const btnClaim = await Button.create({
 										rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: false },
 										caption: `Claim ${rewardSymbol}`,
-										background: { color: `${option.customColorButton} !important` },
+										background: { color: `${campaign.customColorButton} !important` },
 										font: { color: campaign.customColorText || '#fff' },
 										enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero())
 									})
@@ -712,7 +733,7 @@ export class StakingBlock extends Module implements PageBlock {
 							const durationDays = option.minLockTime / (60 * 60 * 24);
 
 							return <i-vstack class="column-custom">
-								<i-panel class="bg-color" background={{ color: option.customColorBackground || 'hsla(0,0%,100%,0.03)' }}>
+								<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || 'hsla(0,0%,100%,0.03)' }}>
 									{stickerOptionSection}
 									<i-panel class="header-info">
 										<i-hstack verticalAlignment='center' horizontalAlignment="center">
@@ -723,7 +744,7 @@ export class StakingBlock extends Module implements PageBlock {
 											}
 											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
 										</i-hstack >
-										<i-label caption={option.customDesc} />
+										<i-label caption={option.customDesc || ''} />
 									</i-panel>
 									<i-panel class="img-custom">
 										{
@@ -796,7 +817,7 @@ export class StakingBlock extends Module implements PageBlock {
 												</i-hstack>
 											})
 										}
-										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} border={{ top: { color: `${campaign.customColorCampaign || '#f15e61'} !important` }}} />
+										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} border={{ top: { color: `${campaign.customColorCampaign || '#f15e61'} !important` } }} />
 										{claimStakedRow}
 										{btnUnstake}
 										{rowRewardsLocked}
@@ -815,7 +836,7 @@ export class StakingBlock extends Module implements PageBlock {
 											})
 										}
 									</i-panel>
-									<i-label visible={ !!campaign.showContractLink } class="view-contract pointer" margin={{ top: isClaim ? 0 : 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+									<i-label visible={!!campaign.showContractLink} class="view-contract pointer" margin={{ top: isClaim ? 0 : 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
 										<i-label caption="View Contract" />
 										<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
 									</i-label>
@@ -833,17 +854,17 @@ export class StakingBlock extends Module implements PageBlock {
 	render() {
 		return (
 			<i-panel id="stakingComponent" class="staking-component">
-				<i-panel class="staking-layout">
+				<i-panel id="stakingLayout" visible={false} class="staking-layout">
 					<i-vstack id="loadingElm" class="i-loading-overlay" minHeight={500}>
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 							<i-icon
 								class="i-loading-spinner_icon"
 								image={{ url: Assets.fullPath('img/loading.svg'), width: 36, height: 36 }}
-							></i-icon>
+							/>
 							<i-label
 								caption="Loading..." font={{ color: '#FD4A4C', size: '1.5em' }}
 								class="i-loading-spinner_text"
-							></i-label>
+							/>
 						</i-vstack>
 					</i-vstack>
 					<i-panel id="stakingElm" class="wrapper" />

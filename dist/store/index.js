@@ -6143,9 +6143,9 @@ __export(exports, {
   DefaultTokens: () => DefaultTokens,
   InfuraId: () => InfuraId,
   LockTokenType: () => LockTokenType,
+  LockTokenTypeList: () => LockTokenTypeList,
   MockOracleMap: () => MockOracleMap,
   Networks: () => Networks,
-  StakingCampaignByChainId: () => StakingCampaignByChainId,
   ToUSDPriceFeedAddressesMap: () => ToUSDPriceFeedAddressesMap,
   TrollManagementActionType: () => TrollManagementActionType,
   TrollStatus: () => TrollStatus,
@@ -6217,7 +6217,7 @@ __export(exports, {
   viewOnExplorerByTxHash: () => viewOnExplorerByTxHash,
   walletList: () => walletList
 });
-var import_eth_wallet7 = __toModule(require("@ijstech/eth-wallet"));
+var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
 var import_global2 = __toModule(require("@staking/global"));
 var import_assets = __toModule(require("@staking/assets"));
 var import_sdk2 = __toModule(require("@openswap/sdk"));
@@ -6317,6 +6317,7 @@ var EventId;
   EventId3["Paid"] = "Paid";
   EventId3["chainChanged"] = "chainChanged";
   EventId3["EmitButtonStatus"] = "emitButtonStatus";
+  EventId3["EmitInput"] = "emitInput";
 })(EventId || (EventId = {}));
 
 // src/store/wallet.ts
@@ -6870,114 +6871,17 @@ var CoreContractAddressesByChainId = {
 };
 
 // src/store/data/staking.ts
-var import_eth_wallet6 = __toModule(require("@ijstech/eth-wallet"));
-var baseUrl = "https://openswap.xyz/#";
 var LockTokenType;
 (function(LockTokenType2) {
   LockTokenType2[LockTokenType2["ERC20_Token"] = 0] = "ERC20_Token";
   LockTokenType2[LockTokenType2["LP_Token"] = 1] = "LP_Token";
   LockTokenType2[LockTokenType2["VAULT_Token"] = 2] = "VAULT_Token";
 })(LockTokenType || (LockTokenType = {}));
-var StakingCampaignByChainId = {
-  56: [
-    {
-      customName: "OpenSwap 1st Anniversary<br>Birthday Staking Campaign",
-      customDesc: "Wow, Time Flies.. Let's Go Bridge Soon<br>Stake Now!",
-      getTokenURL: `${baseUrl}/swap`,
-      stakings: [
-        {
-          address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
-          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-          minLockTime: new import_eth_wallet6.BigNumber("1209600"),
-          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
-          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
-          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0x0616bf20ceEd4D18cD6cc7C327c21a681A5C3271",
-            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            multiplier: new import_eth_wallet6.BigNumber("0.03"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
-          }]
-        },
-        {
-          address: "0x3826C16625771f670e5a56271B2aB2b8e12B9e20",
-          lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
-          minLockTime: new import_eth_wallet6.BigNumber("2592000"),
-          entryStart: new import_eth_wallet6.BigNumber("1663074000"),
-          entryEnd: new import_eth_wallet6.BigNumber("1664283600"),
-          perAddressCap: new import_eth_wallet6.BigNumber("3000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0x83ff3E08C999684FC936cD12859Bdd6B0EbE5E7f",
-            rewardTokenAddress: "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-            multiplier: new import_eth_wallet6.BigNumber("0.1"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x9F7E5cC944d15Df211d959A270C61C1acb10ae5c"
-          }]
-        }
-      ]
-    }
-  ],
-  43113: [
-    {
-      customName: "Testing 1",
-      customDesc: "line 1<br>line 2",
-      getTokenURL: `${baseUrl}/swap`,
-      stakings: [
-        {
-          address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
-          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-          minLockTime: new import_eth_wallet6.BigNumber("300"),
-          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
-          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
-          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0xA4B199b1B4C7C4Ef2d10E1eA11A9DE7F60e84164",
-            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            multiplier: new import_eth_wallet6.BigNumber("0.03"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
-          }]
-        },
-        {
-          address: "0xf9dA3743c57ec64505F27B9822BaFB0f8ab5E90d",
-          lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-          minLockTime: new import_eth_wallet6.BigNumber("86400"),
-          entryStart: new import_eth_wallet6.BigNumber("1662624142"),
-          entryEnd: new import_eth_wallet6.BigNumber("1682899200"),
-          perAddressCap: new import_eth_wallet6.BigNumber("100000"),
-          maxTotalLock: new import_eth_wallet6.BigNumber("100000"),
-          customDesc: "Stake OSWAP, Earn OSWAP",
-          lockTokenType: 0,
-          rewards: [{
-            address: "0x8820b70EC48B259D83C6E4BB95E5e9955C39F670",
-            rewardTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-            multiplier: new import_eth_wallet6.BigNumber("0.1"),
-            initialReward: new import_eth_wallet6.BigNumber("1"),
-            vestingPeriod: new import_eth_wallet6.BigNumber("0"),
-            claimDeadline: new import_eth_wallet6.BigNumber("253402214400"),
-            admin: "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3"
-          }]
-        }
-      ]
-    }
-  ]
-};
+var LockTokenTypeList = [
+  { name: "ERC20_Token", value: 0 },
+  { name: "LP_Token", value: 1 },
+  { name: "VAULT_Token", value: 2 }
+];
 var USDPeggedTokenAddressMap = {
   56: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   97: "0xDe9334C157968320f26e449331D6544b89bbD00F"
@@ -7420,17 +7324,17 @@ var getWETH = (chainId) => {
   return wrappedToken;
 };
 function getChainId() {
-  return import_eth_wallet7.Wallet.getInstance().chainId;
+  return import_eth_wallet6.Wallet.getInstance().chainId;
 }
 function getWallet() {
-  return isWalletConnected() ? import_eth_wallet7.Wallet.getInstance() : new import_eth_wallet7.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId2()).rpc);
+  return isWalletConnected() ? import_eth_wallet6.Wallet.getInstance() : new import_eth_wallet6.Wallet(getNetworkInfo(state.currentChainId || getDefaultChainId2()).rpc);
 }
 function getWalletProvider() {
   return localStorage.getItem("walletProvider") || "";
 }
 function getErc20(address) {
   const wallet = getWallet();
-  return new import_eth_wallet7.Erc20(wallet, address);
+  return new import_eth_wallet6.Erc20(wallet, address);
 }
 var isExpertMode = () => {
   return state.isExpertMode;
@@ -7600,7 +7504,7 @@ var projectNativeTokenSymbol = () => {
   return token ? token.symbol : "";
 };
 var getTokenObject = async (address, showBalance) => {
-  const ERC20Contract = new import_sdk2.Contracts.ERC20(import_eth_wallet7.Wallet.getInstance(), address);
+  const ERC20Contract = new import_sdk2.Contracts.ERC20(import_eth_wallet6.Wallet.getInstance(), address);
   const symbol = await ERC20Contract.symbol();
   const name = await ERC20Contract.name();
   const decimals = (await ERC20Contract.decimals()).toFixed();

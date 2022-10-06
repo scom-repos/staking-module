@@ -18853,6 +18853,7 @@ var require_lib4 = __commonJS({
 // src/staking-utils/index.ts
 __export(exports, {
   claimToken: () => claimToken,
+  deployCampaign: () => deployCampaign,
   getAllCampaignsInfo: () => getAllCampaignsInfo,
   getApprovalModelAction: () => getApprovalModelAction,
   getERC20RewardCurrentAPR: () => getERC20RewardCurrentAPR,
@@ -19025,6 +19026,7 @@ var EventId;
   EventId2["Paid"] = "Paid";
   EventId2["chainChanged"] = "chainChanged";
   EventId2["EmitButtonStatus"] = "emitButtonStatus";
+  EventId2["EmitInput"] = "emitInput";
 })(EventId || (EventId = {}));
 
 // src/staking-utils/API.ts
@@ -19242,9 +19244,7 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
       vestingPeriod: stakingCampaignInfo.vestingPeriod,
-      isSimplified: stakingCampaignInfo.isSimplified,
       getTokenURL: stakingCampaignInfo.getTokenURL,
-      getTokenURL2: stakingCampaignInfo.getTokenURL2,
       options: durationOptionsWithExtendedInfo
     });
     if (durationOptionsWithExtendedInfo.length > 0) {
@@ -19504,6 +19504,53 @@ var getApprovalModelAction = (contractAddress, options) => {
   const approvalModel = new ERC20ApprovalModel(approvalOptions);
   let approvalModelAction = approvalModel.getAction();
   return approvalModelAction;
+};
+var deployCampaign = async (campaign, callback) => {
+  try {
+    let wallet = (0, import_store.getWallet)();
+    let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
+    let rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet);
+    let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
+    for (const staking of campaign.stakings) {
+      let stakingResult;
+      const { lockTokenAddress, maxTotalLock, minLockTime, entryStart, entryEnd, perAddressCap } = staking;
+      let timeIsMoneyToken = new import_eth_wallet4.Erc20(wallet, lockTokenAddress);
+      let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
+      const stakingAddress = await timeIsMoney.deploy({
+        token: lockTokenAddress,
+        maximumTotalLock: import_eth_wallet4.Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
+        minimumLockTime: minLockTime,
+        startOfEntryPeriod: entryStart,
+        endOfEntryPeriod: entryEnd,
+        perAddressCap: import_eth_wallet4.Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals)
+      });
+      let rewardResult = [];
+      for (const reward of staking.rewards) {
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, claimDeadline, admin } = reward;
+        let rewardToken = new import_eth_wallet4.Erc20(wallet, rewardTokenAddress);
+        let rewardTokenDecimals = await rewardToken.decimals;
+        const rewardAddress = await rewardsContract.deploy({
+          timeIsMoney: timeIsMoney.address,
+          token: rewardTokenAddress,
+          multiplier: import_eth_wallet4.Utils.toDecimals(multiplier, rewardTokenDecimals),
+          initialReward: import_eth_wallet4.Utils.toDecimals(initialReward, rewardTokenDecimals),
+          vestingPeriod,
+          claimDeadline,
+          admin
+        });
+        rewardResult.push(__spreadProps(__spreadValues({}, reward), { address: rewardAddress }));
+      }
+      ;
+      stakingResult = __spreadProps(__spreadValues({}, staking), { address: stakingAddress, rewards: rewardResult });
+      result.stakings.push(stakingResult);
+    }
+    return result;
+  } catch (error) {
+    if (callback) {
+      callback(error, null);
+    }
+    return null;
+  }
 };
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
