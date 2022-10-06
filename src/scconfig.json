@@ -22,6 +22,8 @@
     "@staking/sdks": "{root}/sdks/index.js",
     "@staking/assets": "{root}/assets/index.js",
     "@staking/global": "{root}/global/index.js",
-    "@staking/store": "{root}/store/index.js"
+    "@staking/store": "{root}/store/index.js",
+    "@staking/staking-utils": "{root}/staking-utils/index.js",
+    "@staking/staking": "{root}/staking/index.js"
   }
 }

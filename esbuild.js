@@ -44,6 +44,8 @@ const GlobalModuleESBuildConfig = {
     '@openswap/sdk',
     '@staking/global',
     '@staking/store',
+    '@staking/staking',
+    '@staking/staking-utils'
   ]
 }
 
@@ -112,6 +114,8 @@ async function buildLocalModule() {
       '@openswap/sdk',
       '@staking/global',
       '@staking/store',
+      '@staking/staking',
+      '@staking/staking-utils'
     ],
     outdir: 'dist/demo',
     bundle: true,

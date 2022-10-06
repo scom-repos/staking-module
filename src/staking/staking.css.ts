@@ -166,7 +166,6 @@ Styles.cssRule('.staking-component', {
     '.staking-layout': {
       width: '100%',
       maxWidth: '1420px',
-      minHeight: 'calc(100vh - 10rem)',
       marginInline: 'auto',
       padding: '1rem',
     },
