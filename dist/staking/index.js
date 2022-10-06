@@ -6162,19 +6162,21 @@ var StakingBlock = class extends import_components6.Module {
       class: "staking-layout"
     }, /* @__PURE__ */ this.$render("i-vstack", {
       id: "loadingElm",
-      class: "i-loading-overlay",
-      minHeight: 500
-    }, /* @__PURE__ */ this.$render("i-vstack", {
-      class: "i-loading-spinner",
+      minHeight: 500,
+      background: { color: "#0c1234" },
       horizontalAlignment: "center",
       verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      horizontalAlignment: "center",
+      verticalAlignment: "center",
+      gap: "0.5rem",
+      padding: { top: "1rem", bottom: "1rem", left: "1rem", right: "1rem" }
     }, /* @__PURE__ */ this.$render("i-icon", {
-      class: "i-loading-spinner_icon",
+      spin: true,
       image: { url: import_assets4.default.fullPath("img/loading.svg"), width: 36, height: 36 }
     }), /* @__PURE__ */ this.$render("i-label", {
       caption: "Loading...",
-      font: { color: "#FD4A4C", size: "1.5em" },
-      class: "i-loading-spinner_text"
+      font: { color: "#FD4A4C", size: "1.5em" }
     }))), /* @__PURE__ */ this.$render("i-panel", {
       id: "stakingElm",
       class: "wrapper"
