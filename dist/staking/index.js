@@ -4214,7 +4214,6 @@ import_components3.Styles.cssRule(".staking-component", {
     },
     ".staking-layout": {
       width: "100%",
-      maxWidth: "1420px",
       marginInline: "auto",
       padding: "1rem"
     },
@@ -5405,7 +5404,7 @@ var StakingBlock = class extends import_components6.Module {
         this.stakingElm.clearInnerHTML();
         this.stakingElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
           width: "100%",
-          margin: { top: 100 },
+          minHeight: 500,
           verticalAlignment: "center",
           horizontalAlignment: "center"
         }, /* @__PURE__ */ this.$render("i-label", {
@@ -6159,24 +6158,22 @@ var StakingBlock = class extends import_components6.Module {
       id: "stakingComponent",
       class: "staking-component"
     }, /* @__PURE__ */ this.$render("i-panel", {
-      class: "staking-layout"
+      class: "staking-layout",
+      minHeight: 500
     }, /* @__PURE__ */ this.$render("i-vstack", {
       id: "loadingElm",
-      minHeight: 500,
-      background: { color: "#0c1234" },
+      class: "i-loading-overlay"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      class: "i-loading-spinner",
       horizontalAlignment: "center",
       verticalAlignment: "center"
-    }, /* @__PURE__ */ this.$render("i-vstack", {
-      horizontalAlignment: "center",
-      verticalAlignment: "center",
-      gap: "0.5rem",
-      padding: { top: "1rem", bottom: "1rem", left: "1rem", right: "1rem" }
     }, /* @__PURE__ */ this.$render("i-icon", {
-      spin: true,
+      class: "i-loading-spinner_icon",
       image: { url: import_assets4.default.fullPath("img/loading.svg"), width: 36, height: 36 }
     }), /* @__PURE__ */ this.$render("i-label", {
       caption: "Loading...",
-      font: { color: "#FD4A4C", size: "1.5em" }
+      font: { color: "#FD4A4C", size: "1.5em" },
+      class: "i-loading-spinner_text"
     }))), /* @__PURE__ */ this.$render("i-panel", {
       id: "stakingElm",
       class: "wrapper"

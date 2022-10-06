@@ -165,7 +165,6 @@ Styles.cssRule('.staking-component', {
     },
     '.staking-layout': {
       width: '100%',
-      maxWidth: '1420px',
       marginInline: 'auto',
       padding: '1rem',
     },

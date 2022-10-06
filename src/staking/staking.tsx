@@ -135,7 +135,7 @@ export class StakingBlock extends Module implements PageBlock {
 		}
 		if (!connected) {
 			this.stakingElm.clearInnerHTML();
-			this.stakingElm.appendChild(<i-hstack width="100%" margin={{ top: 100 }} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
+			this.stakingElm.appendChild(<i-hstack width="100%" minHeight={500} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
 			this.loadingElm.visible = false;
 			return;
 		}
@@ -833,15 +833,16 @@ export class StakingBlock extends Module implements PageBlock {
 	render() {
 		return (
 			<i-panel id="stakingComponent" class="staking-component">
-				<i-panel class="staking-layout">
-					<i-vstack id="loadingElm" minHeight={500} background={{ color: "#0c1234" }} horizontalAlignment="center" verticalAlignment="center">
-						<i-vstack horizontalAlignment="center" verticalAlignment="center" gap="0.5rem" padding={{ top: "1rem", bottom: "1rem", left: "1rem", right: "1rem" }}>
+				<i-panel class="staking-layout" minHeight={500}>
+					<i-vstack id="loadingElm" class="i-loading-overlay">
+						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 							<i-icon
-								spin={true}
+								class="i-loading-spinner_icon"
 								image={{ url: Assets.fullPath('img/loading.svg'), width: 36, height: 36 }}
 							></i-icon>
 							<i-label
 								caption="Loading..." font={{ color: '#FD4A4C', size: '1.5em' }}
+								class="i-loading-spinner_text"
 							></i-label>
 						</i-vstack>
 					</i-vstack>
