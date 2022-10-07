@@ -3731,6 +3731,7 @@ __export(exports, {
   SITE_ENV: () => SITE_ENV,
   approveERC20Max: () => approveERC20Max,
   compareDate: () => compareDate,
+  downloadJsonFile: () => downloadJsonFile,
   formatDate: () => formatDate,
   formatNumber: () => formatNumber,
   formatNumberValue: () => formatNumberValue,
@@ -4132,6 +4133,21 @@ var renderBalanceTooltip = (params, tokenMap, isBold) => {
     return `<i-label tooltip='${JSON.stringify({ content: tooltip })}'>${result}</i-label>`;
   }
   return data;
+};
+var replacer = (key, value) => {
+  if (["minLockTime", "entryStart", "entryEnd", "perAddressCap", "maxTotalLock", "multiplier", "initialReward", "vestingPeriod", "claimDeadline"].includes(key)) {
+    const val = Number(value);
+    return isNaN(val) ? value : val;
+  }
+  return value;
+};
+var downloadJsonFile = (name, obj) => {
+  const link = document.createElement("a");
+  const text = JSON.stringify(obj, replacer, 2);
+  link.download = name;
+  const jsonContent = `data:application/json;charset=utf-8,${encodeURIComponent(text)}`;
+  link.href = jsonContent;
+  link.click();
 };
 
 // src/global/utils/error.ts

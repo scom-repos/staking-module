@@ -19,6 +19,7 @@ export {
   compareDate,
   renderBalanceTooltip,
   formatPercentNumber,
+  downloadJsonFile,
   SITE_ENV,
 } from './helper';
 

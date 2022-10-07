@@ -318,3 +318,19 @@ export const renderBalanceTooltip = (params: any, tokenMap: TokenMapType, isBold
   return data;
 }
 
+const replacer = (key: string, value: any) => {
+  if (['minLockTime', 'entryStart', 'entryEnd', 'perAddressCap', 'maxTotalLock', 'multiplier', 'initialReward', 'vestingPeriod', 'claimDeadline'].includes(key)) {
+    const val = Number(value);
+    return isNaN(val) ? value : val;
+  }
+  return value;
+}
+
+export const downloadJsonFile = (name: string, obj: any) => {
+  const link = document.createElement("a");
+  const text = JSON.stringify(obj, replacer, 2);
+  link.download = name;
+  const jsonContent = `data:application/json;charset=utf-8,${encodeURIComponent(text)}`;
+  link.href = jsonContent;
+  link.click();
+}

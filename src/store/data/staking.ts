@@ -16,6 +16,7 @@ const LockTokenTypeList = [
 
 interface StakingCampaign {
   //custom
+  chainId?: number,
   customName: string,
   customDesc?: string,
   getTokenURL?: string,

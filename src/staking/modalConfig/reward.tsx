@@ -1,4 +1,4 @@
-import { Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application } from '@ijstech/components';
+import { Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { Reward } from '@staking/store';
@@ -25,14 +25,34 @@ export class RewardConfig extends Module {
 	private lbErr: Label;
 	private isAdminValid = false;
 	private checkboxStartDate: Checkbox;
+	private wrapperAddressElm: HStack;
+	private _isNew: boolean;
+	private inputAddress: Input;
+	private lbAddressErr: Label;
+	private isAddressValid: boolean;
+
+	constructor(parent?: Container, options?: any) {
+		super(parent, options);
+	}
 
 	set chainId(chainId: number) {
 		this.tokenSelection.chainId = chainId;
 		this.token = undefined;
 	}
 
-	constructor(parent?: Container, options?: any) {
-		super(parent, options);
+	set isNew(value: boolean) {
+		this._isNew = value;
+		this.setupInput();
+	}
+
+	get isNew() {
+		return this._isNew;
+	}
+
+	private setupInput = () => {
+		if (this.wrapperAddressElm) {
+			this.wrapperAddressElm.visible = !this.isNew;
+		}
 	}
 
 	private emitInput = () => {
@@ -57,6 +77,12 @@ export class RewardConfig extends Module {
 		this.emitInput();
 	}
 
+	private onInputAddress = async () => {
+		this.isAddressValid = await isAddressValid(this.inputAddress.value);
+		this.lbAddressErr.visible = !this.isAddressValid;
+		this.emitInput();
+	}
+
 	private onInputAdmin = async () => {
 		this.isAdminValid = await isAddressValid(this.inputAdmin.value);
 		this.lbErr.visible = !this.isAdminValid;
@@ -68,12 +94,13 @@ export class RewardConfig extends Module {
 			isValidNumber(this.inputMultiplier.value) &&
 			isValidNumber(this.inputInitialReward.value) &&
 			isValidNumber(this.inputVestingPeriod.value) &&
-			isValidNumber(this.inputClaimDeadline.value);
+			isValidNumber(this.inputClaimDeadline.value) &&
+			(this.isNew || this.isAddressValid);
 	}
 
 	getData = () => {
 		const reward: Reward = {
-			address: '',
+			address: this.inputAddress.value,
 			rewardTokenAddress: this.token?.address || this.token?.symbol || '',
 			multiplier: new BigNumber(this.inputMultiplier.value),
 			initialReward: new BigNumber(this.inputInitialReward.value),
@@ -90,12 +117,23 @@ export class RewardConfig extends Module {
 		this.tokenSelection = new TokenSelection();
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
+		this.setupInput();
 	}
 
 	render() {
 		return (
 			<i-panel class="custom-scroll">
 				<i-vstack gap={10} verticalAlignment="center" class="main-content">
+					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Address" />
+							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
+							<i-input id="inputAddress" class="input-text w-100" onChanged={this.onInputAddress} />
+							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: '#f15e61', size: '12px' }} />
+						</i-vstack>
+					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Token Address" />

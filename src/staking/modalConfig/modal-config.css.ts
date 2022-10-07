@@ -30,6 +30,7 @@ Styles.cssRule('.modal-config', {
     },
     'i-button': {
       padding: '6px 12px',
+      textAlign: 'center',
     },
     '.pnl-label': {
       $nest: {
@@ -156,6 +157,9 @@ Styles.cssRule('.modal-config', {
     },
     'i-checkbox.is-checked .checkmark': {
       backgroundColor: '#FD4A4C'
+    },
+    '.cursor-pointer': {
+      cursor: 'pointer',
     },
     '.custom-scroll *': {
       $nest: {

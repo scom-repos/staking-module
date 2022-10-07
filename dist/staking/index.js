@@ -5391,7 +5391,8 @@ import_components6.Styles.cssRule(".modal-config", {
       color: "#fff"
     },
     "i-button": {
-      padding: "6px 12px"
+      padding: "6px 12px",
+      textAlign: "center"
     },
     ".pnl-label": {
       $nest: {
@@ -5518,6 +5519,9 @@ import_components6.Styles.cssRule(".modal-config", {
     },
     "i-checkbox.is-checked .checkmark": {
       backgroundColor: "#FD4A4C"
+    },
+    ".cursor-pointer": {
+      cursor: "pointer"
     },
     ".custom-scroll *": {
       $nest: {
@@ -5841,6 +5845,11 @@ var RewardConfig = class extends import_components9.Module {
   constructor(parent, options) {
     super(parent, options);
     this.isAdminValid = false;
+    this.setupInput = () => {
+      if (this.wrapperAddressElm) {
+        this.wrapperAddressElm.visible = !this.isNew;
+      }
+    };
     this.emitInput = () => {
       import_components9.application.EventBus.dispatch(import_global3.EventId.EmitInput);
     };
@@ -5859,18 +5868,23 @@ var RewardConfig = class extends import_components9.Module {
       _input.value = value;
       this.emitInput();
     };
+    this.onInputAddress = async () => {
+      this.isAddressValid = await (0, import_global3.isAddressValid)(this.inputAddress.value);
+      this.lbAddressErr.visible = !this.isAddressValid;
+      this.emitInput();
+    };
     this.onInputAdmin = async () => {
       this.isAdminValid = await (0, import_global3.isAddressValid)(this.inputAdmin.value);
       this.lbErr.visible = !this.isAdminValid;
       this.emitInput();
     };
     this.checkValidation = () => {
-      return this.token && this.isAdminValid && (0, import_global3.isValidNumber)(this.inputMultiplier.value) && (0, import_global3.isValidNumber)(this.inputInitialReward.value) && (0, import_global3.isValidNumber)(this.inputVestingPeriod.value) && (0, import_global3.isValidNumber)(this.inputClaimDeadline.value);
+      return this.token && this.isAdminValid && (0, import_global3.isValidNumber)(this.inputMultiplier.value) && (0, import_global3.isValidNumber)(this.inputInitialReward.value) && (0, import_global3.isValidNumber)(this.inputVestingPeriod.value) && (0, import_global3.isValidNumber)(this.inputClaimDeadline.value) && (this.isNew || this.isAddressValid);
     };
     this.getData = () => {
       var _a, _b;
       const reward = {
-        address: "",
+        address: this.inputAddress.value,
         rewardTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || ((_b = this.token) == null ? void 0 : _b.symbol) || "",
         multiplier: new import_eth_wallet2.BigNumber(this.inputMultiplier.value),
         initialReward: new import_eth_wallet2.BigNumber(this.inputInitialReward.value),
@@ -5886,11 +5900,19 @@ var RewardConfig = class extends import_components9.Module {
     this.tokenSelection.chainId = chainId;
     this.token = void 0;
   }
+  set isNew(value) {
+    this._isNew = value;
+    this.setupInput();
+  }
+  get isNew() {
+    return this._isNew;
+  }
   init() {
     super.init();
     this.tokenSelection = new TokenSelection();
     this.tokenSelection.onSelectToken = this.onInputToken;
     this.pnlTokenSelection.appendChild(this.tokenSelection);
+    this.setupInput();
   }
   render() {
     return /* @__PURE__ */ this.$render("i-panel", {
@@ -5900,6 +5922,33 @@ var RewardConfig = class extends import_components9.Module {
       verticalAlignment: "center",
       class: "main-content"
     }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "wrapperAddressElm",
+      gap: 10,
+      verticalAlignment: "center",
+      horizontalAlignment: "space-between"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      gap: 4,
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      class: "lb-title",
+      caption: "Address"
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "*",
+      font: { color: "#f15e61", size: "16px" }
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      gap: 4,
+      width: "calc(100% - 190px)",
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-input", {
+      id: "inputAddress",
+      class: "input-text w-100",
+      onChanged: this.onInputAddress
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbAddressErr",
+      visible: false,
+      caption: "The address is invalid!",
+      font: { color: "#f15e61", size: "12px" }
+    }))), /* @__PURE__ */ this.$render("i-hstack", {
       gap: 10,
       verticalAlignment: "center",
       horizontalAlignment: "space-between"
@@ -6043,6 +6092,11 @@ var StakingConfig = class extends import_components10.Module {
     super(parent, options);
     this.rewardConfig = [];
     this.currentReward = 0;
+    this.setupInput = () => {
+      if (this.wrapperAddressElm) {
+        this.wrapperAddressElm.visible = !this.isNew;
+      }
+    };
     this.renderTypeButton = async () => {
       var _a;
       const vstack = await import_components10.VStack.create({ gap: 8 });
@@ -6120,8 +6174,12 @@ var StakingConfig = class extends import_components10.Module {
       }
       const rewards = [...this.rewardConfig];
       rewards[idx] = new RewardConfig();
+      rewards[idx].isNew = this.isNew;
       this.rewardConfig = [...rewards];
       this.pnlInfoElm.appendChild(this.rewardConfig[idx]);
+      if (!this.isNew) {
+        this.rewardConfig[idx].chainId = this.chainId;
+      }
       this.currentReward = idx;
       this.emitInput();
     };
@@ -6147,6 +6205,11 @@ var StakingConfig = class extends import_components10.Module {
     };
     this.emitInput = () => {
       import_components10.application.EventBus.dispatch(import_global4.EventId.EmitInput);
+    };
+    this.onInputAddress = async () => {
+      this.isAddressValid = await (0, import_global4.isAddressValid)(this.inputAddress.value);
+      this.lbAddressErr.visible = !this.isAddressValid;
+      this.emitInput();
     };
     this.onInputToken = (token) => {
       this.token = token;
@@ -6174,7 +6237,7 @@ var StakingConfig = class extends import_components10.Module {
       return true;
     };
     this.checkValidation = () => {
-      return this.token && !isNaN(this.lockType) && (0, import_global4.isValidNumber)(this.inputMinLockTime.value) && (0, import_global4.isValidNumber)(this.inputEntryStart.value) && (0, import_global4.isValidNumber)(this.inputEntryEnd.value) && (0, import_global4.isValidNumber)(this.inputPerAddressCap.value) && (0, import_global4.isValidNumber)(this.inputMaxTotalLock.value) && this.isRewardValid();
+      return this.token && !isNaN(this.lockType) && (0, import_global4.isValidNumber)(this.inputMinLockTime.value) && (0, import_global4.isValidNumber)(this.inputEntryStart.value) && (0, import_global4.isValidNumber)(this.inputEntryEnd.value) && (0, import_global4.isValidNumber)(this.inputPerAddressCap.value) && (0, import_global4.isValidNumber)(this.inputMaxTotalLock.value) && (this.isNew || this.isAddressValid) && this.isRewardValid();
     };
     this.getRewardData = () => {
       const rewardData = [];
@@ -6188,6 +6251,7 @@ var StakingConfig = class extends import_components10.Module {
       var _a, _b;
       const offset = Number(this.inputDecimalsOffset.value);
       const staking = {
+        address: this.inputAddress.value,
         lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || ((_b = this.token) == null ? void 0 : _b.symbol) || "",
         minLockTime: new import_eth_wallet3.BigNumber(this.inputMinLockTime.value),
         entryStart: new import_eth_wallet3.BigNumber(this.inputEntryStart.value),
@@ -6213,6 +6277,13 @@ var StakingConfig = class extends import_components10.Module {
   get chainId() {
     return this._chainId || (0, import_store5.getChainId)() || (0, import_store5.getDefaultChainId)();
   }
+  set isNew(value) {
+    this._isNew = value;
+    this.setupInput();
+  }
+  get isNew() {
+    return this._isNew;
+  }
   init() {
     super.init();
     this.tokenSelection = new TokenSelection();
@@ -6220,6 +6291,7 @@ var StakingConfig = class extends import_components10.Module {
     this.pnlTokenSelection.appendChild(this.tokenSelection);
     this.onAddReward();
     this.renderTypeButton();
+    this.setupInput();
   }
   render() {
     return /* @__PURE__ */ this.$render("i-panel", {
@@ -6229,6 +6301,33 @@ var StakingConfig = class extends import_components10.Module {
       verticalAlignment: "center",
       class: "main-content"
     }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "wrapperAddressElm",
+      gap: 10,
+      verticalAlignment: "center",
+      horizontalAlignment: "space-between"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      gap: 4,
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      class: "lb-title",
+      caption: "Address"
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "*",
+      font: { color: "#f15e61", size: "16px" }
+    })), /* @__PURE__ */ this.$render("i-vstack", {
+      gap: 4,
+      width: "calc(100% - 190px)",
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-input", {
+      id: "inputAddress",
+      class: "input-text w-100",
+      onChanged: this.onInputAddress
+    }), /* @__PURE__ */ this.$render("i-label", {
+      id: "lbAddressErr",
+      visible: false,
+      caption: "The address is invalid!",
+      font: { color: "#f15e61", size: "12px" }
+    }))), /* @__PURE__ */ this.$render("i-hstack", {
       gap: 10,
       verticalAlignment: "center",
       horizontalAlignment: "space-between"
@@ -6411,6 +6510,58 @@ var CampaignConfig = class extends import_components11.Module {
     super(parent, options);
     this.stakingConfig = [];
     this.currentStaking = 0;
+    this.setupInput = () => {
+      if (this.wapperNetworkElm) {
+        this.wapperNetworkElm.visible = !this.isNew;
+      }
+    };
+    this.renderNetworkButton = async () => {
+      const vstack = await import_components11.VStack.create({ gap: 8 });
+      const dropdownModal = await import_components11.Modal.create({
+        showBackdrop: false,
+        width: "100%",
+        maxWidth: 300,
+        popupPlacement: "bottom"
+      });
+      const listNetwork = import_store6.Networks.filter((f) => !f.isDisabled);
+      const networkObj = listNetwork.find((f) => f.chainId === this.network);
+      const btnNetwork = await import_components11.Button.create({
+        caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
+        font: { color: "#fff" },
+        background: { color: "#0c1234" },
+        border: { style: "none", radius: 12 },
+        padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
+        rightIcon: { name: "caret-down", fill: "#f15e61" },
+        width: "100%",
+        height: 40,
+        maxWidth: 300
+      });
+      btnNetwork.classList.add("btn-select");
+      btnNetwork.onClick = () => {
+        dropdownModal.visible = !dropdownModal.visible;
+      };
+      for (const network of listNetwork) {
+        const dropdownItem = await import_components11.Button.create({
+          caption: `${network.name} (${network.chainId})`,
+          background: { color: "transparent" },
+          height: 36
+        });
+        dropdownItem.onClick = () => {
+          dropdownModal.visible = false;
+          btnNetwork.caption = `${network.name} (${network.chainId})`;
+          this.network = network.chainId;
+          for (const elm of this.stakingConfig) {
+            elm.chainId = this.network;
+          }
+          this.emitInput();
+        };
+        vstack.appendChild(dropdownItem);
+      }
+      dropdownModal.item = vstack;
+      this.networkSelection.clearInnerHTML();
+      this.networkSelection.appendChild(btnNetwork);
+      this.networkSelection.appendChild(dropdownModal);
+    };
     this.onRenderStaking = (button, idx) => {
       for (const elm of this.stakingConfig) {
         elm.visible = false;
@@ -6445,8 +6596,12 @@ var CampaignConfig = class extends import_components11.Module {
       }
       const stakings = [...this.stakingConfig];
       stakings[idx] = new StakingConfig();
+      stakings[idx].isNew = this.isNew;
       this.stakingConfig = [...stakings];
       this.pnlInfoElm.appendChild(this.stakingConfig[idx]);
+      if (!this.isNew) {
+        this.stakingConfig[idx].chainId = this.network;
+      }
       this.currentStaking = idx;
       this.emitInput();
     };
@@ -6498,6 +6653,7 @@ var CampaignConfig = class extends import_components11.Module {
     };
     this.getData = () => {
       const campaign = {
+        chainId: this.network,
         customName: this.inputName.value,
         customDesc: this.inputDesc.value || void 0,
         getTokenURL: this.inputURL.value || void 0,
@@ -6519,10 +6675,19 @@ var CampaignConfig = class extends import_components11.Module {
       elm.chainId = chainId;
     }
   }
+  set isNew(value) {
+    this._isNew = value;
+    this.setupInput();
+  }
+  get isNew() {
+    return this._isNew;
+  }
   init() {
     this.network = (0, import_store6.getChainId)() || (0, import_store6.getDefaultChainId)();
     super.init();
     this.onAddStaking();
+    this.renderNetworkButton();
+    this.setupInput();
   }
   render() {
     return /* @__PURE__ */ this.$render("i-panel", {
@@ -6532,6 +6697,24 @@ var CampaignConfig = class extends import_components11.Module {
       verticalAlignment: "center",
       class: "main-content"
     }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "wapperNetworkElm",
+      gap: 10,
+      verticalAlignment: "center",
+      horizontalAlignment: "space-between"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      gap: 4,
+      verticalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      class: "lb-title",
+      caption: "Network"
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "*",
+      font: { color: "#f15e61", size: "16px" }
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      id: "networkSelection",
+      class: "network-selection",
+      width: "calc(100% - 190px)"
+    })), /* @__PURE__ */ this.$render("i-hstack", {
       gap: 10,
       verticalAlignment: "center",
       horizontalAlignment: "space-between"
@@ -6728,11 +6911,29 @@ var ModalConfig = class extends import_components12.Module {
       }
       this.updateButton();
     };
+    this.showInputCampaign = (isNew) => {
+      this.selectCampaignsElm.visible = false;
+      this.configCampaignsElm.visible = true;
+      this.wrapperNetworkElm.visible = isNew;
+      this.wapperCampaignsButton.visible = !isNew;
+      this.groupBtnSaveElm.visible = !isNew;
+      this.groupBtnDeployElm.visible = isNew;
+      this.isNew = isNew;
+      this.onAddCampaign();
+    };
+    this.onBack = () => {
+      this.pnlInfoElm.clearInnerHTML();
+      this.listCampaignButton.clearInnerHTML();
+      this.campaignConfig = [];
+      this.selectCampaignsElm.visible = true;
+      this.configCampaignsElm.visible = false;
+    };
     this.updateNetworkName = (chainId) => {
       const network = (0, import_store7.getNetworkInfo)(chainId);
       this.lbNetworkName.caption = network ? network.name : "Unknown Network";
     };
     this.showModal = async () => {
+      this.onBack();
       this.modalConfig.visible = true;
     };
     this.closeModal = () => {
@@ -6771,18 +6972,46 @@ var ModalConfig = class extends import_components12.Module {
       }
       const campaigns = [...this.campaignConfig];
       campaigns[idx] = new CampaignConfig();
+      campaigns[idx].isNew = this.isNew;
       this.campaignConfig = [...campaigns];
       this.pnlInfoElm.appendChild(this.campaignConfig[idx]);
       this.currentCampaign = idx;
     };
     this.onAddCampaign = async () => {
       const idx = Number(this.campaignConfig.length);
+      if (!this.isNew) {
+        this.btnAdd.enabled = false;
+        const pnl = await import_components12.Panel.create({ position: "relative" });
+        pnl.classList.add("pnl-label");
+        const icon = await import_components12.Icon.create({ name: "times", fill: "#0c1234", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        icon.onClick = () => this.removeCampaign(idx);
+        const button = await import_components12.Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
+        button.classList.add("btn-item", "btn-active");
+        button.onClick = () => this.onRenderCampaign(button, idx);
+        const active = this.listCampaignButton.querySelector(".btn-active");
+        if (active) {
+          active.classList.remove("btn-active");
+        }
+        pnl.appendChild(button);
+        pnl.appendChild(icon);
+        this.listCampaignButton.appendChild(pnl);
+      }
       await this.addCampaign(idx);
+      if (!this.isNew) {
+        this.btnAdd.enabled = true;
+      }
     };
     this.updateButton = () => {
-      if (this.btnDeploy.rightIcon.visible)
-        return;
-      this.btnDeploy.enabled = this.checkValidation();
+      const valid = this.checkValidation();
+      if (this.isNew) {
+        if (this.btnDeploy.rightIcon.visible || this.btnDeployDownload.rightIcon.visible)
+          return;
+        this.btnDeploy.enabled = valid;
+        this.btnDeployDownload.enabled = valid;
+      } else {
+        this.btnSave.enabled = valid;
+        this.btnDownload.enabled = valid;
+      }
     };
     this.checkValidation = () => {
       if (!this.campaignConfig.length)
@@ -6793,6 +7022,14 @@ var ModalConfig = class extends import_components12.Module {
         }
       }
       return true;
+    };
+    this.getStakingCampaignData = () => {
+      const campaignData = [];
+      for (const campaign of this.campaignConfig) {
+        const data = campaign.getData();
+        campaignData.push(data);
+      }
+      return campaignData;
     };
     this.showResultMessage = (result, status, content) => {
       if (!result)
@@ -6806,28 +7043,58 @@ var ModalConfig = class extends import_components12.Module {
       result.message = __spreadValues({}, params);
       result.showModal();
     };
-    this.onDeployCampaign = async () => {
-      if (this.checkValidation()) {
+    this.parseData = () => {
+      const arr = this.getStakingCampaignData();
+      this.campaigns = arr.reduce((result, currentValue) => {
+        (result[currentValue["chainId"]] = result[currentValue["chainId"]] || []).push(currentValue);
+        return result;
+      }, {});
+    };
+    this.onSave = () => {
+      if (!this.isNew && this.checkValidation()) {
+        this.parseData();
+        const campaigns = __spreadValues({}, this.campaigns);
+        this.onConfigSave(campaigns);
+      }
+    };
+    this.onDownload = (data) => {
+      if (this.isNew) {
+        (0, import_global6.downloadJsonFile)("campaign.json", __spreadValues({}, data));
+        return;
+      }
+      if (!this.isNew && this.checkValidation()) {
+        this.parseData();
+        const campaigns = __spreadValues({}, this.campaigns);
+        (0, import_global6.downloadJsonFile)("campaign.json", campaigns);
+      }
+    };
+    this.onDeployCampaign = async (isDownload) => {
+      if (this.isNew && this.checkValidation()) {
         const campaign = this.campaignConfig[0].getData();
         const chainId = (0, import_store7.getChainId)();
         let result;
+        const btn = isDownload ? this.btnDeployDownload : this.btnDeploy;
         this.showResultMessage(this.stakingResult, "warning", `Deploying ${campaign.customName}`);
         const callBack = async (err, reply) => {
           if (err) {
             this.showResultMessage(this.stakingResult, "error", err);
           } else {
             this.showResultMessage(this.stakingResult, "success", reply);
-            this.btnDeploy.caption = "Deploying";
+            this.backElm.classList.remove("cursor-pointer");
+            this.backElm.onClick = () => {
+            };
+            this.btnDeployDownload.enabled = false;
             this.btnDeploy.enabled = false;
-            this.btnDeploy.rightIcon.visible = true;
+            btn.caption = isDownload ? "Deploying And Downloading" : "Deploying";
+            btn.rightIcon.visible = true;
           }
         };
         const confirmationCallBack = async (receipt) => {
-          if (result) {
-            this.btnDeploy.rightIcon.visible = false;
-            this.btnDeploy.caption = "Deploy";
-            this.updateButton();
-          }
+          btn.rightIcon.visible = false;
+          btn.caption = isDownload ? "Deploy and Download JSON" : "Deploy";
+          this.updateButton();
+          this.backElm.classList.add("cursor-pointer");
+          this.backElm.onClick = () => this.onBack();
         };
         (0, import_global6.registerSendTxEvents)({
           transactionHash: callBack,
@@ -6837,6 +7104,9 @@ var ModalConfig = class extends import_components12.Module {
         if (result) {
           this.stakingResult.closeModal();
           this.onConfigSave({ [chainId]: [__spreadValues({}, result)] });
+          if (isDownload) {
+            this.onDownload(__spreadValues({}, result));
+          }
         }
       }
     };
@@ -6846,7 +7116,6 @@ var ModalConfig = class extends import_components12.Module {
   init() {
     super.init();
     this.modalConfig.closeOnBackdropClick = false;
-    this.onAddCampaign();
     this.stakingResult = new Result();
     this.appendChild(this.stakingResult);
   }
@@ -6860,9 +7129,44 @@ var ModalConfig = class extends import_components12.Module {
     }, /* @__PURE__ */ this.$render("i-panel", {
       class: "custom-scroll"
     }, /* @__PURE__ */ this.$render("i-hstack", {
+      gap: 10,
+      id: "selectCampaignsElm",
+      width: "100%",
+      height: 150,
+      verticalAlignment: "center",
+      horizontalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-button", {
+      caption: "Add New Campaign",
+      class: "btn-os",
+      onClick: () => this.showInputCampaign(true)
+    }), /* @__PURE__ */ this.$render("i-button", {
+      caption: "Add Existing Campaigns",
+      class: "btn-os",
+      onClick: () => this.showInputCampaign(false)
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      id: "configCampaignsElm",
+      visible: false,
+      width: "100%"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "backElm",
+      gap: 4,
+      width: "fit-content",
+      margin: { top: 5, bottom: 15, left: "auto" },
+      verticalAlignment: "center",
+      class: "cursor-pointer",
+      onClick: this.onBack
+    }, /* @__PURE__ */ this.$render("i-icon", {
+      name: "arrow-left",
+      fill: "#fff",
+      width: 20,
+      height: 20
+    }), /* @__PURE__ */ this.$render("i-label", {
+      caption: "Back",
+      font: { size: "20px", bold: true, color: "#fff" }
+    })), /* @__PURE__ */ this.$render("i-hstack", {
       id: "networkElm",
       width: "100%",
-      height: "50vh",
+      height: 150,
       verticalAlignment: "center",
       horizontalAlignment: "center"
     }, /* @__PURE__ */ this.$render("i-label", {
@@ -6872,7 +7176,31 @@ var ModalConfig = class extends import_components12.Module {
       visible: false,
       id: "campaignElm",
       width: "100%"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      id: "wapperCampaignsButton",
+      verticalAlignment: "center"
     }, /* @__PURE__ */ this.$render("i-hstack", {
+      gap: 10,
+      margin: { bottom: 10 },
+      width: "100%",
+      verticalAlignment: "center",
+      horizontalAlignment: "space-between"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "listCampaignButton",
+      verticalAlignment: "center"
+    }), /* @__PURE__ */ this.$render("i-button", {
+      id: "btnAdd",
+      class: "btn-os",
+      margin: { left: "auto" },
+      caption: "Add Campaign",
+      onClick: this.onAddCampaign
+    })), /* @__PURE__ */ this.$render("i-panel", {
+      width: "100%",
+      height: 2,
+      margin: { bottom: 10 },
+      background: { color: "#6b6e7e" }
+    })), /* @__PURE__ */ this.$render("i-hstack", {
+      id: "wrapperNetworkElm",
       width: "100%",
       margin: { bottom: 10 },
       verticalAlignment: "center",
@@ -6887,9 +7215,46 @@ var ModalConfig = class extends import_components12.Module {
     }, /* @__PURE__ */ this.$render("i-panel", {
       id: "pnlInfoElm"
     }), /* @__PURE__ */ this.$render("i-hstack", {
-      margin: { top: 20 },
       horizontalAlignment: "center"
+    }, /* @__PURE__ */ this.$render("i-hstack", {
+      id: "groupBtnSaveElm",
+      gap: 10,
+      margin: { top: 20 },
+      verticalAlignment: "center",
+      horizontalAlignment: "center",
+      wrap: "wrap"
     }, /* @__PURE__ */ this.$render("i-button", {
+      id: "btnSave",
+      caption: "Save",
+      enabled: false,
+      width: 200,
+      maxWidth: "100%",
+      class: "btn-os",
+      onClick: this.onSave
+    }), /* @__PURE__ */ this.$render("i-button", {
+      id: "btnDownload",
+      caption: "Download JSON",
+      enabled: false,
+      width: 200,
+      maxWidth: "100%",
+      class: "btn-os",
+      onClick: () => this.onDownload()
+    })), /* @__PURE__ */ this.$render("i-hstack", {
+      id: "groupBtnDeployElm",
+      gap: 10,
+      margin: { top: 10 },
+      verticalAlignment: "center",
+      horizontalAlignment: "center",
+      wrap: "wrap"
+    }, /* @__PURE__ */ this.$render("i-vstack", {
+      width: "100%",
+      margin: { bottom: 10 },
+      verticalAlignment: "center",
+      horizontalAlignment: "start"
+    }, /* @__PURE__ */ this.$render("i-label", {
+      caption: "Note: You need to confirm on your wallet for each staking/reward!",
+      font: { size: "12px", color: "#f7d063" }
+    })), /* @__PURE__ */ this.$render("i-button", {
       id: "btnDeploy",
       caption: "Deploy",
       enabled: false,
@@ -6897,8 +7262,17 @@ var ModalConfig = class extends import_components12.Module {
       maxWidth: "100%",
       rightIcon: { spin: true, visible: false, fill: "#fff" },
       class: "btn-os",
-      onClick: this.onDeployCampaign
-    }))))));
+      onClick: () => this.onDeployCampaign()
+    }), /* @__PURE__ */ this.$render("i-button", {
+      id: "btnDeployDownload",
+      caption: "Deploy and Download JSON",
+      enabled: false,
+      width: 300,
+      maxWidth: "100%",
+      rightIcon: { spin: true, visible: false, fill: "#fff" },
+      class: "btn-os",
+      onClick: () => this.onDeployCampaign(true)
+    }))))))));
   }
 };
 ModalConfig = __decorateClass([

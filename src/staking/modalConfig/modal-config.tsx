@@ -1,5 +1,5 @@
-import { Button, Modal, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label } from '@ijstech/components';
-import { EventId, registerSendTxEvents } from '@staking/global';
+import { Button, Modal, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label, VStack } from '@ijstech/components';
+import { downloadJsonFile, EventId, registerSendTxEvents } from '@staking/global';
 import { Result } from '../../result';
 import './modal-config.css';
 import { CampaignConfig } from './campaign';
@@ -17,6 +17,11 @@ declare global {
 @customElements('modal-config')
 export class ModalConfig extends Module {
   private modalConfig: Modal;
+  private backElm: HStack;
+  private selectCampaignsElm: HStack;
+  private configCampaignsElm: Panel;
+  private wapperCampaignsButton: VStack;
+  private wrapperNetworkElm: HStack;
   private networkElm: HStack;
   private lbNetworkName: Label;
   private campaignElm: HStack;
@@ -26,8 +31,15 @@ export class ModalConfig extends Module {
   private currentCampaign = 0;
   private btnAdd: Button;
   private stakingResult: Result;
+  private groupBtnSaveElm: HStack;
+  private groupBtnDeployElm: HStack;
+  private btnSave: Button;
+  private btnDownload: Button;
   private btnDeploy: Button;
+  private btnDeployDownload: Button;
   private $eventBus: IEventBus;
+  private isNew: boolean;
+  private campaigns: {[chainId:number]: StakingCampaign[]};
   onConfigSave: any;
 
   constructor(parent?: Container, options?: any) {
@@ -59,12 +71,32 @@ export class ModalConfig extends Module {
     this.updateButton();
   }
 
+  private showInputCampaign = (isNew: boolean) => {
+    this.selectCampaignsElm.visible = false;
+    this.configCampaignsElm.visible = true;
+    this.wrapperNetworkElm.visible = isNew;
+    this.wapperCampaignsButton.visible = !isNew;
+    this.groupBtnSaveElm.visible = !isNew;
+    this.groupBtnDeployElm.visible = isNew;
+    this.isNew = isNew;
+    this.onAddCampaign();
+  }
+
+  private onBack = () => {
+    this.pnlInfoElm.clearInnerHTML();
+    this.listCampaignButton.clearInnerHTML();
+    this.campaignConfig = [];
+    this.selectCampaignsElm.visible = true;
+    this.configCampaignsElm.visible = false;
+  }
+
   private updateNetworkName = (chainId: number) => {
     const network = getNetworkInfo(chainId);
     this.lbNetworkName.caption = network ? network.name : 'Unknown Network';
   }
 
   showModal = async () => {
+    this.onBack();
     this.modalConfig.visible = true;
   }
 
@@ -107,35 +139,47 @@ export class ModalConfig extends Module {
     }
     const campaigns = [...this.campaignConfig];
     campaigns[idx] = new CampaignConfig();
+    campaigns[idx].isNew = this.isNew;
     this.campaignConfig = [...campaigns];
     this.pnlInfoElm.appendChild(this.campaignConfig[idx]);
     this.currentCampaign = idx;
   }
 
   private onAddCampaign = async () => {
-    // this.btnAdd.enabled = false;
     const idx = Number(this.campaignConfig.length);
-    // const pnl = await Panel.create({ position: 'relative' });
-    // pnl.classList.add('pnl-label');
-    // const icon = await Icon.create({ name: 'times', fill: '#0c1234', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
-    // icon.onClick = () => this.removeCampaign(idx);
-    // const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
-    // button.classList.add('btn-item', 'btn-active');
-    // button.onClick = () => this.onRenderCampaign(button, idx);
-    // const active = this.listCampaignButton.querySelector('.btn-active');
-    // if (active) {
-    //   active.classList.remove('btn-active');
-    // }
-    // pnl.appendChild(button);
-    // pnl.appendChild(icon);
-    // this.listCampaignButton.appendChild(pnl);
+    if (!this.isNew) {
+      this.btnAdd.enabled = false;
+      const pnl = await Panel.create({ position: 'relative' });
+      pnl.classList.add('pnl-label');
+      const icon = await Icon.create({ name: 'times', fill: '#0c1234', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+      icon.onClick = () => this.removeCampaign(idx);
+      const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
+      button.classList.add('btn-item', 'btn-active');
+      button.onClick = () => this.onRenderCampaign(button, idx);
+      const active = this.listCampaignButton.querySelector('.btn-active');
+      if (active) {
+        active.classList.remove('btn-active');
+      }
+      pnl.appendChild(button);
+      pnl.appendChild(icon);
+      this.listCampaignButton.appendChild(pnl);
+    }
     await this.addCampaign(idx);
-    // this.btnAdd.enabled = true;
+    if (!this.isNew) {
+      this.btnAdd.enabled = true;
+    }
   }
 
   private updateButton = () => {
-    if (this.btnDeploy.rightIcon.visible) return;
-    this.btnDeploy.enabled = this.checkValidation();
+    const valid = this.checkValidation();
+    if (this.isNew) {
+      if (this.btnDeploy.rightIcon.visible || this.btnDeployDownload.rightIcon.visible) return;
+      this.btnDeploy.enabled = valid;
+      this.btnDeployDownload.enabled = valid;
+    } else {
+      this.btnSave.enabled = valid;
+      this.btnDownload.enabled = valid;
+    }
   }
 
   private checkValidation = () => {
@@ -148,14 +192,14 @@ export class ModalConfig extends Module {
     return true;
   }
 
-  // private getStakingCampaignData = () => {
-  //   const campaignData: StakingCampaign[] = [];
-  //   for (const campaign of this.campaignConfig) {
-  //     const data = campaign.getData();
-  //     campaignData.push(data);
-  //   }
-  //   return campaignData;
-  // }
+  private getStakingCampaignData = () => {
+    const campaignData: StakingCampaign[] = [];
+    for (const campaign of this.campaignConfig) {
+      const data = campaign.getData();
+      campaignData.push(data);
+    }
+    return campaignData;
+  }
 
   private showResultMessage = (result: Result, status: 'warning' | 'success' | 'error', content?: string | Error) => {
     if (!result) return;
@@ -169,29 +213,63 @@ export class ModalConfig extends Module {
     result.showModal();
   }
 
-  private onDeployCampaign = async () => {
-    if (this.checkValidation()) {
+  private parseData = () => {
+    const arr = this.getStakingCampaignData();
+    this.campaigns = arr.reduce((result: any, currentValue: any) => {
+      (result[currentValue['chainId']] = result[currentValue['chainId']] || []).push(
+        currentValue
+      );
+      return result;
+    }, {});
+  }
+
+  private onSave = () => {
+    if (!this.isNew && this.checkValidation()) {
+      this.parseData();
+      const campaigns = { ...this.campaigns };
+      this.onConfigSave(campaigns);
+    }
+  }
+
+  private onDownload = (data?: any) => {
+    if (this.isNew) {
+      downloadJsonFile('campaign.json', { ...data });
+      return;
+    }
+    if (!this.isNew && this.checkValidation()) {
+      this.parseData();
+      const campaigns = { ...this.campaigns };
+      downloadJsonFile('campaign.json', campaigns);
+    }
+  }
+
+  private onDeployCampaign = async (isDownload?: boolean) => {
+    if (this.isNew && this.checkValidation()) {
       const campaign = this.campaignConfig[0].getData();
       const chainId = getChainId();
       let result: StakingCampaign | null;
+      const btn = isDownload ? this.btnDeployDownload : this.btnDeploy;
       this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
       const callBack = async (err: any, reply: any) => {
         if (err) {
           this.showResultMessage(this.stakingResult, 'error', err);
         } else {
           this.showResultMessage(this.stakingResult, 'success', reply);
-          this.btnDeploy.caption = 'Deploying';
+          this.backElm.classList.remove('cursor-pointer');
+          this.backElm.onClick = () => {};
+          this.btnDeployDownload.enabled = false;
           this.btnDeploy.enabled = false;
-          this.btnDeploy.rightIcon.visible = true;
+          btn.caption = isDownload ? 'Deploying And Downloading' : 'Deploying';
+          btn.rightIcon.visible = true;
         }
       };
 
       const confirmationCallBack = async (receipt: any) => {
-        if (result) {
-          this.btnDeploy.rightIcon.visible = false;
-          this.btnDeploy.caption = 'Deploy';
-          this.updateButton();
-        }
+        btn.rightIcon.visible = false;
+        btn.caption = isDownload ? 'Deploy and Download JSON' : 'Deploy';
+        this.updateButton();
+        this.backElm.classList.add('cursor-pointer');
+        this.backElm.onClick = () => this.onBack();
       };
 
       registerSendTxEvents({
@@ -203,6 +281,9 @@ export class ModalConfig extends Module {
       if (result) {
         this.stakingResult.closeModal();
         this.onConfigSave({[chainId]: [{ ...result }]});
+        if (isDownload) {
+          this.onDownload({ ...result });
+        }
       }
     }
   }
@@ -210,7 +291,6 @@ export class ModalConfig extends Module {
   init() {
     super.init();
     this.modalConfig.closeOnBackdropClick = false;
-    this.onAddCampaign();
     this.stakingResult = new Result();
     this.appendChild(this.stakingResult);
   }
@@ -225,33 +305,80 @@ export class ModalConfig extends Module {
         closeIcon={{ name: 'times' }}
       >
         <i-panel class="custom-scroll">
-          <i-hstack id="networkElm" width="100%" height="50vh" verticalAlignment="center" horizontalAlignment="center">
-            <i-label caption="Please connect with your network!" font={{ color: '#fff' }} />
+          <i-hstack gap={10} id="selectCampaignsElm" width="100%" height={150} verticalAlignment="center" horizontalAlignment="center">
+            <i-button caption="Add New Campaign" class="btn-os" onClick={() => this.showInputCampaign(true)} />
+            <i-button caption="Add Existing Campaigns" class="btn-os" onClick={() => this.showInputCampaign(false)} />
           </i-hstack>
-          <i-panel visible={false} id="campaignElm" width="100%">
-            {/* <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
-              <i-hstack id="listCampaignButton" verticalAlignment="center" />
-              <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={this.onAddCampaign} />
+          <i-panel id="configCampaignsElm" visible={false} width="100%">
+            <i-hstack id="backElm" gap={4} width="fit-content" margin={{ top: 5, bottom: 15, left: 'auto' }} verticalAlignment="center" class="cursor-pointer" onClick={this.onBack}>
+              <i-icon name="arrow-left" fill="#fff" width={20} height={20} />
+              <i-label caption="Back" font={{ size: '20px', bold: true, color: '#fff' }} />
             </i-hstack>
-            <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6b6e7e' }} /> */}
-            <i-hstack width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
-              <i-label id="lbNetworkName" font={{ color: '#f15e61', size: '20px', bold: true }} />
+            <i-hstack id="networkElm" width="100%" height={150} verticalAlignment="center" horizontalAlignment="center">
+              <i-label caption="Please connect with your network!" font={{ color: '#fff' }} />
             </i-hstack>
-            <i-vstack gap={10} verticalAlignment="center" class="main-content">
-              <i-panel id="pnlInfoElm" />
-              <i-hstack margin={{ top: 20 }} horizontalAlignment="center">
-                <i-button
-                  id="btnDeploy"
-                  caption="Deploy"
-                  enabled={false}
-                  width={200}
-                  maxWidth="100%"
-                  rightIcon={{ spin: true, visible: false, fill: '#fff' }}
-                  class="btn-os"
-                  onClick={this.onDeployCampaign}
-                />
+            <i-panel visible={false} id="campaignElm" width="100%">
+              <i-vstack id="wapperCampaignsButton" verticalAlignment="center">
+                <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
+                  <i-hstack id="listCampaignButton" verticalAlignment="center" />
+                  <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={this.onAddCampaign} />
+                </i-hstack>
+                <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6b6e7e' }} />
+              </i-vstack>
+              <i-hstack id="wrapperNetworkElm" width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
+                <i-label id="lbNetworkName" font={{ color: '#f15e61', size: '20px', bold: true }} />
               </i-hstack>
-            </i-vstack>
+              <i-vstack gap={10} verticalAlignment="center" class="main-content">
+                <i-panel id="pnlInfoElm" />
+                <i-hstack horizontalAlignment="center">
+                  <i-hstack id="groupBtnSaveElm" gap={10} margin={{ top: 20 }} verticalAlignment="center" horizontalAlignment="center" wrap="wrap">
+                    <i-button
+                      id="btnSave"
+                      caption="Save"
+                      enabled={false}
+                      width={200}
+                      maxWidth="100%"
+                      class="btn-os"
+                      onClick={this.onSave}
+                    />
+                    <i-button
+                      id="btnDownload"
+                      caption="Download JSON"
+                      enabled={false}
+                      width={200}
+                      maxWidth="100%"
+                      class="btn-os"
+                      onClick={() => this.onDownload()}
+                    />
+                  </i-hstack>
+                  <i-hstack id="groupBtnDeployElm" gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center" wrap="wrap">
+                    <i-vstack width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="start">
+                      <i-label caption="Note: You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: '#f7d063' }} />
+                    </i-vstack>
+                    <i-button
+                      id="btnDeploy"
+                      caption="Deploy"
+                      enabled={false}
+                      width={200}
+                      maxWidth="100%"
+                      rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+                      class="btn-os"
+                      onClick={() => this.onDeployCampaign()}
+                    />
+                    <i-button
+                      id="btnDeployDownload"
+                      caption="Deploy and Download JSON"
+                      enabled={false}
+                      width={300}
+                      maxWidth="100%"
+                      rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+                      class="btn-os"
+                      onClick={() => this.onDeployCampaign(true)}
+                    />
+                  </i-hstack>
+                </i-hstack>
+              </i-vstack>
+            </i-panel>
           </i-panel>
         </i-panel>
       </i-modal>

@@ -1,4 +1,4 @@
-import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application } from '@ijstech/components';
+import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label } from '@ijstech/components';
 import { EventId } from '@staking/global';
 import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
 import { StakingConfig } from './staking';
@@ -31,6 +31,8 @@ export class CampaignConfig extends Module {
 	private inputCountdownBg: Input;
 	private inputStakingBg: Input;
 	private inputStakingBtn: Input;
+	private _isNew: boolean;
+	private wapperNetworkElm: HStack;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -42,50 +44,66 @@ export class CampaignConfig extends Module {
 		}
 	}
 
-	// renderNetworkButton = async () => {
-	// 	const vstack = await VStack.create({ gap: 8 });
-	// 	const dropdownModal = await Modal.create({
-	// 		showBackdrop: false,
-	// 		width: '100%',
-	// 		maxWidth: 300,
-	// 		popupPlacement: 'bottom',
-	// 	});
-	// 	const networkObj = Networks.find(f => f.chainId === this.network);
-	// 	const btnNetwork = await Button.create({
-	// 		caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
-	// 		font: { color: '#fff' },
-	// 		background: { color: '#0c1234' },
-	// 		border: { style: 'none', radius: 12 },
-	// 		padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
-	// 		rightIcon: { name: 'caret-down', fill: '#f15e61' },
-	// 		width: '100%',
-	// 		height: 40,
-	// 		maxWidth: 300,
-	// 	});
-	// 	btnNetwork.classList.add('btn-select');
-	// 	btnNetwork.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
-	// 	for (const network of Networks) {
-	// 		const dropdownItem = await Button.create({
-	// 			caption: `${network.name} (${network.chainId})`,
-	// 			background: { color: 'transparent' },
-	// 			height: 36,
-	// 		});
-	// 		dropdownItem.onClick = () => {
-	// 			dropdownModal.visible = false;
-	// 			btnNetwork.caption = `${network.name} (${network.chainId})`;
-	// 			this.network = network.chainId;
-	// 			for (const elm of this.stakingConfig) {
-	// 				elm.chainId = this.network;
-	// 			}
-	// 			this.emitInput();
-	// 		};
-	// 		vstack.appendChild(dropdownItem);
-	// 	}
-	// 	dropdownModal.item = vstack;
-	// 	this.networkSelection.clearInnerHTML();
-	// 	this.networkSelection.appendChild(btnNetwork);
-	// 	this.networkSelection.appendChild(dropdownModal);
-	// }
+	set isNew(value: boolean) {
+		this._isNew = value;
+		this.setupInput();
+	}
+
+	get isNew() {
+		return this._isNew;
+	}
+
+	private setupInput = () => {
+		if (this.wapperNetworkElm) {
+			this.wapperNetworkElm.visible = !this.isNew;
+		}
+	}
+
+	renderNetworkButton = async () => {
+		const vstack = await VStack.create({ gap: 8 });
+		const dropdownModal = await Modal.create({
+			showBackdrop: false,
+			width: '100%',
+			maxWidth: 300,
+			popupPlacement: 'bottom',
+		});
+		const listNetwork = Networks.filter(f => !f.isDisabled);
+		const networkObj = listNetwork.find(f => f.chainId === this.network);
+		const btnNetwork = await Button.create({
+			caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
+			font: { color: '#fff' },
+			background: { color: '#0c1234' },
+			border: { style: 'none', radius: 12 },
+			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
+			rightIcon: { name: 'caret-down', fill: '#f15e61' },
+			width: '100%',
+			height: 40,
+			maxWidth: 300,
+		});
+		btnNetwork.classList.add('btn-select');
+		btnNetwork.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
+		for (const network of listNetwork) {
+			const dropdownItem = await Button.create({
+				caption: `${network.name} (${network.chainId})`,
+				background: { color: 'transparent' },
+				height: 36,
+			});
+			dropdownItem.onClick = () => {
+				dropdownModal.visible = false;
+				btnNetwork.caption = `${network.name} (${network.chainId})`;
+				this.network = network.chainId;
+				for (const elm of this.stakingConfig) {
+					elm.chainId = this.network;
+				}
+				this.emitInput();
+			};
+			vstack.appendChild(dropdownItem);
+		}
+		dropdownModal.item = vstack;
+		this.networkSelection.clearInnerHTML();
+		this.networkSelection.appendChild(btnNetwork);
+		this.networkSelection.appendChild(dropdownModal);
+	}
 
 	private onRenderStaking = (button: Button, idx: number) => {
 		for (const elm of this.stakingConfig) {
@@ -123,9 +141,12 @@ export class CampaignConfig extends Module {
 		}
 		const stakings = [...this.stakingConfig];
 		stakings[idx] = new StakingConfig();
+		stakings[idx].isNew = this.isNew;
 		this.stakingConfig = [...stakings];
 		this.pnlInfoElm.appendChild(this.stakingConfig[idx]);
-		// this.stakingConfig[idx].chainId = this.network;
+		if (!this.isNew) {
+			this.stakingConfig[idx].chainId = this.network;
+		}
 		this.currentStaking = idx;
 		this.emitInput();
 	}
@@ -184,6 +205,7 @@ export class CampaignConfig extends Module {
 
 	getData = () => {
 		const campaign: StakingCampaign = {
+			chainId: this.network,
 			customName: this.inputName.value,
 			customDesc: this.inputDesc.value || undefined,
 			getTokenURL: this.inputURL.value || undefined,
@@ -204,20 +226,21 @@ export class CampaignConfig extends Module {
 		this.network = getChainId() || getDefaultChainId();
 		super.init();
 		this.onAddStaking();
-		// this.renderNetworkButton();
+		this.renderNetworkButton();
+		this.setupInput();
 	}
 
 	render() {
 		return (
 			<i-panel class="custom-scroll">
 				<i-vstack gap={10} verticalAlignment="center" class="main-content">
-					{/* <i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack id="wapperNetworkElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Network" />
 							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
 						</i-hstack>
 						<i-panel id="networkSelection" class="network-selection" width="calc(100% - 190px)" />
-					</i-hstack> */}
+					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign Name" />

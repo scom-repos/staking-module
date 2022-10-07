@@ -1,6 +1,6 @@
-import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application } from '@ijstech/components';
+import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
+import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
@@ -33,6 +33,11 @@ export class StakingConfig extends Module {
 	private inputMaxTotalLock: Input;
 	private inputDesc: Input;
 	private inputDecimalsOffset: Input;
+	private wrapperAddressElm: HStack;
+	private _isNew: boolean;
+	private inputAddress: Input;
+	private lbAddressErr: Label;
+	private isAddressValid: boolean;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -49,6 +54,21 @@ export class StakingConfig extends Module {
 
 	get chainId() {
 		return this._chainId || getChainId() || getDefaultChainId();
+	}
+
+	set isNew(value: boolean) {
+		this._isNew = value;
+		this.setupInput();
+	}
+
+	get isNew() {
+		return this._isNew;
+	}
+
+	private setupInput = () => {
+		if (this.wrapperAddressElm) {
+			this.wrapperAddressElm.visible = !this.isNew;
+		}
 	}
 
 	renderTypeButton = async () => {
@@ -128,8 +148,12 @@ export class StakingConfig extends Module {
 		}
 		const rewards = [...this.rewardConfig];
 		rewards[idx] = new RewardConfig();
+		rewards[idx].isNew = this.isNew;
 		this.rewardConfig = [...rewards];
 		this.pnlInfoElm.appendChild(this.rewardConfig[idx]);
+		if (!this.isNew) {
+			this.rewardConfig[idx].chainId = this.chainId;
+		}
 		this.currentReward = idx;
 		this.emitInput();
 	}
@@ -157,6 +181,12 @@ export class StakingConfig extends Module {
 
 	private emitInput = () => {
 		application.EventBus.dispatch(EventId.EmitInput);
+	}
+
+	private onInputAddress = async () => {
+		this.isAddressValid = await isAddressValid(this.inputAddress.value);
+		this.lbAddressErr.visible = !this.isAddressValid;
+		this.emitInput();
 	}
 
 	private onInputToken = (token: ITokenObject) => {
@@ -194,7 +224,8 @@ export class StakingConfig extends Module {
 			isValidNumber(this.inputEntryEnd.value) &&
 			isValidNumber(this.inputPerAddressCap.value) &&
 			isValidNumber(this.inputMaxTotalLock.value) &&
-			this.isRewardValid()
+			(this.isNew || this.isAddressValid) &&
+			this.isRewardValid();
 	}
 
 	getRewardData = () => {
@@ -209,6 +240,7 @@ export class StakingConfig extends Module {
 	getData = () => {
 		const offset = Number(this.inputDecimalsOffset.value);
 		const staking: Staking = {
+			address: this.inputAddress.value,
 			lockTokenAddress: this.token?.address || this.token?.symbol || '',
 			minLockTime: new BigNumber(this.inputMinLockTime.value),
 			entryStart: new BigNumber(this.inputEntryStart.value),
@@ -230,12 +262,23 @@ export class StakingConfig extends Module {
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
 		this.onAddReward();
 		this.renderTypeButton();
+		this.setupInput();
 	}
 
 	render() {
 		return (
 			<i-panel class="custom-scroll">
 				<i-vstack gap={10} verticalAlignment="center" class="main-content">
+					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Address" />
+							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
+							<i-input id="inputAddress" class="input-text w-100" onChanged={this.onInputAddress} />
+							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: '#f15e61', size: '12px' }} />
+						</i-vstack>
+					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Lock Token Address" />
