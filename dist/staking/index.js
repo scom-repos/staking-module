@@ -4037,6 +4037,7 @@
         button.onClick = () => this.closeModal();
         mainSection.appendChild(button);
       }
+      this.mainContent.clearInnerHTML();
       this.mainContent.appendChild(mainSection);
     }
     async onErrMsgChanged() {
@@ -5359,33 +5360,32 @@
 
   // src/staking/modalConfig/modal-config.css.ts
   var import_components6 = __toModule(__require("@ijstech/components"));
+  var Theme = import_components6.Styles.Theme.ThemeVars;
   import_components6.Styles.cssRule(".modal-config", {
     $nest: {
       ".i-modal_header": {
-        borderBottom: "2px solid #f15e61",
+        borderBottom: `2px solid ${Theme.colors.primary.main}`,
         paddingBottom: 12,
         marginBottom: 16,
         $nest: {
           "span": {
-            color: "#f15e61",
+            color: Theme.colors.primary.main,
             fontWeight: "bold",
             fontSize: 20
           },
           "i-icon": {
             height: "20px !important",
             width: "20px !important",
-            fill: "#f15e61 !important",
+            fill: `${Theme.colors.primary.main} !important`,
             display: "none"
           }
         }
       },
       ".modal": {
-        background: "#192046",
         width: 800,
         maxWidth: "100%",
         borderRadius: "1rem",
-        padding: "1.5rem 1rem",
-        color: "#fff"
+        padding: "1.5rem 1rem"
       },
       "i-button": {
         padding: "6px 12px",
@@ -5403,12 +5403,12 @@
         }
       },
       ".btn-item": {
-        background: "#59595e !important",
+        background: `${Theme.colors.secondary.main} !important`,
         borderRadius: 0,
-        color: "#fff",
+        color: Theme.colors.primary.contrastText,
         $nest: {
           "&.btn-active": {
-            background: "#FF8800 !important",
+            background: `${Theme.colors.primary.main} !important`,
             cursor: "default"
           }
         }
@@ -5433,7 +5433,7 @@
         height: "80px !important",
         borderRadius: 12,
         padding: 8,
-        background: "#0c1234",
+        background: Theme.background.paper,
         $nest: {
           "textarea": {
             width: "100% !important",
@@ -5442,7 +5442,7 @@
             boxShadow: "none",
             outline: "none",
             border: "none",
-            color: "#fff",
+            color: Theme.colors.primary.contrastText,
             fontSize: "1rem"
           }
         }
@@ -5452,7 +5452,7 @@
         height: "40px !important",
         borderRadius: 12,
         paddingInline: 8,
-        background: "#0c1234",
+        background: Theme.background.paper,
         $nest: {
           "&.w-100": {
             width: "100% !important"
@@ -5462,7 +5462,7 @@
             width: "100% !important",
             height: "100% !important",
             backgroundColor: "transparent",
-            color: "#fff",
+            color: Theme.colors.primary.contrastText,
             fontSize: "1rem",
             textAlign: "left"
           }
@@ -5472,18 +5472,18 @@
         $nest: {
           ".lb-title > *": {
             fontSize: "1rem",
-            color: "#fff"
+            color: Theme.colors.primary.contrastText
           }
         }
       },
       ".network-selection": {
         $nest: {
           ".btn-select:hover": {
-            background: "#0c112c !important"
+            background: `${Theme.action.active} !important`
           },
           ".modal": {
             padding: "0.75rem 0",
-            background: "#484860",
+            background: Theme.background.paper,
             borderRadius: 0,
             $nest: {
               "& > i-vstack": {
@@ -5492,18 +5492,18 @@
               },
               "i-button": {
                 boxShadow: "none",
-                color: "#fff"
+                color: Theme.colors.primary.contrastText
               },
               "i-button:hover": {
-                background: "#26262a !important"
+                background: `${Theme.action.hover} !important`
               }
             }
           }
         }
       },
       "i-checkbox .checkmark": {
-        backgroundColor: "#0c1234",
-        border: "1px solid #484860",
+        backgroundColor: Theme.background.paper,
+        border: `1px solid ${Theme.colors.primary.light}`,
         borderRadius: 6,
         width: 20,
         height: 20,
@@ -5515,7 +5515,7 @@
         }
       },
       "i-checkbox.is-checked .checkmark": {
-        backgroundColor: "#FD4A4C"
+        backgroundColor: Theme.colors.secondary.light
       },
       ".cursor-pointer": {
         cursor: "pointer"
@@ -5529,7 +5529,7 @@
             width: "5px"
           },
           "&::-webkit-scrollbar-thumb": {
-            background: "#f15e61",
+            background: Theme.colors.primary.main,
             borderRadius: "5px"
           }
         }
@@ -5564,6 +5564,7 @@
 
   // src/token-selection/tokenSelection.css.ts
   var import_components7 = __toModule(__require("@ijstech/components"));
+  var Theme2 = import_components7.Styles.Theme.ThemeVars;
   import_components7.Styles.cssRule(".token-selection", {
     $nest: {
       "i-icon": {
@@ -5573,26 +5574,27 @@
         display: "none"
       },
       "::-webkit-scrollbar-track": {
-        background: "#FFB82F"
+        background: Theme2.colors.secondary.main
       },
       "::-webkit-scrollbar": {
         width: "5px"
       },
       "::-webkit-scrollbar-thumb": {
-        background: "#f7d063",
+        background: Theme2.colors.primary.main,
         borderRadius: "5px"
       },
       "#btnToken": {
         alignItems: "center",
         justifyContent: "start",
         boxShadow: "none",
+        background: Theme2.background.paper,
         $nest: {
           "&:hover": {
-            background: "#0c1234",
-            opacity: 0.9
+            background: Theme2.action.active,
+            opacity: 0.8
           },
           "&.disabled": {
-            background: "#0c1234",
+            background: Theme2.action.disabled,
             opacity: 0.6
           },
           "span": {
@@ -5647,6 +5649,7 @@
   });
 
   // src/token-selection/tokenSelection.tsx
+  var Theme3 = import_components8.Styles.Theme.ThemeVars;
   var TokenSelection = class extends import_components8.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -5691,7 +5694,7 @@
           url: logoAddress
         }), /* @__PURE__ */ this.$render("i-label", {
           caption: `${token.symbol} ${token.address ? `(${token.address})` : ""}`,
-          font: { size: "16px", color: "#fff", name: "Proxima Nova" }
+          font: { size: "16px", color: Theme3.colors.primary.contrastText, name: "Proxima Nova" }
         }))));
       };
       this.renderTokenItems = async () => {
@@ -5703,7 +5706,7 @@
           this.tokenList.append(...tokenItems);
         } else {
           this.tokenList.append(/* @__PURE__ */ this.$render("i-label", {
-            font: { color: "#fff" },
+            font: { color: Theme3.colors.primary.contrastText },
             margin: { top: 10, bottom: 16 },
             class: "text-center",
             caption: "No tokens found"
@@ -5740,13 +5743,13 @@
           }
           if (!token) {
             btnToken.caption = "Select Token";
-            btnToken.font = { size: "16px", color: "#A8A8A8" };
+            btnToken.font = { size: "16px", color: Theme3.colors.primary.contrastText };
             if (image) {
               btnToken.removeChild(image);
             }
           } else {
             btnToken.caption = `${token.symbol} ${token.address ? `(${token.address})` : ""}`;
-            btnToken.font = { size: "16px", color: "#fff" };
+            btnToken.font = { size: "16px", color: Theme3.colors.primary.contrastText };
             const logoAddress = import_assets4.default.fullPath((0, import_store4.getTokenIconPath)(token, this.chainId));
             if (!image) {
               image = new import_components8.Image(btnToken, {
@@ -5793,7 +5796,7 @@
       return this._chainId || (0, import_store4.getChainId)() || (0, import_store4.getDefaultChainId)();
     }
     get tokenDataList() {
-      const tokenList = (0, import_store4.getTokenList)(this.chainId);
+      const tokenList = (0, import_store4.getTokenList)(this.chainId).filter((token) => token.address);
       return tokenList.map((token) => {
         const tokenObject = __spreadValues({}, token);
         const nativeToken = import_store4.ChainNativeTokenByChainId[this.chainId];
@@ -5811,11 +5814,11 @@
         display: "flex",
         width: "100%",
         height: 40,
-        background: { color: "#0c1234" },
-        font: { size: "16px", color: "#fff" },
+        background: { color: Theme3.background.main },
+        font: { size: "16px", color: Theme3.colors.primary.contrastText },
         padding: { left: "1rem", right: "1rem" },
         border: { radius: 16 },
-        rightIcon: { name: "caret-down", fill: "#f15e61", width: 16, height: 16 },
+        rightIcon: { name: "caret-down", fill: Theme3.colors.primary.main, width: 16, height: 16 },
         caption: "Select Token",
         onClick: () => this.showModal()
       }), /* @__PURE__ */ this.$render("i-modal", {
@@ -5838,6 +5841,7 @@
   var import_components9 = __toModule(__require("@ijstech/components"));
   var import_eth_wallet2 = __toModule(__require("@ijstech/eth-wallet"));
   var import_global3 = __toModule(__require("@staking/global"));
+  var Theme4 = import_components9.Styles.Theme.ThemeVars;
   var RewardConfig = class extends import_components9.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -5879,10 +5883,10 @@
         return this.token && this.isAdminValid && (0, import_global3.isValidNumber)(this.inputMultiplier.value) && (0, import_global3.isValidNumber)(this.inputInitialReward.value) && (0, import_global3.isValidNumber)(this.inputVestingPeriod.value) && (0, import_global3.isValidNumber)(this.inputClaimDeadline.value) && (this.isNew || this.isAddressValid);
       };
       this.getData = () => {
-        var _a, _b;
+        var _a;
         const reward = {
           address: this.inputAddress.value,
-          rewardTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || ((_b = this.token) == null ? void 0 : _b.symbol) || "",
+          rewardTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
           multiplier: new import_eth_wallet2.BigNumber(this.inputMultiplier.value),
           initialReward: new import_eth_wallet2.BigNumber(this.inputInitialReward.value),
           vestingPeriod: new import_eth_wallet2.BigNumber(this.inputVestingPeriod.value),
@@ -5931,7 +5935,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         width: "calc(100% - 190px)",
@@ -5944,7 +5948,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: "#f15e61", size: "12px" }
+        font: { color: Theme4.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -5957,7 +5961,7 @@
         caption: "Reward Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         width: "calc(100% - 190px)"
@@ -5973,7 +5977,7 @@
         caption: "Multiplier"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMultiplier",
         inputType: "number",
@@ -5991,7 +5995,7 @@
         caption: "Initial Reward"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputInitialReward",
         inputType: "number",
@@ -6009,7 +6013,7 @@
         caption: "Vesting Period"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputVestingPeriod",
         placeholder: "Second",
@@ -6028,7 +6032,7 @@
         caption: "Claim Deadline"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputClaimDeadline",
         placeholder: "Unix",
@@ -6047,7 +6051,7 @@
         caption: "Admin"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme4.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         width: "calc(100% - 190px)",
@@ -6060,7 +6064,7 @@
         id: "lbErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: "#f15e61", size: "12px" }
+        font: { color: Theme4.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -6084,6 +6088,7 @@
   ], RewardConfig);
 
   // src/staking/modalConfig/staking.tsx
+  var Theme5 = import_components10.Styles.Theme.ThemeVars;
   var StakingConfig = class extends import_components10.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -6106,11 +6111,11 @@
         this.lockType = (_a = import_store5.LockTokenTypeList[0]) == null ? void 0 : _a.value;
         const btnType = await import_components10.Button.create({
           caption: import_store5.LockTokenTypeList[0] ? import_store5.LockTokenTypeList[0].name : "Select Type",
-          font: { color: "#fff" },
-          background: { color: "#0c1234" },
+          font: { color: Theme5.colors.primary.contrastText },
+          background: { color: Theme5.background.paper },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: "#f15e61" },
+          rightIcon: { name: "caret-down", fill: Theme5.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 300
@@ -6185,7 +6190,7 @@
         const idx = Number(this.rewardConfig.length);
         const pnl = await import_components10.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components10.Icon.create({ name: "times", fill: "#0c1234", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components10.Icon.create({ name: "times", fill: Theme5.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeReward(idx);
         const button = await import_components10.Button.create({ caption: `Reward ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item", "btn-active");
@@ -6245,11 +6250,11 @@
         return rewardData;
       };
       this.getData = () => {
-        var _a, _b;
+        var _a;
         const offset = Number(this.inputDecimalsOffset.value);
         const staking = {
           address: this.inputAddress.value,
-          lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || ((_b = this.token) == null ? void 0 : _b.symbol) || "",
+          lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
           minLockTime: new import_eth_wallet3.BigNumber(this.inputMinLockTime.value),
           entryStart: new import_eth_wallet3.BigNumber(this.inputEntryStart.value),
           entryEnd: new import_eth_wallet3.BigNumber(this.inputEntryEnd.value),
@@ -6310,7 +6315,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         width: "calc(100% - 190px)",
@@ -6323,7 +6328,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: "#f15e61", size: "12px" }
+        font: { color: Theme5.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -6336,7 +6341,7 @@
         caption: "Lock Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         width: "calc(100% - 190px)"
@@ -6352,7 +6357,7 @@
         caption: "Min Lock Time"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMinLockTime",
         placeholder: "Second",
@@ -6371,7 +6376,7 @@
         caption: "Entry Start"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputEntryStart",
         placeholder: "Unix",
@@ -6390,7 +6395,7 @@
         caption: "Entry End"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputEntryEnd",
         placeholder: "Unix",
@@ -6409,7 +6414,7 @@
         caption: "Per Address Cap"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputPerAddressCap",
         inputType: "number",
@@ -6427,7 +6432,7 @@
         caption: "Max Total Lock"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMaxTotalLock",
         inputType: "number",
@@ -6455,7 +6460,7 @@
         caption: "Lock Token Type"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme5.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "typeSelection",
         class: "network-selection",
@@ -6491,7 +6496,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: "#6b6e7e" }
+        background: { color: Theme5.colors.primary.light }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       })));
@@ -6502,6 +6507,7 @@
   ], StakingConfig);
 
   // src/staking/modalConfig/campaign.tsx
+  var Theme6 = import_components11.Styles.Theme.ThemeVars;
   var CampaignConfig = class extends import_components11.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -6524,11 +6530,11 @@
         const networkObj = listNetwork.find((f) => f.chainId === this.network);
         const btnNetwork = await import_components11.Button.create({
           caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
-          font: { color: "#fff" },
-          background: { color: "#0c1234" },
+          font: { color: Theme6.colors.primary.contrastText },
+          background: { color: Theme6.background.paper },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: "#f15e61" },
+          rightIcon: { name: "caret-down", fill: Theme6.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 300
@@ -6607,7 +6613,7 @@
         const idx = Number(this.stakingConfig.length);
         const pnl = await import_components11.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components11.Icon.create({ name: "times", fill: "#0c1234", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components11.Icon.create({ name: "times", fill: Theme6.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeStaking(idx);
         const button = await import_components11.Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item", "btn-active");
@@ -6706,7 +6712,7 @@
         caption: "Network"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme6.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "networkSelection",
         class: "network-selection",
@@ -6723,7 +6729,7 @@
         caption: "Campaign Name"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: "#f15e61", size: "16px" }
+        font: { color: Theme6.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputName",
         class: "input-text",
@@ -6870,7 +6876,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: "#6b6e7e" }
+        background: { color: Theme6.colors.primary.light }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       })));
@@ -6883,6 +6889,7 @@
   // src/staking/modalConfig/modal-config.tsx
   var import_store7 = __toModule(__require("@staking/store"));
   var import_staking_utils2 = __toModule(__require("@staking/staking-utils"));
+  var Theme7 = import_components12.Styles.Theme.ThemeVars;
   var ModalConfig = class extends import_components12.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -6980,7 +6987,7 @@
           this.btnAdd.enabled = false;
           const pnl = await import_components12.Panel.create({ position: "relative" });
           pnl.classList.add("pnl-label");
-          const icon = await import_components12.Icon.create({ name: "times", fill: "#0c1234", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+          const icon = await import_components12.Icon.create({ name: "times", fill: Theme7.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
           icon.onClick = () => this.removeCampaign(idx);
           const button = await import_components12.Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
           button.classList.add("btn-item", "btn-active");
@@ -7087,6 +7094,8 @@
             }
           };
           const confirmationCallBack = async (receipt) => {
+            if (!result)
+              return;
             btn.rightIcon.visible = false;
             btn.caption = isDownload ? "Deploy and Download JSON" : "Deploy";
             this.updateButton();
@@ -7101,6 +7110,7 @@
           if (result) {
             this.stakingResult.closeModal();
             this.onConfigSave({ [chainId]: [__spreadValues({}, result)] });
+            confirmationCallBack(true);
             if (isDownload) {
               this.onDownload(__spreadValues({}, result));
             }
@@ -7154,12 +7164,12 @@
         onClick: this.onBack
       }, /* @__PURE__ */ this.$render("i-icon", {
         name: "arrow-left",
-        fill: "#fff",
+        fill: Theme7.colors.primary.contrastText,
         width: 20,
         height: 20
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Back",
-        font: { size: "20px", bold: true, color: "#fff" }
+        font: { size: "20px", bold: true, color: Theme7.colors.primary.contrastText }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "networkElm",
         width: "100%",
@@ -7168,7 +7178,7 @@
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         caption: "Please connect with your network!",
-        font: { color: "#fff" }
+        font: { color: Theme7.colors.primary.contrastText }
       })), /* @__PURE__ */ this.$render("i-panel", {
         visible: false,
         id: "campaignElm",
@@ -7195,7 +7205,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: "#6b6e7e" }
+        background: { color: Theme7.colors.primary.light }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperNetworkElm",
         width: "100%",
@@ -7204,7 +7214,7 @@
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         id: "lbNetworkName",
-        font: { color: "#f15e61", size: "20px", bold: true }
+        font: { color: Theme7.colors.primary.main, size: "20px", bold: true }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -7250,14 +7260,14 @@
         horizontalAlignment: "start"
       }, /* @__PURE__ */ this.$render("i-label", {
         caption: "Note: You need to confirm on your wallet for each staking/reward!",
-        font: { size: "12px", color: "#f7d063" }
+        font: { size: "12px", color: Theme7.colors.secondary.main }
       })), /* @__PURE__ */ this.$render("i-button", {
         id: "btnDeploy",
         caption: "Deploy",
         enabled: false,
         width: 200,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: "#fff" },
+        rightIcon: { spin: true, visible: false, fill: Theme7.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign()
       }), /* @__PURE__ */ this.$render("i-button", {
@@ -7266,7 +7276,7 @@
         enabled: false,
         width: 300,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: "#fff" },
+        rightIcon: { spin: true, visible: false, fill: Theme7.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign(true)
       }))))))));
