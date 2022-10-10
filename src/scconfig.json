@@ -1,13 +1,13 @@
 {
   "name": "@staking/main",
   "version": "0.1.0",
-  "main": "{root}/demo/index.js",
+  "main": "{root}/staking/index.js",
   "env": "mainnet",
   "routes": [
     {
       "url": "#/staking",
       "default": true,
-      "module": "./demo/index.js"
+      "module": "./staking/index.js"
     }
   ],
   "menuItems": [
@@ -23,7 +23,6 @@
     "@staking/assets": "{root}/assets/index.js",
     "@staking/global": "{root}/global/index.js",
     "@staking/store": "{root}/store/index.js",
-    "@staking/staking-utils": "{root}/staking-utils/index.js",
-    "@staking/staking": "{root}/staking/index.js"
+    "@staking/staking-utils": "{root}/staking-utils/index.js"
   }
 }
