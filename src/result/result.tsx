@@ -201,7 +201,7 @@ export class Result extends Module {
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);
     }
-
+    this.mainContent.clearInnerHTML();
     this.mainContent.appendChild(mainSection);
   }
 

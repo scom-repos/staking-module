@@ -1,8 +1,9 @@
-import { Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
+import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { Reward } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -101,7 +102,7 @@ export class RewardConfig extends Module {
 	getData = () => {
 		const reward: Reward = {
 			address: this.inputAddress.value,
-			rewardTokenAddress: this.token?.address || this.token?.symbol || '',
+			rewardTokenAddress: this.token?.address || '',
 			multiplier: new BigNumber(this.inputMultiplier.value),
 			initialReward: new BigNumber(this.inputInitialReward.value),
 			vestingPeriod: new BigNumber(this.inputVestingPeriod.value),
@@ -127,56 +128,56 @@ export class RewardConfig extends Module {
 					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Address" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
 							<i-input id="inputAddress" class="input-text w-100" onChanged={this.onInputAddress} />
-							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: '#f15e61', size: '12px' }} />
+							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Token Address" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-panel id="pnlTokenSelection" width="calc(100% - 190px)" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Multiplier" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMultiplier" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Initial Reward" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputInitialReward" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Vesting Period" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputVestingPeriod" placeholder="Second" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Claim Deadline" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputClaimDeadline" placeholder="Unix" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Admin" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
 							<i-input id="inputAdmin" class="input-text w-100" onChanged={this.onInputAdmin} />
-							<i-label id="lbErr" visible={false} caption="The address is invalid!" font={{ color: '#f15e61', size: '12px' }} />
+							<i-label id="lbErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">

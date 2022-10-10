@@ -1,11 +1,11 @@
-import { Button, Modal, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label, VStack } from '@ijstech/components';
+import { Styles, Button, Modal, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label, VStack } from '@ijstech/components';
 import { downloadJsonFile, EventId, registerSendTxEvents } from '@staking/global';
 import { Result } from '../../result';
 import './modal-config.css';
 import { CampaignConfig } from './campaign';
 import { getChainId, getNetworkInfo, isWalletConnected, StakingCampaign } from '@staking/store';
 import { deployCampaign } from '@staking/staking-utils';
-
+const Theme = Styles.Theme.ThemeVars;
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -151,7 +151,7 @@ export class ModalConfig extends Module {
       this.btnAdd.enabled = false;
       const pnl = await Panel.create({ position: 'relative' });
       pnl.classList.add('pnl-label');
-      const icon = await Icon.create({ name: 'times', fill: '#0c1234', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+      const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
       icon.onClick = () => this.removeCampaign(idx);
       const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
       button.classList.add('btn-item', 'btn-active');
@@ -265,6 +265,7 @@ export class ModalConfig extends Module {
       };
 
       const confirmationCallBack = async (receipt: any) => {
+        if (!result) return;
         btn.rightIcon.visible = false;
         btn.caption = isDownload ? 'Deploy and Download JSON' : 'Deploy';
         this.updateButton();
@@ -281,6 +282,7 @@ export class ModalConfig extends Module {
       if (result) {
         this.stakingResult.closeModal();
         this.onConfigSave({[chainId]: [{ ...result }]});
+        confirmationCallBack(true)
         if (isDownload) {
           this.onDownload({ ...result });
         }
@@ -311,11 +313,11 @@ export class ModalConfig extends Module {
           </i-hstack>
           <i-panel id="configCampaignsElm" visible={false} width="100%">
             <i-hstack id="backElm" gap={4} width="fit-content" margin={{ top: 5, bottom: 15, left: 'auto' }} verticalAlignment="center" class="cursor-pointer" onClick={this.onBack}>
-              <i-icon name="arrow-left" fill="#fff" width={20} height={20} />
-              <i-label caption="Back" font={{ size: '20px', bold: true, color: '#fff' }} />
+              <i-icon name="arrow-left" fill={Theme.colors.primary.contrastText} width={20} height={20} />
+              <i-label caption="Back" font={{ size: '20px', bold: true, color: Theme.colors.primary.contrastText }} />
             </i-hstack>
             <i-hstack id="networkElm" width="100%" height={150} verticalAlignment="center" horizontalAlignment="center">
-              <i-label caption="Please connect with your network!" font={{ color: '#fff' }} />
+              <i-label caption="Please connect with your network!" font={{ color: Theme.colors.primary.contrastText }} />
             </i-hstack>
             <i-panel visible={false} id="campaignElm" width="100%">
               <i-vstack id="wapperCampaignsButton" verticalAlignment="center">
@@ -323,10 +325,10 @@ export class ModalConfig extends Module {
                   <i-hstack id="listCampaignButton" verticalAlignment="center" />
                   <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={this.onAddCampaign} />
                 </i-hstack>
-                <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6b6e7e' }} />
+                <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
               </i-vstack>
               <i-hstack id="wrapperNetworkElm" width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
-                <i-label id="lbNetworkName" font={{ color: '#f15e61', size: '20px', bold: true }} />
+                <i-label id="lbNetworkName" font={{ color: Theme.colors.primary.main, size: '20px', bold: true }} />
               </i-hstack>
               <i-vstack gap={10} verticalAlignment="center" class="main-content">
                 <i-panel id="pnlInfoElm" />
@@ -353,7 +355,7 @@ export class ModalConfig extends Module {
                   </i-hstack>
                   <i-hstack id="groupBtnDeployElm" gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center" wrap="wrap">
                     <i-vstack width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="start">
-                      <i-label caption="Note: You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: '#f7d063' }} />
+                      <i-label caption="Note: You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
                     </i-vstack>
                     <i-button
                       id="btnDeploy"
@@ -361,7 +363,7 @@ export class ModalConfig extends Module {
                       enabled={false}
                       width={200}
                       maxWidth="100%"
-                      rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+                      rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                       class="btn-os"
                       onClick={() => this.onDeployCampaign()}
                     />
@@ -371,7 +373,7 @@ export class ModalConfig extends Module {
                       enabled={false}
                       width={300}
                       maxWidth="100%"
-                      rightIcon={{ spin: true, visible: false, fill: '#fff' }}
+                      rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                       class="btn-os"
                       onClick={() => this.onDeployCampaign(true)}
                     />

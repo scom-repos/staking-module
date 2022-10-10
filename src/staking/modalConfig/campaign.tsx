@@ -1,7 +1,8 @@
-import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label } from '@ijstech/components';
+import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label } from '@ijstech/components';
 import { EventId } from '@staking/global';
 import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
 import { StakingConfig } from './staking';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -71,11 +72,11 @@ export class CampaignConfig extends Module {
 		const networkObj = listNetwork.find(f => f.chainId === this.network);
 		const btnNetwork = await Button.create({
 			caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
-			font: { color: '#fff' },
-			background: { color: '#0c1234' },
+			font: { color: Theme.colors.primary.contrastText },
+			background: { color: Theme.background.paper },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
-			rightIcon: { name: 'caret-down', fill: '#f15e61' },
+			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
 			width: '100%',
 			height: 40,
 			maxWidth: 300,
@@ -156,7 +157,7 @@ export class CampaignConfig extends Module {
 		const idx = Number(this.stakingConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
 		pnl.classList.add('pnl-label');
-		const icon = await Icon.create({ name: 'times', fill: '#0c1234', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+		const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
 		icon.onClick = () => this.removeStaking(idx);
 		const button = await Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
 		button.classList.add('btn-item', 'btn-active');
@@ -237,14 +238,14 @@ export class CampaignConfig extends Module {
 					<i-hstack id="wapperNetworkElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Network" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-panel id="networkSelection" class="network-selection" width="calc(100% - 190px)" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign Name" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputName" class="input-text" onChanged={this.emitInput} />
 					</i-hstack>
@@ -298,7 +299,7 @@ export class CampaignConfig extends Module {
 						<i-hstack id="listStakingButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={this.onAddStaking} />
 					</i-hstack>
-					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6b6e7e' }} />
+					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
 					<i-panel id="pnlInfoElm" />
 				</i-vstack>
 			</i-panel>

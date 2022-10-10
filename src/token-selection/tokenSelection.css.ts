@@ -1,4 +1,5 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.token-selection', {
   $nest: {
@@ -9,26 +10,27 @@ Styles.cssRule('.token-selection', {
       display: 'none',
     },
     '::-webkit-scrollbar-track': {
-      background: '#FFB82F',
+      background: Theme.colors.secondary.main,
     },
     '::-webkit-scrollbar': {
       width: '5px',
     },
     '::-webkit-scrollbar-thumb': {
-      background: '#f7d063',
+      background: Theme.colors.primary.main,
       borderRadius: '5px',
     },
     '#btnToken': {
       alignItems: 'center',
       justifyContent: 'start',
       boxShadow: 'none',
+      background: Theme.background.paper,
       $nest: {
         '&:hover': {
-          background: '#0c1234',
-          opacity: .9
+          background: Theme.action.active,
+          opacity: .8
         },
         '&.disabled': {
-          background: '#0c1234',
+          background: Theme.action.disabled,
           opacity: 0.6
         },
         'span': {

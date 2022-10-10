@@ -1,9 +1,10 @@
-import { Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
+import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -82,11 +83,11 @@ export class StakingConfig extends Module {
 		this.lockType = LockTokenTypeList[0]?.value;
 		const btnType = await Button.create({
 			caption: LockTokenTypeList[0] ? LockTokenTypeList[0].name : 'Select Type',
-			font: { color: '#fff' },
-			background: { color: '#0c1234' },
+			font: { color: Theme.colors.primary.contrastText },
+			background: { color: Theme.background.paper },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
-			rightIcon: { name: 'caret-down', fill: '#f15e61' },
+			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
 			width: '100%',
 			height: 40,
 			maxWidth: 300,
@@ -163,7 +164,7 @@ export class StakingConfig extends Module {
 		const idx = Number(this.rewardConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
 		pnl.classList.add('pnl-label');
-		const icon = await Icon.create({ name: 'times', fill: '#0c1234', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+		const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
 		icon.onClick = () => this.removeReward(idx);
 		const button = await Button.create({ caption: `Reward ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
 		button.classList.add('btn-item', 'btn-active');
@@ -241,7 +242,7 @@ export class StakingConfig extends Module {
 		const offset = Number(this.inputDecimalsOffset.value);
 		const staking: Staking = {
 			address: this.inputAddress.value,
-			lockTokenAddress: this.token?.address || this.token?.symbol || '',
+			lockTokenAddress: this.token?.address || '',
 			minLockTime: new BigNumber(this.inputMinLockTime.value),
 			entryStart: new BigNumber(this.inputEntryStart.value),
 			entryEnd: new BigNumber(this.inputEntryEnd.value),
@@ -272,52 +273,52 @@ export class StakingConfig extends Module {
 					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Address" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
 							<i-input id="inputAddress" class="input-text w-100" onChanged={this.onInputAddress} />
-							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: '#f15e61', size: '12px' }} />
+							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Lock Token Address" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-panel id="pnlTokenSelection" width="calc(100% - 190px)" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Min Lock Time" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMinLockTime" placeholder="Second" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnixAndSecond(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Entry Start" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputEntryStart" placeholder="Unix" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnixAndSecond(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Entry End" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputEntryEnd" placeholder="Unix" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnixAndSecond(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Per Address Cap" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputPerAddressCap" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Max Total Lock" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMaxTotalLock" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
@@ -328,7 +329,7 @@ export class StakingConfig extends Module {
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Lock Token Type" />
-							<i-label caption="*" font={{ color: '#f15e61', size: '16px' }} />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-panel id="typeSelection" class="network-selection" width="calc(100% - 190px)" />
 					</i-hstack>
@@ -340,7 +341,7 @@ export class StakingConfig extends Module {
 						<i-hstack id="listRewardButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Reward" onClick={this.onAddReward} />
 					</i-hstack>
-					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6b6e7e' }} />
+					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
 					<i-panel id="pnlInfoElm" />
 				</i-vstack>
 			</i-panel>

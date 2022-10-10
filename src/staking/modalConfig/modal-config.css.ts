@@ -1,32 +1,31 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.modal-config', {
   $nest: {
     '.i-modal_header': {
-      borderBottom: '2px solid #f15e61',
+      borderBottom: `2px solid ${Theme.colors.primary.main}`,
       paddingBottom: 12,
       marginBottom: 16,
       $nest: {
         'span': {
-          color: '#f15e61',
+          color: Theme.colors.primary.main,
           fontWeight: 'bold',
           fontSize: 20,
         },
         'i-icon': {
           height: '20px !important',
           width: '20px !important',
-          fill: '#f15e61 !important',
+          fill: `${Theme.colors.primary.main} !important`,
           display: 'none',
         }
       }
     },
     '.modal': {
-      background: '#192046',
       width: 800,
       maxWidth: '100%',
       borderRadius: '1rem',
       padding: '1.5rem 1rem',
-      color: '#fff'
     },
     'i-button': {
       padding: '6px 12px',
@@ -44,12 +43,12 @@ Styles.cssRule('.modal-config', {
       }
     },
     '.btn-item': {
-      background: '#59595e !important',
+      background: `${Theme.colors.secondary.main} !important`,
       borderRadius: 0,
-      color: '#fff',
+      color: Theme.colors.primary.contrastText,
       $nest: {
         '&.btn-active': {
-          background: '#FF8800 !important',
+          background: `${Theme.colors.primary.main} !important`,
           cursor: 'default',
         }
       }
@@ -74,7 +73,7 @@ Styles.cssRule('.modal-config', {
       height: '80px !important',
       borderRadius: 12,
       padding: 8,
-      background: '#0c1234',
+      background: Theme.background.paper,
       $nest: {
         'textarea': {
           width: '100% !important',
@@ -83,7 +82,7 @@ Styles.cssRule('.modal-config', {
           boxShadow: 'none',
           outline: 'none',
           border: 'none',
-          color: '#fff',
+          color: Theme.colors.primary.contrastText,
           fontSize: '1rem',
         }
       }
@@ -93,7 +92,7 @@ Styles.cssRule('.modal-config', {
       height: '40px !important',
       borderRadius: 12,
       paddingInline: 8,
-      background: '#0c1234',
+      background: Theme.background.paper,
       $nest: {
         '&.w-100': {
           width: '100% !important',
@@ -103,7 +102,7 @@ Styles.cssRule('.modal-config', {
           width: '100% !important',
           height: '100% !important',
           backgroundColor: 'transparent',
-          color: '#fff',
+          color: Theme.colors.primary.contrastText,
           fontSize: '1rem',
           textAlign: 'left'
         },
@@ -113,18 +112,18 @@ Styles.cssRule('.modal-config', {
       $nest: {
         '.lb-title > *': {
           fontSize: '1rem',
-          color: '#fff',
+          color: Theme.colors.primary.contrastText,
         },
       }
     },
     '.network-selection': {
       $nest: {
         '.btn-select:hover': {
-          background: '#0c112c !important',
+          background: `${Theme.action.active} !important`,
         },
         '.modal': {
           padding: '0.75rem 0',
-          background: '#484860',
+          background: Theme.background.paper,
           borderRadius: 0,
           $nest: {
             '& > i-vstack': {
@@ -133,18 +132,18 @@ Styles.cssRule('.modal-config', {
             },
             'i-button': {
               boxShadow: 'none',
-              color: '#fff',
+              color: Theme.colors.primary.contrastText,
             },
             'i-button:hover': {
-              background: '#26262a !important',
+              background: `${Theme.action.hover} !important`,
             },
           },
         },
       },
     },
     'i-checkbox .checkmark': {
-      backgroundColor: '#0c1234',
-      border: '1px solid #484860',
+      backgroundColor: Theme.background.paper,
+      border: `1px solid ${Theme.colors.primary.light}`,
       borderRadius: 6,
       width: 20,
       height: 20,
@@ -156,7 +155,7 @@ Styles.cssRule('.modal-config', {
       }
     },
     'i-checkbox.is-checked .checkmark': {
-      backgroundColor: '#FD4A4C'
+      backgroundColor: Theme.colors.secondary.light
     },
     '.cursor-pointer': {
       cursor: 'pointer',
@@ -170,7 +169,7 @@ Styles.cssRule('.modal-config', {
           width: '5px',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: '#f15e61',
+          background: Theme.colors.primary.main,
           borderRadius: '5px',
         }
       }

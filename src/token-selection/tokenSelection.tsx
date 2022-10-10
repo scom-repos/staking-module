@@ -1,4 +1,4 @@
-import { customElements, Module, ControlElement, Modal, Button, Image, Container, GridLayout } from '@ijstech/components';
+import { Styles, customElements, Module, ControlElement, Modal, Button, Image, Container, GridLayout } from '@ijstech/components';
 import {
   ChainNativeTokenByChainId,
   getChainId,
@@ -9,6 +9,7 @@ import {
 import { ITokenObject } from '@staking/global';
 import Assets from '@staking/assets';
 import './tokenSelection.css';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
   namespace JSX {
@@ -63,7 +64,7 @@ export class TokenSelection extends Module {
   }
 
   private get tokenDataList(): ITokenObject[] {
-    const tokenList = getTokenList(this.chainId);
+    const tokenList = getTokenList(this.chainId).filter(token => token.address);
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
@@ -101,7 +102,7 @@ export class TokenSelection extends Module {
         <i-vstack width="100%">
           <i-hstack gap={16} verticalAlignment="center">
             <i-image width={24} height={24} minWidth={16} minHeight={16} url={logoAddress} />
-            <i-label caption={`${token.symbol} ${token.address ? `(${token.address})` : ''}`} font={{ size: '16px', color: '#fff', name: 'Proxima Nova' }} />
+            <i-label caption={`${token.symbol} ${token.address ? `(${token.address})` : ''}`} font={{ size: '16px', color: Theme.colors.primary.contrastText, name: 'Proxima Nova' }} />
           </i-hstack>
         </i-vstack>
       </i-hstack>
@@ -115,7 +116,7 @@ export class TokenSelection extends Module {
       const tokenItems = this.tokenDataList.map((token: ITokenObject) => this.renderToken(token));
       this.tokenList.append(...tokenItems);
     } else {
-      this.tokenList.append(<i-label font={{ color: '#fff' }} margin={{ top: 10, bottom: 16 }} class="text-center" caption="No tokens found" />)
+      this.tokenList.append(<i-label font={{ color: Theme.colors.primary.contrastText }} margin={{ top: 10, bottom: 16 }} class="text-center" caption="No tokens found" />)
     }
   }
 
@@ -145,13 +146,13 @@ export class TokenSelection extends Module {
       }
       if (!token) {
         btnToken.caption = 'Select Token';
-        btnToken.font = { size: '16px', color: '#A8A8A8' };
+        btnToken.font = { size: '16px', color: Theme.colors.primary.contrastText };
         if (image) {
           btnToken.removeChild(image);
         }
       } else {
         btnToken.caption = `${token.symbol} ${token.address ? `(${token.address})` : ''}`;
-        btnToken.font = { size: '16px', color: '#fff', };
+        btnToken.font = { size: '16px', color: Theme.colors.primary.contrastText };
         const logoAddress = Assets.fullPath(getTokenIconPath(token, this.chainId));
         if (!image) {
           image = new Image(btnToken, {
@@ -190,11 +191,11 @@ export class TokenSelection extends Module {
           display="flex"
           width="100%"
           height={40}
-          background={{ color: "#0c1234" }}
-          font={{ size: '16px', color: '#fff' }}
+          background={{ color: Theme.background.main }}
+          font={{ size: '16px', color: Theme.colors.primary.contrastText }}
           padding={{ left: '1rem', right: '1rem' }}
           border={{ radius: 16 }}
-          rightIcon={{ name: 'caret-down', fill: '#f15e61', width: 16, height: 16 }}
+          rightIcon={{ name: 'caret-down', fill: Theme.colors.primary.main, width: 16, height: 16 }}
           caption="Select Token"
           onClick={() => this.showModal()}
         />
