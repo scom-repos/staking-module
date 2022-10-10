@@ -14,11 +14,6 @@ const GlobalBuildModuleList = [
     moduleName: '@staking/assets'
   },
   {
-    sourceFilePath: 'src/staking/index.tsx',
-    distFilePath: './dist/staking/index.js',
-    moduleName: '@staking/staking'
-  },
-  {
     sourceFilePath: 'src/global/index.ts',
     distFilePath: './dist/global/index.js',
     moduleName: '@staking/global'
@@ -44,7 +39,6 @@ const GlobalModuleESBuildConfig = {
     '@openswap/sdk',
     '@staking/global',
     '@staking/store',
-    '@staking/staking',
     '@staking/staking-utils'
   ]
 }
@@ -104,8 +98,7 @@ async function buildGlobalModule() {
 async function buildLocalModule() {
   require('esbuild').build({
     entryPoints: [
-      // demo
-      'src/demo/index.tsx'
+      'src/staking/index.tsx'
     ],
     external: [
       '@staking/assets',
@@ -114,10 +107,9 @@ async function buildLocalModule() {
       '@openswap/sdk',
       '@staking/global',
       '@staking/store',
-      '@staking/staking',
       '@staking/staking-utils'
     ],
-    outdir: 'dist/demo',
+    outdir: 'dist/staking',
     bundle: true,
     minify: false,
     format: 'iife',
