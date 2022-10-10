@@ -108,14 +108,6 @@ Styles.cssRule('.modal-config', {
         },
       }
     },
-    '.main-content': {
-      $nest: {
-        '.lb-title > *': {
-          fontSize: '1rem',
-          color: Theme.colors.primary.contrastText,
-        },
-      }
-    },
     '.network-selection': {
       $nest: {
         '.btn-select:hover': {

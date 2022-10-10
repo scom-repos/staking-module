@@ -313,11 +313,11 @@ export class ModalConfig extends Module {
           </i-hstack>
           <i-panel id="configCampaignsElm" visible={false} width="100%">
             <i-hstack id="backElm" gap={4} width="fit-content" margin={{ top: 5, bottom: 15, left: 'auto' }} verticalAlignment="center" class="cursor-pointer" onClick={this.onBack}>
-              <i-icon name="arrow-left" fill={Theme.colors.primary.contrastText} width={20} height={20} />
-              <i-label caption="Back" font={{ size: '20px', bold: true, color: Theme.colors.primary.contrastText }} />
+              <i-icon name="arrow-left" fill="currentColor" width={20} height={20} />
+              <i-label caption="Back" font={{ size: '20px', bold: true }} />
             </i-hstack>
             <i-hstack id="networkElm" width="100%" height={150} verticalAlignment="center" horizontalAlignment="center">
-              <i-label caption="Please connect with your network!" font={{ color: Theme.colors.primary.contrastText }} />
+              <i-label caption="Please connect with your network!" />
             </i-hstack>
             <i-panel visible={false} id="campaignElm" width="100%">
               <i-vstack id="wapperCampaignsButton" verticalAlignment="center">
@@ -363,7 +363,7 @@ export class ModalConfig extends Module {
                       enabled={false}
                       width={200}
                       maxWidth="100%"
-                      rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                      rightIcon={{ spin: true, visible: false, fill: "currentColor" }}
                       class="btn-os"
                       onClick={() => this.onDeployCampaign()}
                     />
@@ -373,7 +373,7 @@ export class ModalConfig extends Module {
                       enabled={false}
                       width={300}
                       maxWidth="100%"
-                      rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                      rightIcon={{ spin: true, visible: false, fill: "currentColor" }}
                       class="btn-os"
                       onClick={() => this.onDeployCampaign(true)}
                     />
