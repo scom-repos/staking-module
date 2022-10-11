@@ -9006,12 +9006,12 @@
         onClick: this.onBack
       }, /* @__PURE__ */ this.$render("i-icon", {
         name: "arrow-left",
-        fill: "currentColor",
+        fill: Theme7.colors.primary.contrastText,
         width: 20,
         height: 20
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Back",
-        font: { size: "20px", bold: true }
+        font: { size: "20px", bold: true, color: Theme7.colors.primary.contrastText }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "networkElm",
         width: "100%",
@@ -9019,7 +9019,8 @@
         verticalAlignment: "center",
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Please connect with your network!"
+        caption: "Please connect with your network!",
+        font: { color: Theme7.colors.primary.contrastText }
       })), /* @__PURE__ */ this.$render("i-panel", {
         visible: false,
         id: "campaignElm",
@@ -9108,7 +9109,7 @@
         enabled: false,
         width: 200,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: "currentColor" },
+        rightIcon: { spin: true, visible: false, fill: Theme7.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign()
       }), /* @__PURE__ */ this.$render("i-button", {
@@ -9117,7 +9118,7 @@
         enabled: false,
         width: 300,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: "currentColor" },
+        rightIcon: { spin: true, visible: false, fill: Theme7.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign(true)
       })))))));
