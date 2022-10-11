@@ -23,7 +23,7 @@ Styles.cssRule('.token-selection', {
       alignItems: 'center',
       justifyContent: 'start',
       boxShadow: 'none',
-      background: Theme.background.paper,
+      background: Theme.input.background,
       $nest: {
         '&:hover': {
           background: Theme.action.active,

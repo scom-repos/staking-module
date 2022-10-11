@@ -72,8 +72,7 @@ export class CampaignConfig extends Module {
 		const networkObj = listNetwork.find(f => f.chainId === this.network);
 		const btnNetwork = await Button.create({
 			caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
-			font: { color: Theme.colors.primary.contrastText },
-			background: { color: Theme.background.paper },
+			background: { color: Theme.input.background },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
 			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },

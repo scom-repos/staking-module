@@ -146,13 +146,13 @@ export class TokenSelection extends Module {
       }
       if (!token) {
         btnToken.caption = 'Select Token';
-        btnToken.font = { size: '16px', color: Theme.colors.primary.contrastText };
+        btnToken.font = { size: '16px' };
         if (image) {
           btnToken.removeChild(image);
         }
       } else {
         btnToken.caption = `${token.symbol} ${token.address ? `(${token.address})` : ''}`;
-        btnToken.font = { size: '16px', color: Theme.colors.primary.contrastText };
+        btnToken.font = { size: '16px' };
         const logoAddress = Assets.fullPath(getTokenIconPath(token, this.chainId));
         if (!image) {
           image = new Image(btnToken, {
@@ -192,7 +192,7 @@ export class TokenSelection extends Module {
           width="100%"
           height={40}
           background={{ color: Theme.background.main }}
-          font={{ size: '16px', color: Theme.colors.primary.contrastText }}
+          font={{ size: '16px' }}
           padding={{ left: '1rem', right: '1rem' }}
           border={{ radius: 16 }}
           rightIcon={{ name: 'caret-down', fill: Theme.colors.primary.main, width: 16, height: 16 }}

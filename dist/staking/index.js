@@ -7442,7 +7442,7 @@
         alignItems: "center",
         justifyContent: "start",
         boxShadow: "none",
-        background: Theme4.background.paper,
+        background: Theme4.input.background,
         $nest: {
           "&:hover": {
             background: Theme4.action.active,
@@ -7597,13 +7597,13 @@
           }
           if (!token) {
             btnToken.caption = "Select Token";
-            btnToken.font = { size: "16px", color: Theme5.colors.primary.contrastText };
+            btnToken.font = { size: "16px" };
             if (image) {
               btnToken.removeChild(image);
             }
           } else {
             btnToken.caption = `${token.symbol} ${token.address ? `(${token.address})` : ""}`;
-            btnToken.font = { size: "16px", color: Theme5.colors.primary.contrastText };
+            btnToken.font = { size: "16px" };
             const logoAddress = import_assets4.default.fullPath((0, import_store4.getTokenIconPath)(token, this.chainId));
             if (!image) {
               image = new import_components8.Image(btnToken, {
@@ -7669,7 +7669,7 @@
         width: "100%",
         height: 40,
         background: { color: Theme5.background.main },
-        font: { size: "16px", color: Theme5.colors.primary.contrastText },
+        font: { size: "16px" },
         padding: { left: "1rem", right: "1rem" },
         border: { radius: 16 },
         rightIcon: { name: "caret-down", fill: Theme5.colors.primary.main, width: 16, height: 16 },
@@ -7965,8 +7965,7 @@
         this.lockType = (_a = import_store5.LockTokenTypeList[0]) == null ? void 0 : _a.value;
         const btnType = await import_components10.Button.create({
           caption: import_store5.LockTokenTypeList[0] ? import_store5.LockTokenTypeList[0].name : "Select Type",
-          font: { color: Theme7.colors.primary.contrastText },
-          background: { color: Theme7.background.paper },
+          background: { color: Theme7.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
           rightIcon: { name: "caret-down", fill: Theme7.colors.primary.main },
@@ -8384,8 +8383,7 @@
         const networkObj = listNetwork.find((f) => f.chainId === this.network);
         const btnNetwork = await import_components11.Button.create({
           caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
-          font: { color: Theme8.colors.primary.contrastText },
-          background: { color: Theme8.background.paper },
+          background: { color: Theme8.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
           rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },

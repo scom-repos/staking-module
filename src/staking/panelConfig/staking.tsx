@@ -83,8 +83,7 @@ export class StakingConfig extends Module {
 		this.lockType = LockTokenTypeList[0]?.value;
 		const btnType = await Button.create({
 			caption: LockTokenTypeList[0] ? LockTokenTypeList[0].name : 'Select Type',
-			font: { color: Theme.colors.primary.contrastText },
-			background: { color: Theme.background.paper },
+			background: { color: Theme.input.background },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
 			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
