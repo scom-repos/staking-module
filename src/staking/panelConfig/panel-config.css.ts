@@ -1,26 +1,11 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
+const Theme = Styles.Theme.defaultTheme;
 
-Styles.cssRule('.modal-config', {
+Styles.cssRule('.panel-config', {
+  background: Theme.background.main,
+  padding: '1rem',
+  margin: 'auto',
   $nest: {
-    '.i-modal_header': {
-      borderBottom: `2px solid ${Theme.colors.primary.main}`,
-      paddingBottom: 12,
-      marginBottom: 16,
-      $nest: {
-        'span': {
-          color: Theme.colors.primary.main,
-          fontWeight: 'bold',
-          fontSize: 20,
-        },
-        'i-icon': {
-          height: '20px !important',
-          width: '20px !important',
-          fill: `${Theme.colors.primary.main} !important`,
-          display: 'none',
-        }
-      }
-    },
     '.modal': {
       width: 800,
       maxWidth: '100%',
@@ -152,7 +137,7 @@ Styles.cssRule('.modal-config', {
     '.cursor-pointer': {
       cursor: 'pointer',
     },
-    '.custom-scroll *': {
+    '&.custom-scroll *': {
       $nest: {
         '&::-webkit-scrollbar-track': {
           background: 'transparent',
