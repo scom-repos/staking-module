@@ -6366,9 +6366,7 @@
             }
           },
           ".no-campaign": {
-            margin: "0 1rem",
             padding: "3rem 2rem",
-            borderRadius: "26px",
             display: "flex",
             flexDirection: "column",
             textAlign: "center",
