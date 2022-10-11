@@ -15,6 +15,7 @@ declare global {
 @customElements('campaign-config')
 export class CampaignConfig extends Module {
 	private networkSelection: Panel;
+	private btnNetwork: Button;
 	private network: number;
 	private listStakingButton: HStack;
 	private pnlInfoElm: Panel;
@@ -87,7 +88,8 @@ export class CampaignConfig extends Module {
 					this.inputCountdownBg.value = customColorTimeBackground || '';
 					this.inputStakingBg.value = customColorStakingBackground || '';
 					this.inputStakingBtn.value = customColorButton || '';
-					this.renderNetworkButton();
+					const networkObj = Networks.find(f => f.chainId === this.network);
+					this.btnNetwork.caption = networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Unknown Network'
 					this.listStakingButton.clearInnerHTML();
 					this.pnlInfoElm.clearInnerHTML();
 					this.stakingConfig = [];
@@ -116,7 +118,7 @@ export class CampaignConfig extends Module {
 		});
 		const listNetwork = Networks.filter(f => !f.isDisabled);
 		const networkObj = listNetwork.find(f => f.chainId === this.network);
-		const btnNetwork = await Button.create({
+		this.btnNetwork = await Button.create({
 			caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
 			background: { color: Theme.input.background },
 			border: { style: 'none', radius: 12 },
@@ -126,8 +128,8 @@ export class CampaignConfig extends Module {
 			height: 40,
 			maxWidth: 300,
 		});
-		btnNetwork.classList.add('btn-select');
-		btnNetwork.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
+		this.btnNetwork.classList.add('btn-select');
+		this.btnNetwork.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
 		for (const network of listNetwork) {
 			const dropdownItem = await Button.create({
 				caption: `${network.name} (${network.chainId})`,
@@ -136,7 +138,7 @@ export class CampaignConfig extends Module {
 			});
 			dropdownItem.onClick = () => {
 				dropdownModal.visible = false;
-				btnNetwork.caption = `${network.name} (${network.chainId})`;
+				this.btnNetwork.caption = `${network.name} (${network.chainId})`;
 				this.network = network.chainId;
 				for (const elm of this.stakingConfig) {
 					elm.chainId = this.network;
@@ -147,7 +149,7 @@ export class CampaignConfig extends Module {
 		}
 		dropdownModal.item = vstack;
 		this.networkSelection.clearInnerHTML();
-		this.networkSelection.appendChild(btnNetwork);
+		this.networkSelection.appendChild(this.btnNetwork);
 		this.networkSelection.appendChild(dropdownModal);
 	}
 
@@ -268,10 +270,11 @@ export class CampaignConfig extends Module {
 		return campaign;
 	}
 
-	init() {
+	async init() {
 		this.network = getChainId() || getDefaultChainId();
 		super.init();
 		this.setupInput();
+		await this.renderNetworkButton();
 		this.isInitialized = true;
 	}
 

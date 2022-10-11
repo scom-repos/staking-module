@@ -86,6 +86,7 @@ export class RewardConfig extends Module {
 					this.inputAdmin.value = admin;
 					this.isAdminValid = true;
 					this.checkboxStartDate.checked = !!isCommonStartDate;
+					this.emitInput();
 				}
 			}, 200);
 		}

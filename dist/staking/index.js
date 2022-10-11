@@ -7726,6 +7726,7 @@
               this.inputAdmin.value = admin;
               this.isAdminValid = true;
               this.checkboxStartDate.checked = !!isCommonStartDate;
+              this.emitInput();
             }
           }, 200);
         }
@@ -7994,6 +7995,7 @@
           const token = tokenMap[lockTokenAddress] || tokenMap[lockTokenAddress.toLowerCase()];
           this.lockType = lockTokenType;
           const interval = setInterval(async () => {
+            var _a;
             if (this.isInitialized) {
               clearInterval(interval);
               this.inputAddress.value = address;
@@ -8007,7 +8009,7 @@
               this.inputMaxTotalLock.value = maxTotalLock;
               this.inputDesc.value = customDesc || "";
               this.inputDecimalsOffset.value = decimalsOffset || "";
-              this.renderTypeButton();
+              this.btnType.caption = ((_a = import_store6.LockTokenTypeList.find((f) => f.value === this.lockType)) == null ? void 0 : _a.name) || "Select Type";
               this.listRewardButton.clearInnerHTML();
               this.pnlInfoElm.clearInnerHTML();
               this.rewardConfig = [];
@@ -8037,8 +8039,9 @@
         if (this.lockType === void 0) {
           this.lockType = (_a = import_store6.LockTokenTypeList[0]) == null ? void 0 : _a.value;
         }
-        const btnType = await import_components10.Button.create({
-          caption: import_store6.LockTokenTypeList[0] ? import_store6.LockTokenTypeList[0].name : "Select Type",
+        const type = import_store6.LockTokenTypeList.find((f) => f.value === this.lockType);
+        this.btnType = await import_components10.Button.create({
+          caption: (type == null ? void 0 : type.name) || "Select Type",
           background: { color: Theme7.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
@@ -8047,26 +8050,26 @@
           height: 40,
           maxWidth: 300
         });
-        btnType.classList.add("btn-select");
-        btnType.onClick = () => {
+        this.btnType.classList.add("btn-select");
+        this.btnType.onClick = () => {
           dropdownModal.visible = !dropdownModal.visible;
         };
-        for (const type of import_store6.LockTokenTypeList) {
+        for (const type2 of import_store6.LockTokenTypeList) {
           const dropdownItem = await import_components10.Button.create({
-            caption: `${type.name} (${type.value})`,
+            caption: `${type2.name} (${type2.value})`,
             background: { color: "transparent" },
             height: 36
           });
           dropdownItem.onClick = () => {
             dropdownModal.visible = false;
-            btnType.caption = `${type.name} (${type.value})`;
-            this.lockType = type.value;
+            this.btnType.caption = `${type2.name} (${type2.value})`;
+            this.lockType = type2.value;
           };
           vstack.appendChild(dropdownItem);
         }
         dropdownModal.item = vstack;
         this.typeSelection.clearInnerHTML();
-        this.typeSelection.appendChild(btnType);
+        this.typeSelection.appendChild(this.btnType);
         this.typeSelection.appendChild(dropdownModal);
       };
       this.onRenderReward = (button, idx) => {
@@ -8221,12 +8224,13 @@
     get data() {
       return this._data;
     }
-    init() {
+    async init() {
       super.init();
       this.tokenSelection = new TokenSelection();
       this.tokenSelection.onSelectToken = this.onInputToken;
       this.pnlTokenSelection.appendChild(this.tokenSelection);
       this.setupInput();
+      await this.renderTypeButton();
       this.isInitialized = true;
     }
     render() {
@@ -8470,7 +8474,8 @@
               this.inputCountdownBg.value = customColorTimeBackground || "";
               this.inputStakingBg.value = customColorStakingBackground || "";
               this.inputStakingBtn.value = customColorButton || "";
-              this.renderNetworkButton();
+              const networkObj = import_store7.Networks.find((f) => f.chainId === this.network);
+              this.btnNetwork.caption = networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Unknown Network";
               this.listStakingButton.clearInnerHTML();
               this.pnlInfoElm.clearInnerHTML();
               this.stakingConfig = [];
@@ -8498,7 +8503,7 @@
         });
         const listNetwork = import_store7.Networks.filter((f) => !f.isDisabled);
         const networkObj = listNetwork.find((f) => f.chainId === this.network);
-        const btnNetwork = await import_components11.Button.create({
+        this.btnNetwork = await import_components11.Button.create({
           caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
           background: { color: Theme8.input.background },
           border: { style: "none", radius: 12 },
@@ -8508,8 +8513,8 @@
           height: 40,
           maxWidth: 300
         });
-        btnNetwork.classList.add("btn-select");
-        btnNetwork.onClick = () => {
+        this.btnNetwork.classList.add("btn-select");
+        this.btnNetwork.onClick = () => {
           dropdownModal.visible = !dropdownModal.visible;
         };
         for (const network of listNetwork) {
@@ -8520,7 +8525,7 @@
           });
           dropdownItem.onClick = () => {
             dropdownModal.visible = false;
-            btnNetwork.caption = `${network.name} (${network.chainId})`;
+            this.btnNetwork.caption = `${network.name} (${network.chainId})`;
             this.network = network.chainId;
             for (const elm of this.stakingConfig) {
               elm.chainId = this.network;
@@ -8531,7 +8536,7 @@
         }
         dropdownModal.item = vstack;
         this.networkSelection.clearInnerHTML();
-        this.networkSelection.appendChild(btnNetwork);
+        this.networkSelection.appendChild(this.btnNetwork);
         this.networkSelection.appendChild(dropdownModal);
       };
       this.onRenderStaking = (button, idx) => {
@@ -8661,10 +8666,11 @@
     get data() {
       return this._data;
     }
-    init() {
+    async init() {
       this.network = (0, import_store7.getChainId)() || (0, import_store7.getDefaultChainId)();
       super.init();
       this.setupInput();
+      await this.renderNetworkButton();
       this.isInitialized = true;
     }
     render() {
@@ -8728,7 +8734,7 @@
         horizontalAlignment: "space-between"
       }, /* @__PURE__ */ this.$render("i-label", {
         class: "lb-title",
-        caption: "Get Trade URL"
+        caption: "Token Trade URL"
       }), /* @__PURE__ */ this.$render("i-input", {
         id: "inputURL",
         class: "input-text",
@@ -9414,55 +9420,6 @@
         if (!this.data) {
           await this.renderEmpty();
         }
-        setTimeout(() => {
-          this.setData({
-            "43113": [
-              {
-                "chainId": 43113,
-                "customName": "Testing 1",
-                "stakings": [
-                  {
-                    "address": "0xD8211dB4c5D97D18b9ED799b7fa76456EAA38317",
-                    "lockTokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                    "minLockTime": 300,
-                    "entryStart": 1662624142,
-                    "entryEnd": 1682899200,
-                    "perAddressCap": 1e5,
-                    "maxTotalLock": 1e5,
-                    "customDesc": "",
-                    "lockTokenType": 0,
-                    "decimalsOffset": 0,
-                    "rewards": [
-                      {
-                        "address": "0xF4E06E1739139AAE9404B3606aD51b09eb3f40F5",
-                        "rewardTokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                        "multiplier": 0.03,
-                        "initialReward": 1,
-                        "vestingPeriod": 0,
-                        "claimDeadline": 253402214400,
-                        "admin": "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b3",
-                        "isCommonStartDate": false
-                      },
-                      {
-                        "address": "0xF4E06E1739139AAE9404B3606aD51b09eb3f40F5",
-                        "rewardTokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                        "multiplier": 0.03,
-                        "initialReward": 1,
-                        "vestingPeriod": 0,
-                        "claimDeadline": 253402214400,
-                        "admin": "0x18a6Ab8742BD46d27B9823c9767522f48ebF26b2",
-                        "isCommonStartDate": false
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          });
-        }, 2e3);
-        setTimeout(() => {
-          this.edit();
-        }, 5e3);
       };
       this.updateButtonStatus = async (data) => {
         if (data) {

@@ -20,6 +20,7 @@ export class StakingConfig extends Module {
 	private token?: ITokenObject;
 	private pnlTokenSelection: Panel;
 	private typeSelection: Panel;
+	private btnType: Button;
 	private lockType: LockTokenType;
 	private listRewardButton: HStack;
 	private pnlInfoElm: Panel;
@@ -103,7 +104,7 @@ export class StakingConfig extends Module {
 					this.inputMaxTotalLock.value = maxTotalLock;
 					this.inputDesc.value = customDesc || '';
 					this.inputDecimalsOffset.value = decimalsOffset || '';
-					this.renderTypeButton();
+					this.btnType.caption = LockTokenTypeList.find(f => f.value === this.lockType)?.name || 'Select Type';
 					this.listRewardButton.clearInnerHTML();
 					this.pnlInfoElm.clearInnerHTML();
 					this.rewardConfig = [];
@@ -133,8 +134,10 @@ export class StakingConfig extends Module {
 		if (this.lockType === undefined) {
 			this.lockType = LockTokenTypeList[0]?.value;
 		}
-		const btnType = await Button.create({
-			caption: LockTokenTypeList[0] ? LockTokenTypeList[0].name : 'Select Type',
+
+		const type = LockTokenTypeList.find(f => f.value === this.lockType);
+		this.btnType = await Button.create({
+			caption: type?.name || 'Select Type',
 			background: { color: Theme.input.background },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
@@ -143,8 +146,8 @@ export class StakingConfig extends Module {
 			height: 40,
 			maxWidth: 300,
 		});
-		btnType.classList.add('btn-select');
-		btnType.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
+		this.btnType.classList.add('btn-select');
+		this.btnType.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
 		for (const type of LockTokenTypeList) {
 			const dropdownItem = await Button.create({
 				caption: `${type.name} (${type.value})`,
@@ -153,14 +156,14 @@ export class StakingConfig extends Module {
 			});
 			dropdownItem.onClick = () => {
 				dropdownModal.visible = false;
-				btnType.caption = `${type.name} (${type.value})`;
+				this.btnType.caption = `${type.name} (${type.value})`;
 				this.lockType = type.value;
 			};
 			vstack.appendChild(dropdownItem);
 		}
 		dropdownModal.item = vstack;
 		this.typeSelection.clearInnerHTML();
-		this.typeSelection.appendChild(btnType);
+		this.typeSelection.appendChild(this.btnType);
 		this.typeSelection.appendChild(dropdownModal);
 	}
 
@@ -308,12 +311,13 @@ export class StakingConfig extends Module {
 		return staking;
 	}
 
-	init() {
+	async init() {
 		super.init();
 		this.tokenSelection = new TokenSelection();
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
 		this.setupInput();
+		await this.renderTypeButton();
 		this.isInitialized = true;
 	}
 
