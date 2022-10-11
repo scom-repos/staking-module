@@ -5,7 +5,7 @@ import './panel-config.css';
 import { CampaignConfig } from './campaign';
 import { getChainId, getNetworkInfo, isWalletConnected, StakingCampaign } from '@staking/store';
 import { deployCampaign } from '@staking/staking-utils';
-const Theme = Styles.Theme.defaultTheme;
+const Theme = Styles.Theme.ThemeVars;
 declare global {
   namespace JSX {
     interface IntrinsicElements {

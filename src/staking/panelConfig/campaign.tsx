@@ -2,7 +2,7 @@ import { Styles, Button, Modal, Container, VStack, Panel, customElements, Contro
 import { EventId } from '@staking/global';
 import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
 import { StakingConfig } from './staking';
-const Theme = Styles.Theme.defaultTheme;
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {

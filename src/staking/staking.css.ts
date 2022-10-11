@@ -1,32 +1,7 @@
 import { Styles } from '@ijstech/components';
 import Assets from '@staking/assets';
 
-Styles.Theme.defaultTheme.background.main = '#181e3e';
-Styles.Theme.defaultTheme.background.paper = '#000';
-Styles.Theme.defaultTheme.colors.primary.main = '#FF6600';
-Styles.Theme.defaultTheme.colors.primary.light = 'rgb(101, 115, 195)';
-Styles.Theme.defaultTheme.colors.primary.contrastText = '#fff';
-Styles.Theme.defaultTheme.colors.secondary.main = '#f50057';
-Styles.Theme.defaultTheme.colors.secondary.light = 'rgb(247, 51, 120)';
-Styles.Theme.defaultTheme.action.active = 'rgba(0, 0, 0, 0.54)';
-Styles.Theme.defaultTheme.action.hover = 'rgba(0, 0, 0, 0.04)';
-Styles.Theme.defaultTheme.action.disabled = 'rgba(0, 0, 0, 0.26)';
-
-// Styles.Theme.darkTheme.background.default = '#0c1234';
-// Styles.Theme.darkTheme.background.paper = '#1f1e4f';
-// Styles.Theme.darkTheme.colors.primary.dark = '#F05E61';
-// Styles.Theme.darkTheme.colors.primary.light = '#f15e60e7';
-// Styles.Theme.darkTheme.colors.primary.main = '#f15e61';
-// Styles.Theme.darkTheme.colors.secondary.dark = '#f7d063';
-// Styles.Theme.darkTheme.colors.secondary.light = '#f7d063b6';
-// Styles.Theme.darkTheme.colors.secondary.main = '#f7d063';
-// Styles.Theme.darkTheme.text.secondary = 'hsla(0, 0%, 100%, 0.55)';
-// Styles.Theme.darkTheme.typography.fontFamily = 'Proxima Nova';
-// Styles.Theme.darkTheme.colors.warning.dark = '#f57c00';
-// Styles.Theme.darkTheme.colors.warning.light = '#F6C958';
-// Styles.Theme.darkTheme.colors.warning.main = '#ffa726';
-// Styles.Theme.darkTheme.divider = '#0E132E';
-// Styles.Theme.darkTheme.typography.fontSize = '16px';
+const Theme = Styles.Theme.ThemeVars;
 
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
@@ -98,10 +73,10 @@ Styles.cssRule('.staking-component', {
       fontFamily: 'Proxima Nova',
     },
     '#stakingElm': {
-      background: '#0c1234',
+      background: Theme.background.default,
     },
     '.i-loading-overlay': {
-      background: '#0c1234',
+      background: Theme.background.default,
     },
     '.overflow-inherit': {
       overflow: 'inherit',
@@ -191,7 +166,6 @@ Styles.cssRule('.staking-component', {
     '.wrapper': {
       $nest: {
         'i-label:not(.duration) > *': {
-          color: '#fff',
           fontSize: '0.875rem',
         },
         '.sticker': {
@@ -206,7 +180,7 @@ Styles.cssRule('.staking-component', {
               borderBottomColor: '#ccc',
             },
             '&.closed': {
-              borderBottomColor: '#0c1234',
+              borderBottomColor: Theme.background.default,
               $nest: {
                 'i-label > *': {
                   color: '#f7d064 !important',

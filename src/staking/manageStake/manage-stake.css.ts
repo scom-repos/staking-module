@@ -140,7 +140,6 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
-          background: '#192046',
           width: 480,
           maxWidth: '100%',
           borderRadius: '1rem',
@@ -155,7 +154,6 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
-          background: '#192046',
           width: 480,
           maxWidth: '100%',
           padding: '0.75rem 1rem',

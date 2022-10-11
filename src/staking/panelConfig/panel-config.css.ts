@@ -1,5 +1,5 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.defaultTheme;
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.panel-config', {
   background: Theme.background.main,

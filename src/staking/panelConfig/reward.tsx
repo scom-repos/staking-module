@@ -3,7 +3,7 @@ import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { Reward } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
-const Theme = Styles.Theme.defaultTheme;
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {

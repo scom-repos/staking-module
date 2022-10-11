@@ -12,6 +12,22 @@
 <body>
   <script>
     async function init() {
+      const { Styles } = require("@ijstech/components");
+      Styles.Theme.defaultTheme.background.default = '#0c1234';
+      Styles.Theme.defaultTheme.background.main = '#181e3e';
+      Styles.Theme.defaultTheme.background.paper = '#000';
+      Styles.Theme.defaultTheme.background.modal = '#192046';
+      Styles.Theme.defaultTheme.colors.primary.main = '#FF6600';
+      Styles.Theme.defaultTheme.colors.primary.light = 'rgb(101, 115, 195)';
+      Styles.Theme.defaultTheme.colors.primary.contrastText = '#fff';
+      Styles.Theme.defaultTheme.colors.secondary.main = '#f50057';
+      Styles.Theme.defaultTheme.colors.secondary.light = 'rgb(247, 51, 120)';
+      Styles.Theme.defaultTheme.action.active = 'rgba(0, 0, 0, 0.54)';
+      Styles.Theme.defaultTheme.action.hover = 'rgba(0, 0, 0, 0.04)';
+      Styles.Theme.defaultTheme.action.disabled = 'rgba(0, 0, 0, 0.26)';
+      Styles.Theme.defaultTheme.text.primary = "#fff";
+      Styles.Theme.applyTheme(Styles.Theme.defaultTheme);
+
       let module = await application.newModule('./staking/index.js', {{scconfig}})
       document.body.append(module)
     };

@@ -1,4 +1,4 @@
-import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
 import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign } from '@staking/store';
 import {
@@ -26,6 +26,8 @@ import './staking.css';
 import { ManageStake } from './manageStake';
 import { PanelConfig } from './panelConfig';
 import { Contracts } from '@validapp/time-is-money-sdk';
+
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -337,7 +339,7 @@ export class StakingBlock extends Module implements PageBlock {
 		const isConnected = isWalletConnected();
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
-			<i-panel class="no-campaign" background={{ color: '#192046' }}>
+			<i-panel class="no-campaign" background={{ color: Theme.background.modal }}>
 				<i-vstack gap={10} verticalAlignment="center">
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
 					<i-label caption={ isConnected ? 'No Campaigns' : 'Please connect with your wallet!' } />
