@@ -26,6 +26,8 @@
       Styles.Theme.defaultTheme.action.hover = 'rgba(0, 0, 0, 0.04)';
       Styles.Theme.defaultTheme.action.disabled = 'rgba(0, 0, 0, 0.26)';
       Styles.Theme.defaultTheme.text.primary = "#fff";
+      Styles.Theme.defaultTheme.input.fontColor = "#fff";
+      Styles.Theme.defaultTheme.input.background = "#000";
       Styles.Theme.applyTheme(Styles.Theme.defaultTheme);
 
       let module = await application.newModule('./staking/index.js', {{scconfig}})

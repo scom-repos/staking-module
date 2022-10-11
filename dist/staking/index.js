@@ -6018,9 +6018,6 @@
       "*": {
         fontFamily: "Proxima Nova"
       },
-      "#stakingElm": {
-        background: Theme.background.default
-      },
       ".i-loading-overlay": {
         background: Theme.background.default
       },
@@ -7301,7 +7298,7 @@
         height: "80px !important",
         borderRadius: 12,
         padding: 8,
-        background: Theme3.background.paper,
+        background: Theme3.input.background,
         $nest: {
           "textarea": {
             width: "100% !important",
@@ -7310,7 +7307,6 @@
             boxShadow: "none",
             outline: "none",
             border: "none",
-            color: Theme3.colors.primary.contrastText,
             fontSize: "1rem"
           }
         }
@@ -7320,7 +7316,7 @@
         height: "40px !important",
         borderRadius: 12,
         paddingInline: 8,
-        background: Theme3.background.paper,
+        background: Theme3.input.background,
         $nest: {
           "&.w-100": {
             width: "100% !important"
@@ -7330,7 +7326,6 @@
             width: "100% !important",
             height: "100% !important",
             backgroundColor: "transparent",
-            color: Theme3.colors.primary.contrastText,
             fontSize: "1rem",
             textAlign: "left"
           }
@@ -7362,7 +7357,7 @@
         }
       },
       "i-checkbox .checkmark": {
-        backgroundColor: Theme3.background.paper,
+        backgroundColor: Theme3.input.background,
         border: `1px solid ${Theme3.colors.primary.light}`,
         borderRadius: 6,
         width: 20,
@@ -7554,7 +7549,7 @@
           url: logoAddress
         }), /* @__PURE__ */ this.$render("i-label", {
           caption: `${token.symbol} ${token.address ? `(${token.address})` : ""}`,
-          font: { size: "16px", color: Theme5.colors.primary.contrastText, name: "Proxima Nova" }
+          font: { size: "16px", name: "Proxima Nova" }
         }))));
       };
       this.renderTokenItems = async () => {
@@ -7566,7 +7561,6 @@
           this.tokenList.append(...tokenItems);
         } else {
           this.tokenList.append(/* @__PURE__ */ this.$render("i-label", {
-            font: { color: Theme5.colors.primary.contrastText },
             margin: { top: 10, bottom: 16 },
             class: "text-center",
             caption: "No tokens found"
@@ -8995,12 +8989,12 @@
         onClick: this.onBack
       }, /* @__PURE__ */ this.$render("i-icon", {
         name: "arrow-left",
-        fill: Theme9.colors.primary.contrastText,
+        fill: Theme9.text.primary,
         width: 20,
         height: 20
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Back",
-        font: { size: "20px", bold: true, color: Theme9.colors.primary.contrastText }
+        font: { size: "20px", bold: true }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "networkElm",
         width: "100%",
@@ -9008,8 +9002,7 @@
         verticalAlignment: "center",
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Please connect with your network!",
-        font: { color: Theme9.colors.primary.contrastText }
+        caption: "Please connect with your network!"
       })), /* @__PURE__ */ this.$render("i-panel", {
         visible: false,
         id: "campaignElm",

@@ -58,7 +58,7 @@ Styles.cssRule('.panel-config', {
       height: '80px !important',
       borderRadius: 12,
       padding: 8,
-      background: Theme.background.paper,
+      background: Theme.input.background,
       $nest: {
         'textarea': {
           width: '100% !important',
@@ -67,7 +67,6 @@ Styles.cssRule('.panel-config', {
           boxShadow: 'none',
           outline: 'none',
           border: 'none',
-          color: Theme.colors.primary.contrastText,
           fontSize: '1rem',
         }
       }
@@ -77,7 +76,7 @@ Styles.cssRule('.panel-config', {
       height: '40px !important',
       borderRadius: 12,
       paddingInline: 8,
-      background: Theme.background.paper,
+      background: Theme.input.background,
       $nest: {
         '&.w-100': {
           width: '100% !important',
@@ -87,7 +86,6 @@ Styles.cssRule('.panel-config', {
           width: '100% !important',
           height: '100% !important',
           backgroundColor: 'transparent',
-          color: Theme.colors.primary.contrastText,
           fontSize: '1rem',
           textAlign: 'left'
         },
@@ -119,7 +117,7 @@ Styles.cssRule('.panel-config', {
       },
     },
     'i-checkbox .checkmark': {
-      backgroundColor: Theme.background.paper,
+      backgroundColor: Theme.input.background,
       border: `1px solid ${Theme.colors.primary.light}`,
       borderRadius: 6,
       width: 20,

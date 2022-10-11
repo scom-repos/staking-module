@@ -102,7 +102,7 @@ export class TokenSelection extends Module {
         <i-vstack width="100%">
           <i-hstack gap={16} verticalAlignment="center">
             <i-image width={24} height={24} minWidth={16} minHeight={16} url={logoAddress} />
-            <i-label caption={`${token.symbol} ${token.address ? `(${token.address})` : ''}`} font={{ size: '16px', color: Theme.colors.primary.contrastText, name: 'Proxima Nova' }} />
+            <i-label caption={`${token.symbol} ${token.address ? `(${token.address})` : ''}`} font={{ size: '16px', name: 'Proxima Nova' }} />
           </i-hstack>
         </i-vstack>
       </i-hstack>
@@ -116,7 +116,7 @@ export class TokenSelection extends Module {
       const tokenItems = this.tokenDataList.map((token: ITokenObject) => this.renderToken(token));
       this.tokenList.append(...tokenItems);
     } else {
-      this.tokenList.append(<i-label font={{ color: Theme.colors.primary.contrastText }} margin={{ top: 10, bottom: 16 }} class="text-center" caption="No tokens found" />)
+      this.tokenList.append(<i-label margin={{ top: 10, bottom: 16 }} class="text-center" caption="No tokens found" />)
     }
   }
 
