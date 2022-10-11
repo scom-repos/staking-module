@@ -10,8 +10,8 @@
     "keywords": [],
     "license": "AGPL-3.0",
     "devDependencies": {
-        "@ijstech/components": "0.1.10",
-        "@ijstech/eth-wallet": "0.1.14",
+        "@ijstech/components": "0.1.13",
+        "@ijstech/eth-wallet": "0.1.16",
         "@openswap/sdk": "https://github.com/openswapdex/openswap-sdk",
         "@validapp/cross-chain-token-sdk": "https://github.com/valid-app/cross-chain-token-sdk",
         "@validapp/time-is-money-sdk": "https://github.com/valid-app/time-is-money-sdk",
