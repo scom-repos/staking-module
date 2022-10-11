@@ -7346,8 +7346,7 @@
                 overflow: "auto"
               },
               "i-button": {
-                boxShadow: "none",
-                color: Theme3.colors.primary.contrastText
+                boxShadow: "none"
               },
               "i-button:hover": {
                 background: `${Theme3.action.hover} !important`

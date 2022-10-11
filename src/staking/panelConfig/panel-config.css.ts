@@ -107,7 +107,6 @@ Styles.cssRule('.panel-config', {
             },
             'i-button': {
               boxShadow: 'none',
-              color: Theme.colors.primary.contrastText,
             },
             'i-button:hover': {
               background: `${Theme.action.hover} !important`,
