@@ -55,7 +55,7 @@ Styles.cssRule('.token-selection', {
           width: 450,
           maxWidth: '100%',
           minWidth: 'auto',
-          background: '#484860',
+          background: Theme.background.paper,
           padding: '0.5rem 0',
         },
         '#tokenList': {

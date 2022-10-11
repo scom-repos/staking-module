@@ -72,6 +72,9 @@ Styles.cssRule('.staking-component', {
     '*': {
       fontFamily: 'Proxima Nova',
     },
+    '#stakingElm': {
+      background: Theme.background.default,
+    },
     '.i-loading-overlay': {
       background: Theme.background.default,
     },

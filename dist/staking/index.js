@@ -6018,6 +6018,9 @@
       "*": {
         fontFamily: "Proxima Nova"
       },
+      "#stakingElm": {
+        background: Theme.background.default
+      },
       ".i-loading-overlay": {
         background: Theme.background.default
       },
@@ -7473,7 +7476,7 @@
             width: 450,
             maxWidth: "100%",
             minWidth: "auto",
-            background: "#484860",
+            background: Theme4.background.paper,
             padding: "0.5rem 0"
           },
           "#tokenList": {
