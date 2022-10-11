@@ -4,7 +4,7 @@ import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber 
 import { getChainId, getDefaultChainId, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
-const Theme = Styles.Theme.ThemeVars;
+const Theme = Styles.Theme.defaultTheme;
 
 declare global {
 	namespace JSX {

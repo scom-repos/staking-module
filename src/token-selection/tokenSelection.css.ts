@@ -1,5 +1,5 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
+const Theme = Styles.Theme.defaultTheme;
 
 Styles.cssRule('.token-selection', {
   $nest: {

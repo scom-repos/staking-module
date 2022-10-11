@@ -24,7 +24,8 @@ import { Result } from '../result';
 import { getTokenUrl, tokenIcon } from '../config';
 import './staking.css';
 import { ManageStake } from './manageStake';
-import { ModalConfig } from './modalConfig';
+import { PanelConfig } from './panelConfig';
+import { Contracts } from '@validapp/time-is-money-sdk';
 
 declare global {
 	namespace JSX {
@@ -42,7 +43,7 @@ export class StakingBlock extends Module implements PageBlock {
 	readonly onConfirm: () => Promise<void>;
 	readonly onDiscard: () => Promise<void>;
 
-	private mdConfig: ModalConfig;
+	private pnlConfig: PanelConfig;
 	private $eventBus: IEventBus;
 	private loadingElm: Panel;
 	private campaigns: any = [];
@@ -56,6 +57,7 @@ export class StakingBlock extends Module implements PageBlock {
 	private listActiveTimer: any = [];
 	private tokenIcon = tokenIcon || 'img/swap/openswap.png';
 	private tokenMap: TokenMapType = {};
+	private isNew: boolean;
 
 	validateConfig() {
 
@@ -67,7 +69,7 @@ export class StakingBlock extends Module implements PageBlock {
 
 	async setData(value: any) {
 		this.data = value;
-		this.mdConfig.closeModal();
+		this.pnlConfig.visible = false;
 		this.stakingLayout.visible = true;
 		this.onSetupPage(isWalletConnected());
 	}
@@ -81,7 +83,9 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async edit() {
-
+		this.pnlConfig.showInputCampaign(this.isNew);
+		this.stakingLayout.visible = false;
+		this.pnlConfig.visible = true;
 	}
 
 	async confirm() {
@@ -93,15 +97,19 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async config() {
-		this.stakingLayout.visible = false;
-		this.mdConfig.showModal();
+
 	}
 
 	async onConfigSave(campaign: StakingCampaign) {
 		this.data = campaign;
-		this.mdConfig.closeModal();
+		this.pnlConfig.visible = false;
 		this.stakingLayout.visible = true;
 		this.onSetupPage(isWalletConnected());
+	}
+
+	async onEditCampaign(isNew: boolean) {
+		this.isNew = isNew;
+		this.edit();
 	}
 
 	constructor(parent?: Container, options?: ControlElement) {
@@ -121,8 +129,29 @@ export class StakingBlock extends Module implements PageBlock {
 		this.onSetupPage(connected);
 	}
 
-	private onChainChange = () => {
-		this.onSetupPage(isWalletConnected());
+	private onChainChange = async () => {
+		const isConnected = isWalletConnected();
+		if (await this.isWalletValid(isConnected)) {
+			this.onSetupPage(isConnected);
+		}
+	}
+
+	private isWalletValid = async (isConnected: boolean) => {
+		if (this.data && isConnected) {
+			try {
+				const wallet = Wallet.getInstance();
+				const infoList = this.data[wallet.chainId];
+				const stakingAddress = infoList && infoList[0].stakings[0]?.address;
+				if (stakingAddress) {
+					const timeIsMoney = new Contracts.TimeIsMoney(wallet, stakingAddress);
+					await timeIsMoney.getCredit(wallet.address);
+				}
+				return true;
+			} catch {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private initWalletData = async () => {
@@ -146,19 +175,16 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	private onSetupPage = async (connected: boolean, hideLoading?: boolean) => {
-		if (!this.data) return;
-		if (!hideLoading) {
+		if (!hideLoading && this.loadingElm) {
 			this.loadingElm.visible = true;
 		}
-		if (!connected) {
-			this.stakingElm.clearInnerHTML();
-			this.stakingElm.appendChild(<i-hstack width="100%" minHeight={500} verticalAlignment="center" horizontalAlignment="center"><i-label caption="Please connect with your wallet!" /></i-hstack>);
-			this.loadingElm.visible = false;
+		if (!connected || !this.data) {
+			await this.renderEmpty();
 			return;
 		}
 		this.campaigns = await getAllCampaignsInfo(this.data);
 		await this.renderCampaigns(hideLoading);
-		if (!hideLoading) {
+		if (!hideLoading && this.loadingElm) {
 			this.loadingElm.visible = false;
 		}
 	}
@@ -266,14 +292,23 @@ export class StakingBlock extends Module implements PageBlock {
 
 	init = async () => {
 		super.init();
-		this.mdConfig = new ModalConfig();
-		this.mdConfig.onConfigSave = (campaign: StakingCampaign) => this.onConfigSave(campaign);
-		this.stakingComponent.appendChild(this.mdConfig);
+		this.pnlConfig = new PanelConfig();
+		this.pnlConfig.visible = false;
+		this.pnlConfig.onConfigSave = (campaign: StakingCampaign) => this.onConfigSave(campaign);
+		this.pnlConfig.onReset = () => {
+			this.pnlConfig.visible = false;
+			this.stakingLayout.visible = true;
+		}
+		this.stakingComponent.appendChild(this.pnlConfig);
 		this.stakingResult = new Result();
 		this.stakingComponent.appendChild(this.stakingResult);
 		this.initWalletData();
 		setDataFromSCConfig(Networks, InfuraId);
 		setCurrentChainId(getDefaultChainId());
+		if (!this.data) {
+			await this.renderEmpty();
+		}
+		
 	}
 
 	private updateButtonStatus = async (data: any) => {
@@ -295,6 +330,42 @@ export class StakingBlock extends Module implements PageBlock {
 		return text;
 	}
 
+	private initEmptyUI = async () => {
+		if (!this.noCampaignSection) {
+			this.noCampaignSection = await Panel.create();
+		}
+		const isConnected = isWalletConnected();
+		this.noCampaignSection.clearInnerHTML();
+		this.noCampaignSection.appendChild(
+			<i-panel class="no-campaign" background={{ color: '#192046' }}>
+				<i-vstack gap={10} verticalAlignment="center">
+					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
+					<i-label caption={ isConnected ? 'No Campaigns' : 'Please connect with your wallet!' } />
+					{
+						!this.data && isConnected ? (
+							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">
+								<i-button maxWidth={200} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
+								<i-button maxWidth={200} caption="Add Existing Campaigns" class="btn-os btn-stake" onClick={() => this.onEditCampaign(false)} />
+							</i-hstack>
+						) : []
+					}
+				</i-vstack>
+			</i-panel>
+		);
+		this.noCampaignSection.visible = true;
+	}
+
+	private renderEmpty = async () => {
+		await this.initEmptyUI();
+		if (this.stakingElm) {
+			this.stakingElm.clearInnerHTML();
+			this.stakingElm.appendChild(this.noCampaignSection);
+		}
+		if (this.loadingElm) {
+			this.loadingElm.visible = false;
+		}
+	}
+
 	private renderCampaigns = async (hideLoading?: boolean) => {
 		if (!hideLoading) {
 			this.stakingElm.clearInnerHTML();
@@ -302,15 +373,7 @@ export class StakingBlock extends Module implements PageBlock {
 		this.tokenMap = getTokenMap();
 		const chainId = getChainId();
 		const network = getNetworkInfo(chainId);
-		if (!this.noCampaignSection) {
-			this.noCampaignSection = await Panel.create();
-			this.noCampaignSection.appendChild(
-				<i-panel class="no-campaign" background={{ color: '#192046' }}>
-					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label caption="No Campaigns" />
-				</i-panel>
-			);
-		}
+		await this.initEmptyUI();
 		this.noCampaignSection.visible = false;
 		if (this.campaigns && !this.campaigns.length) {
 			this.stakingElm.clearInnerHTML();
@@ -853,7 +916,7 @@ export class StakingBlock extends Module implements PageBlock {
 	render() {
 		return (
 			<i-panel id="stakingComponent" class="staking-component" minHeight={200}>
-				<i-panel id="stakingLayout" visible={false} class="staking-layout" minHeight={500}>
+				<i-panel id="stakingLayout" class="staking-layout" minHeight={290}>
 					<i-vstack id="loadingElm" class="i-loading-overlay">
 						<i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
 							<i-icon

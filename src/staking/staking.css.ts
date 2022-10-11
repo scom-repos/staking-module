@@ -1,6 +1,17 @@
 import { Styles } from '@ijstech/components';
 import Assets from '@staking/assets';
 
+Styles.Theme.defaultTheme.background.main = '#181e3e';
+Styles.Theme.defaultTheme.background.paper = '#000';
+Styles.Theme.defaultTheme.colors.primary.main = '#FF6600';
+Styles.Theme.defaultTheme.colors.primary.light = 'rgb(101, 115, 195)';
+Styles.Theme.defaultTheme.colors.primary.contrastText = '#fff';
+Styles.Theme.defaultTheme.colors.secondary.main = '#f50057';
+Styles.Theme.defaultTheme.colors.secondary.light = 'rgb(247, 51, 120)';
+Styles.Theme.defaultTheme.action.active = 'rgba(0, 0, 0, 0.54)';
+Styles.Theme.defaultTheme.action.hover = 'rgba(0, 0, 0, 0.04)';
+Styles.Theme.defaultTheme.action.disabled = 'rgba(0, 0, 0, 0.26)';
+
 // Styles.Theme.darkTheme.background.default = '#0c1234';
 // Styles.Theme.darkTheme.background.paper = '#1f1e4f';
 // Styles.Theme.darkTheme.colors.primary.dark = '#F05E61';
@@ -81,6 +92,7 @@ Styles.fontFace({
 })
 
 Styles.cssRule('.staking-component', {
+  padding: '1rem',
   $nest: {
     '*': {
       fontFamily: 'Proxima Nova',
@@ -166,7 +178,6 @@ Styles.cssRule('.staking-component', {
     '.staking-layout': {
       width: '100%',
       marginInline: 'auto',
-      padding: '1rem',
     },
     'i-link': {
       display: 'flex',
@@ -435,7 +446,7 @@ Styles.cssRule('.staking-component', {
           },
         },
         '.no-campaign': {
-          margin: '2rem 1rem',
+          margin: '0 1rem',
           padding: '3rem 2rem',
           borderRadius: '26px',
           display: 'flex',

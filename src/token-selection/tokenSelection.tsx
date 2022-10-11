@@ -9,7 +9,7 @@ import {
 import { ITokenObject } from '@staking/global';
 import Assets from '@staking/assets';
 import './tokenSelection.css';
-const Theme = Styles.Theme.ThemeVars;
+const Theme = Styles.Theme.defaultTheme;
 
 declare global {
   namespace JSX {
