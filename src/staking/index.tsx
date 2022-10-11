@@ -59,7 +59,6 @@ export class StakingBlock extends Module implements PageBlock {
 	private listActiveTimer: any = [];
 	private tokenIcon = tokenIcon || 'img/swap/openswap.png';
 	private tokenMap: TokenMapType = {};
-	private isNew: boolean;
 
 	validateConfig() {
 
@@ -85,7 +84,7 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async edit() {
-		this.pnlConfig.showInputCampaign(this.isNew);
+		this.pnlConfig.showInputCampaign(!this.data, this.getCampaign());
 		this.stakingLayout.visible = false;
 		this.pnlConfig.visible = true;
 	}
@@ -95,7 +94,8 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async discard() {
-
+		this.pnlConfig.visible = false;
+		this.stakingLayout.visible = true;
 	}
 
 	async config() {
@@ -110,8 +110,19 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async onEditCampaign(isNew: boolean) {
-		this.isNew = isNew;
-		this.edit();
+		this.pnlConfig.showInputCampaign(isNew, this.getCampaign());
+		this.stakingLayout.visible = false;
+		this.pnlConfig.visible = true;
+	}
+
+	private getCampaign() {
+		if (this.data) {
+			const keys = Object.keys(this.data);
+			if (keys.length) {
+				return this.data[keys[0]][0]
+			}
+		}
+		return this.data;
 	}
 
 	constructor(parent?: Container, options?: ControlElement) {
@@ -310,7 +321,6 @@ export class StakingBlock extends Module implements PageBlock {
 		if (!this.data) {
 			await this.renderEmpty();
 		}
-		
 	}
 
 	private updateButtonStatus = async (data: any) => {
@@ -347,7 +357,7 @@ export class StakingBlock extends Module implements PageBlock {
 						!this.data && isConnected ? (
 							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">
 								<i-button maxWidth={200} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
-								<i-button maxWidth={200} caption="Add Existing Campaigns" class="btn-os btn-stake" onClick={() => this.onEditCampaign(false)} />
+								<i-button maxWidth={200} caption="Edit Existing Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(false)} />
 							</i-hstack>
 						) : []
 					}
@@ -604,7 +614,7 @@ export class StakingBlock extends Module implements PageBlock {
 
 			nodeItems.push(containerSection);
 			containerSection.appendChild(
-				<i-hstack class="row-custom" background={{ color: campaign.customColorBackground || 'hsla(0,0%,100%,0.15)' }} width="100%" wrap="wrap">
+				<i-hstack class="row-custom" background={{ color: campaign.customColorBackground || '#ffffff26' }} width="100%" wrap="wrap">
 					<i-vstack class="column-custom">
 						<i-vstack class="banner" background={{ color: campaign.customColorCampaign || '#f15e61' }} verticalAlignment="space-between">
 							{stickerSection}
@@ -797,7 +807,7 @@ export class StakingBlock extends Module implements PageBlock {
 							const durationDays = option.minLockTime / (60 * 60 * 24);
 
 							return <i-vstack class="column-custom">
-								<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || 'hsla(0,0%,100%,0.03)' }}>
+								<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || '#ffffff07' }}>
 									{stickerOptionSection}
 									<i-panel class="header-info">
 										<i-hstack verticalAlignment='center' horizontalAlignment="center">

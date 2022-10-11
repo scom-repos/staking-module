@@ -1,7 +1,7 @@
 import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
-import { Reward } from '@staking/store';
+import { getTokenMap, Reward } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -28,9 +28,11 @@ export class RewardConfig extends Module {
 	private checkboxStartDate: Checkbox;
 	private wrapperAddressElm: HStack;
 	private _isNew: boolean;
+	private _data?: Reward;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
+	private isInitialized = false;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -50,9 +52,42 @@ export class RewardConfig extends Module {
 		return this._isNew;
 	}
 
+	set data(value: Reward | undefined) {
+		this._data = value;
+		this.setupData();
+	}
+
+	get data() {
+		return this._data;
+	}
+
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
+		}
+	}
+
+	private setupData = async () => {
+		if (this.data) {
+			const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate } = this.data;
+			const tokenMap = getTokenMap();
+			const token = tokenMap[rewardTokenAddress] || tokenMap[rewardTokenAddress.toLowerCase()];
+			const interval = setInterval(() => {
+				if (this.isInitialized) {
+					clearInterval(interval);
+					this.inputAddress.value = address;
+					this.isAddressValid = true;
+					this.token = token;
+					this.tokenSelection.token = token;
+					this.inputMultiplier.value = multiplier;
+					this.inputInitialReward.value = initialReward;
+					this.inputVestingPeriod.value = vestingPeriod;
+					this.inputClaimDeadline.value = claimDeadline;
+					this.inputAdmin.value = admin;
+					this.isAdminValid = true;
+					this.checkboxStartDate.checked = !!isCommonStartDate;
+				}
+			}, 200);
 		}
 	}
 
@@ -119,6 +154,7 @@ export class RewardConfig extends Module {
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
 		this.setupInput();
+		this.isInitialized = true;
 	}
 
 	render() {

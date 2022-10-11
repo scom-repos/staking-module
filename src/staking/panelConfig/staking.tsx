@@ -1,7 +1,7 @@
 import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
-import { getChainId, getDefaultChainId, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
+import { getChainId, getDefaultChainId, getTokenMap, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
 const Theme = Styles.Theme.ThemeVars;
@@ -36,9 +36,11 @@ export class StakingConfig extends Module {
 	private inputDecimalsOffset: Input;
 	private wrapperAddressElm: HStack;
 	private _isNew: boolean;
+	private _data?: Staking;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
+	private isInitialized = false;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -66,9 +68,57 @@ export class StakingConfig extends Module {
 		return this._isNew;
 	}
 
+	set data(value: Staking | undefined) {
+		this._data = value;
+		this.setupData();
+	}
+
+	get data() {
+		return this._data;
+	}
+
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
+		}
+	}
+
+	private setupData = async () => {
+		if (this.data) {
+			const { address, lockTokenAddress, minLockTime, maxTotalLock, entryStart, entryEnd, perAddressCap, customDesc, lockTokenType, decimalsOffset, rewards } = this.data;
+			const tokenMap = getTokenMap();
+			const token = tokenMap[lockTokenAddress] || tokenMap[lockTokenAddress.toLowerCase()];
+			this.lockType = lockTokenType;
+			const interval = setInterval(async () => {
+				if (this.isInitialized) {
+					clearInterval(interval);
+					this.inputAddress.value = address;
+					this.isAddressValid = true;
+					this.token = token;
+					this.tokenSelection.token = token;
+					this.inputMinLockTime.value = minLockTime;
+					this.inputEntryStart.value = entryStart;
+					this.inputEntryEnd.value = entryEnd;
+					this.inputPerAddressCap.value = perAddressCap;
+					this.inputMaxTotalLock.value = maxTotalLock;
+					this.inputDesc.value = customDesc || '';
+					this.inputDecimalsOffset.value = decimalsOffset || '';
+					this.renderTypeButton();
+					this.listRewardButton.clearInnerHTML();
+					this.pnlInfoElm.clearInnerHTML();
+					this.rewardConfig = [];
+					for (const reward of rewards) {
+						await this.onAddReward(reward);
+					}
+				}
+			}, 200)
+		} else if (!this.rewardConfig.length) {
+			const interval = setInterval(() => {
+				if (this.isInitialized) {
+					clearInterval(interval);
+					this.onAddReward();
+				}
+			}, 200);
 		}
 	}
 
@@ -80,7 +130,9 @@ export class StakingConfig extends Module {
 			maxWidth: 300,
 			popupPlacement: 'bottom'
 		});
-		this.lockType = LockTokenTypeList[0]?.value;
+		if (this.lockType === undefined) {
+			this.lockType = LockTokenTypeList[0]?.value;
+		}
 		const btnType = await Button.create({
 			caption: LockTokenTypeList[0] ? LockTokenTypeList[0].name : 'Select Type',
 			background: { color: Theme.input.background },
@@ -142,7 +194,7 @@ export class StakingConfig extends Module {
 		this.emitInput();
 	}
 
-	private addReward = async (idx: number) => {
+	private addReward = async (idx: number, reward?: Reward) => {
 		for (const elm of this.rewardConfig) {
 			elm.visible = false;
 		}
@@ -154,11 +206,12 @@ export class StakingConfig extends Module {
 		if (!this.isNew) {
 			this.rewardConfig[idx].chainId = this.chainId;
 		}
+		this.rewardConfig[idx].data = reward;
 		this.currentReward = idx;
 		this.emitInput();
 	}
 
-	private onAddReward = async () => {
+	private onAddReward = async (reward?: Reward) => {
 		this.btnAdd.enabled = false;
 		const idx = Number(this.rewardConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
@@ -175,7 +228,7 @@ export class StakingConfig extends Module {
 		pnl.appendChild(button);
 		pnl.appendChild(icon);
 		this.listRewardButton.appendChild(pnl);
-		await this.addReward(idx);
+		await this.addReward(idx, reward);
 		this.btnAdd.enabled = true;
 	}
 
@@ -260,9 +313,8 @@ export class StakingConfig extends Module {
 		this.tokenSelection = new TokenSelection();
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
-		this.onAddReward();
-		this.renderTypeButton();
 		this.setupInput();
+		this.isInitialized = true;
 	}
 
 	render() {
@@ -338,7 +390,7 @@ export class StakingConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} margin={{ top: 10, bottom: 5 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack id="listRewardButton" verticalAlignment="center" />
-						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Reward" onClick={this.onAddReward} />
+						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Reward" onClick={() => this.onAddReward()} />
 					</i-hstack>
 					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
 					<i-panel id="pnlInfoElm" />

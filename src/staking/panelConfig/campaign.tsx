@@ -24,7 +24,6 @@ export class CampaignConfig extends Module {
 	private inputName: Input;
 	private inputDesc: Input;
 	private inputURL: Input;
-	private inputVestingPeriod: Input;
 	private checkboxContract: Checkbox;
 	private inputMainColor: Input;
 	private inputBg: Input;
@@ -33,7 +32,9 @@ export class CampaignConfig extends Module {
 	private inputStakingBg: Input;
 	private inputStakingBtn: Input;
 	private _isNew: boolean;
+	private _data?: StakingCampaign;
 	private wapperNetworkElm: HStack;
+	private isInitialized = false;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -54,9 +55,54 @@ export class CampaignConfig extends Module {
 		return this._isNew;
 	}
 
+	set data(value: StakingCampaign | undefined) {
+		this._data = value;
+		this.setupData();
+	}
+
+	get data() {
+		return this._data;
+	}
+
 	private setupInput = () => {
 		if (this.wapperNetworkElm) {
 			this.wapperNetworkElm.visible = !this.isNew;
+		}
+	}
+
+	private setupData = async () => {
+		if (this.data) {
+			const { chainId, customName, customDesc, getTokenURL, showContractLink, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
+			this.network = chainId || getChainId();
+			const interval = setInterval(async () => {
+				if (this.isInitialized) {
+					clearInterval(interval)
+					this.inputName.value = customName;
+					this.inputDesc.value = customDesc || '';
+					this.inputURL.value = getTokenURL || '';
+					this.checkboxContract.checked = !!showContractLink;
+					this.inputMainColor.value = customColorCampaign || '';
+					this.inputBg.value = customColorBackground || '';
+					this.inputColorText.value = customColorText || '';
+					this.inputCountdownBg.value = customColorTimeBackground || '';
+					this.inputStakingBg.value = customColorStakingBackground || '';
+					this.inputStakingBtn.value = customColorButton || '';
+					this.renderNetworkButton();
+					this.listStakingButton.clearInnerHTML();
+					this.pnlInfoElm.clearInnerHTML();
+					this.stakingConfig = [];
+					for (const staking of stakings) {
+						await this.onAddStaking(staking);
+					}
+				}
+			}, 200);
+		} else if (!this.stakingConfig.length) {
+			const interval = setInterval(() => {
+				if (this.isInitialized) {
+					clearInterval(interval);
+					this.onAddStaking();
+				}
+			}, 200);
 		}
 	}
 
@@ -135,7 +181,7 @@ export class CampaignConfig extends Module {
 		this.emitInput();
 	}
 
-	private addStaking = async (idx: number) => {
+	private addStaking = async (idx: number, staking?: Staking) => {
 		for (const elm of this.stakingConfig) {
 			elm.visible = false;
 		}
@@ -147,11 +193,12 @@ export class CampaignConfig extends Module {
 		if (!this.isNew) {
 			this.stakingConfig[idx].chainId = this.network;
 		}
+		this.stakingConfig[idx].data = staking;
 		this.currentStaking = idx;
 		this.emitInput();
 	}
 
-	private onAddStaking = async () => {
+	private onAddStaking = async (staking?: Staking) => {
 		this.btnAdd.enabled = false;
 		const idx = Number(this.stakingConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
@@ -168,7 +215,7 @@ export class CampaignConfig extends Module {
 		pnl.appendChild(button);
 		pnl.appendChild(icon);
 		this.listStakingButton.appendChild(pnl);
-		await this.addStaking(idx);
+		await this.addStaking(idx, staking);
 		this.btnAdd.enabled = true;
 	}
 
@@ -209,7 +256,6 @@ export class CampaignConfig extends Module {
 			customName: this.inputName.value,
 			customDesc: this.inputDesc.value || undefined,
 			getTokenURL: this.inputURL.value || undefined,
-			vestingPeriod: this.inputVestingPeriod.value || undefined,
 			showContractLink: this.checkboxContract.checked || undefined,
 			customColorCampaign: this.inputMainColor.value || undefined,
 			customColorBackground: this.inputBg.value || undefined,
@@ -225,9 +271,8 @@ export class CampaignConfig extends Module {
 	init() {
 		this.network = getChainId() || getDefaultChainId();
 		super.init();
-		this.onAddStaking();
-		this.renderNetworkButton();
 		this.setupInput();
+		this.isInitialized = true;
 	}
 
 	render() {
@@ -253,12 +298,8 @@ export class CampaignConfig extends Module {
 						<i-input id="inputDesc" class="input-area" inputType="textarea" rows={3} onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Get Token URL" />
+						<i-label class="lb-title" caption="Token Trade URL" />
 						<i-input id="inputURL" class="input-text" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Vesting Period" />
-						<i-input id="inputVestingPeriod" class="input-text" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Show Contract Link" />
@@ -276,7 +317,7 @@ export class CampaignConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Campaign Background" />
-						<i-input id="inputBg" placeholder="hsla(0, 0%, 100%, 0.15)" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputBg" placeholder="#ffffff26" class="input-text" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Color Text" />
@@ -288,7 +329,7 @@ export class CampaignConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Staking Background" />
-						<i-input id="inputStakingBg" placeholder="hsla(0, 0%, 100%, 0.03)" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputStakingBg" placeholder="#ffffff07" class="input-text" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Staking Button" />
@@ -296,7 +337,7 @@ export class CampaignConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} margin={{ top: 10, bottom: 5 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack id="listStakingButton" verticalAlignment="center" />
-						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={this.onAddStaking} />
+						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={() => this.onAddStaking()} />
 					</i-hstack>
 					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
 					<i-panel id="pnlInfoElm" />

@@ -20,14 +20,13 @@ interface StakingCampaign {
   customName: string,
   customDesc?: string,
   getTokenURL?: string,
-  vestingPeriod?: string,
   showContractLink?: boolean,
   customColorCampaign?: string, // 1 campaign main color
   customColorBackground?: string, // 2 campign background
   customColorStakingBackground?: string, // 3 staking background
   customColorButton?: string, // 4 staking button
   customColorText?: string, // 5 text
-  customColorTimeBackground?:string, //6 string end countdown background
+  customColorTimeBackground? :string, //6 string end countdown background
 
   stakings: Staking[],
 }
