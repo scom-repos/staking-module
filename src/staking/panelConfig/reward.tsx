@@ -1,4 +1,4 @@
-import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
+import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack, VStack, Modal, Button } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenMapData, Reward } from '@staking/store';
@@ -34,7 +34,25 @@ export class RewardConfig extends Module {
 	private isAddressValid: boolean;
 	private _chainId: number;
 	private isInitialized = false;
-	private dayVal = 24 * 60 * 60;
+
+	private pnlTimeSelection: Panel;
+	private btnTime: Button;
+	private unit: number = 1;
+	private hourVal = 60 * 60;
+	private units = [
+		{
+			name: 'Hour(s)',
+			value: 1
+		},
+		{
+			name: 'Day(s)',
+			value: 24
+		},
+		{
+			name: 'Week(s)',
+			value: 7 * 24
+		},
+	];
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
@@ -96,7 +114,7 @@ export class RewardConfig extends Module {
 					this.tokenSelection.token = token;
 					this.inputMultiplier.value = new BigNumber(multiplier).toFixed();
 					this.inputInitialReward.value = new BigNumber(initialReward).toFixed();
-					this.inputRewardVesting.value = new BigNumber(vestingPeriod).dividedBy(this.dayVal).toFixed();
+					this.inputRewardVesting.value = new BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
 					this.inputClaimDeadline.value = new BigNumber(claimDeadline).toFixed();
 					this.inputAdmin.value = admin;
 					this.isAdminValid = true;
@@ -105,6 +123,46 @@ export class RewardConfig extends Module {
 				}
 			}, 200);
 		}
+	}
+
+	renderTimeButton = async () => {
+		const vstack = await VStack.create({ gap: 8 });
+		const dropdownModal = await Modal.create({
+			showBackdrop: false,
+			maxWidth: 80,
+			minWidth: 'auto',
+			popupPlacement: 'bottom'
+		});
+		this.btnTime = await Button.create({
+			caption: 'Hour(s)',
+			background: { color: Theme.input.background },
+			border: { style: 'none', radius: 12 },
+			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
+			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
+			width: '100%',
+			height: 40,
+			maxWidth: 80,
+		});
+		this.btnTime.classList.add('btn-select');
+		this.btnTime.onClick = () => { dropdownModal.visible = !dropdownModal.visible }
+		for (const unit of this.units) {
+			const dropdownItem = await Button.create({
+				caption: unit.name,
+				background: { color: 'transparent' },
+				height: 36,
+			});
+			dropdownItem.onClick = () => {
+				if (this.unit === unit.value) return;
+				dropdownModal.visible = false;
+				this.btnTime.caption = unit.name;
+				this.unit = unit.value;
+			};
+			vstack.appendChild(dropdownItem);
+		}
+		dropdownModal.item = vstack;
+		this.pnlTimeSelection.clearInnerHTML();
+		this.pnlTimeSelection.appendChild(this.btnTime);
+		this.pnlTimeSelection.appendChild(dropdownModal);
 	}
 
 	private emitInput = () => {
@@ -156,7 +214,7 @@ export class RewardConfig extends Module {
 			rewardTokenAddress: this.token?.address || '',
 			multiplier: new BigNumber(this.inputMultiplier.value),
 			initialReward: new BigNumber(this.inputInitialReward.value),
-			vestingPeriod: new BigNumber(this.inputRewardVesting.value).multipliedBy(this.dayVal),
+			vestingPeriod: new BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
 			claimDeadline: new BigNumber(this.inputClaimDeadline.value),
 			admin: `${this.inputAdmin.value}`,
 			isCommonStartDate: this.checkboxStartDate.checked,
@@ -164,11 +222,12 @@ export class RewardConfig extends Module {
 		return reward;
 	}
 
-	init() {
+	async init() {
 		super.init();
 		this.tokenSelection = new TokenSelection();
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
+		await this.renderTimeButton();
 		this.setupInput();
 		this.isInitialized = true;
 	}
@@ -213,7 +272,10 @@ export class RewardConfig extends Module {
 							<i-label class="lb-title" caption="Reward Vesting" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputRewardVesting" placeholder="Day" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-hstack gap={4} class="w-input" verticalAlignment="center" wrap="nowrap">
+							<i-input id="inputRewardVesting" inputType="number" width={216} class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
+							<i-panel id="pnlTimeSelection" class="network-selection" width={80} />
+						</i-hstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">

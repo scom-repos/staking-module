@@ -8453,7 +8453,22 @@
       super(parent, options);
       this.isAdminValid = false;
       this.isInitialized = false;
-      this.dayVal = 24 * 60 * 60;
+      this.unit = 1;
+      this.hourVal = 60 * 60;
+      this.units = [
+        {
+          name: "Hour(s)",
+          value: 1
+        },
+        {
+          name: "Day(s)",
+          value: 24
+        },
+        {
+          name: "Week(s)",
+          value: 7 * 24
+        }
+      ];
       this.setupInput = () => {
         if (this.wrapperAddressElm) {
           this.wrapperAddressElm.visible = !this.isNew;
@@ -8473,7 +8488,7 @@
               this.tokenSelection.token = token;
               this.inputMultiplier.value = new import_eth_wallet3.BigNumber(multiplier).toFixed();
               this.inputInitialReward.value = new import_eth_wallet3.BigNumber(initialReward).toFixed();
-              this.inputRewardVesting.value = new import_eth_wallet3.BigNumber(vestingPeriod).dividedBy(this.dayVal).toFixed();
+              this.inputRewardVesting.value = new import_eth_wallet3.BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
               this.inputClaimDeadline.value = new import_eth_wallet3.BigNumber(claimDeadline).toFixed();
               this.inputAdmin.value = admin;
               this.isAdminValid = true;
@@ -8482,6 +8497,48 @@
             }
           }, 200);
         }
+      };
+      this.renderTimeButton = async () => {
+        const vstack = await import_components10.VStack.create({ gap: 8 });
+        const dropdownModal = await import_components10.Modal.create({
+          showBackdrop: false,
+          maxWidth: 80,
+          minWidth: "auto",
+          popupPlacement: "bottom"
+        });
+        this.btnTime = await import_components10.Button.create({
+          caption: "Hour(s)",
+          background: { color: Theme6.input.background },
+          border: { style: "none", radius: 12 },
+          padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
+          rightIcon: { name: "caret-down", fill: Theme6.colors.primary.main },
+          width: "100%",
+          height: 40,
+          maxWidth: 80
+        });
+        this.btnTime.classList.add("btn-select");
+        this.btnTime.onClick = () => {
+          dropdownModal.visible = !dropdownModal.visible;
+        };
+        for (const unit of this.units) {
+          const dropdownItem = await import_components10.Button.create({
+            caption: unit.name,
+            background: { color: "transparent" },
+            height: 36
+          });
+          dropdownItem.onClick = () => {
+            if (this.unit === unit.value)
+              return;
+            dropdownModal.visible = false;
+            this.btnTime.caption = unit.name;
+            this.unit = unit.value;
+          };
+          vstack.appendChild(dropdownItem);
+        }
+        dropdownModal.item = vstack;
+        this.pnlTimeSelection.clearInnerHTML();
+        this.pnlTimeSelection.appendChild(this.btnTime);
+        this.pnlTimeSelection.appendChild(dropdownModal);
       };
       this.emitInput = () => {
         import_components10.application.EventBus.dispatch(import_global5.EventId.EmitInput);
@@ -8521,7 +8578,7 @@
           rewardTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
           multiplier: new import_eth_wallet3.BigNumber(this.inputMultiplier.value),
           initialReward: new import_eth_wallet3.BigNumber(this.inputInitialReward.value),
-          vestingPeriod: new import_eth_wallet3.BigNumber(this.inputRewardVesting.value).multipliedBy(this.dayVal),
+          vestingPeriod: new import_eth_wallet3.BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
           claimDeadline: new import_eth_wallet3.BigNumber(this.inputClaimDeadline.value),
           admin: `${this.inputAdmin.value}`,
           isCommonStartDate: this.checkboxStartDate.checked
@@ -8551,11 +8608,12 @@
     get data() {
       return this._data;
     }
-    init() {
+    async init() {
       super.init();
       this.tokenSelection = new TokenSelection();
       this.tokenSelection.onSelectToken = this.onInputToken;
       this.pnlTokenSelection.appendChild(this.tokenSelection);
+      await this.renderTimeButton();
       this.setupInput();
       this.isInitialized = true;
     }
@@ -8658,13 +8716,22 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme6.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-input", {
-        id: "inputRewardVesting",
-        placeholder: "Day",
-        inputType: "number",
-        class: "input-text w-input",
-        onChanged: (src) => this.onInputUnix(src)
       })), /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 4,
+        class: "w-input",
+        verticalAlignment: "center",
+        wrap: "nowrap"
+      }, /* @__PURE__ */ this.$render("i-input", {
+        id: "inputRewardVesting",
+        inputType: "number",
+        width: 216,
+        class: "input-text",
+        onChanged: (src) => this.onInputUnix(src)
+      }), /* @__PURE__ */ this.$render("i-panel", {
+        id: "pnlTimeSelection",
+        class: "network-selection",
+        width: 80
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -8741,11 +8808,19 @@
       this.rewardConfig = [];
       this.currentReward = 0;
       this.isInitialized = false;
-      this.dayVal = 24 * 60 * 60;
+      this.hourVal = 60 * 60;
       this.units = [
         {
-          name: "Day",
+          name: "Hour(s)",
           value: 1
+        },
+        {
+          name: "Day(s)",
+          value: 24
+        },
+        {
+          name: "Week(s)",
+          value: 7 * 24
         }
       ];
       this.setupInput = () => {
@@ -8768,7 +8843,7 @@
               this.isAddressValid = true;
               this.token = token;
               this.tokenSelection.token = token;
-              this.inputLockingTime.value = lockingTime.dividedBy(this.dayVal).toFixed();
+              this.inputLockingTime.value = lockingTime.dividedBy(this.hourVal).toFixed();
               this.lbMinLockTime.caption = lockingTime.isEqualTo(1) ? "1 second" : `${(0, import_global6.formatNumber)(minLockTime)} seconds`;
               this.inputPerAddressCap.value = new import_eth_wallet4.BigNumber(perAddressCap).toFixed();
               this.inputMaxTotalLock.value = new import_eth_wallet4.BigNumber(maxTotalLock).toFixed();
@@ -8800,7 +8875,7 @@
           popupPlacement: "bottom"
         });
         this.btnTime = await import_components11.Button.create({
-          caption: "Day",
+          caption: "Hour(s)",
           background: { color: Theme7.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
@@ -8973,7 +9048,7 @@
       };
       this.updateMinLockTime = () => {
         const val = new import_eth_wallet4.BigNumber(this.inputLockingTime.value || 0);
-        this.lbMinLockTime.caption = `${(0, import_global6.formatNumber)(val.multipliedBy(this.unit).multipliedBy(this.dayVal))} seconds`;
+        this.lbMinLockTime.caption = `${(0, import_global6.formatNumber)(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
       };
       this.onInputNumber = (input) => {
         (0, import_global6.limitInputNumber)(input, 18);
@@ -9005,7 +9080,7 @@
         const staking = {
           address: this.inputAddress.value,
           lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
-          minLockTime: new import_eth_wallet4.BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.dayVal),
+          minLockTime: new import_eth_wallet4.BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
           perAddressCap: new import_eth_wallet4.BigNumber(this.inputPerAddressCap.value),
           maxTotalLock: new import_eth_wallet4.BigNumber(this.inputMaxTotalLock.value),
           customDesc: this.inputDesc.value,
@@ -11006,7 +11081,9 @@
         id: "stakingComponent",
         class: "staking-component",
         minHeight: 200
-      }, /* @__PURE__ */ this.$render("i-panel", {
+      }, /* @__PURE__ */ this.$render("i-datepicker", {
+        type: "dateTime"
+      }), /* @__PURE__ */ this.$render("i-panel", {
         id: "stakingLayout",
         class: "staking-layout",
         minHeight: 290

@@ -44,20 +44,20 @@ export class StakingConfig extends Module {
 	private isAddressValid: boolean;
 	private isInitialized = false;
 
-	private dayVal = 24 * 60 * 60;
+	private hourVal = 60 * 60;
 	private units = [
 		{
-			name: 'Day',
+			name: 'Hour(s)',
 			value: 1
 		},
-		// {
-		// 	name: 'Week',
-		// 	value: 7
-		// },
-		// {
-		// 	name: 'Month',
-		// 	value: 30
-		// },
+		{
+			name: 'Day(s)',
+			value: 24
+		},
+		{
+			name: 'Week(s)',
+			value: 7 * 24
+		},
 	];
 
 	constructor(parent?: Container, options?: any) {
@@ -127,7 +127,7 @@ export class StakingConfig extends Module {
 					this.isAddressValid = true;
 					this.token = token;
 					this.tokenSelection.token = token;
-					this.inputLockingTime.value = lockingTime.dividedBy(this.dayVal).toFixed();
+					this.inputLockingTime.value = lockingTime.dividedBy(this.hourVal).toFixed();
 					this.lbMinLockTime.caption = lockingTime.isEqualTo(1) ? '1 second' : `${formatNumber(minLockTime)} seconds`;
 					this.inputPerAddressCap.value = new BigNumber(perAddressCap).toFixed();
 					this.inputMaxTotalLock.value = new BigNumber(maxTotalLock).toFixed();
@@ -160,7 +160,7 @@ export class StakingConfig extends Module {
 			popupPlacement: 'bottom'
 		});
 		this.btnTime = await Button.create({
-			caption: 'Day',
+			caption: 'Hour(s)',
 			background: { color: Theme.input.background },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
@@ -337,7 +337,7 @@ export class StakingConfig extends Module {
 
 	private updateMinLockTime = () => {
 		const val = new BigNumber(this.inputLockingTime.value || 0);
-		this.lbMinLockTime.caption = `${formatNumber(val.multipliedBy(this.unit).multipliedBy(this.dayVal))} seconds`;
+		this.lbMinLockTime.caption = `${formatNumber(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
 	}
 
 	private onInputNumber = (input: Control) => {
@@ -377,7 +377,7 @@ export class StakingConfig extends Module {
 		const staking: Staking = {
 			address: this.inputAddress.value,
 			lockTokenAddress: this.token?.address || '',
-			minLockTime: new BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.dayVal),
+			minLockTime: new BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
 			perAddressCap: new BigNumber(this.inputPerAddressCap.value),
 			maxTotalLock: new BigNumber(this.inputMaxTotalLock.value),
 			customDesc: this.inputDesc.value,
