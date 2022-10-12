@@ -11081,9 +11081,7 @@
         id: "stakingComponent",
         class: "staking-component",
         minHeight: 200
-      }, /* @__PURE__ */ this.$render("i-datepicker", {
-        type: "dateTime"
-      }), /* @__PURE__ */ this.$render("i-panel", {
+      }, /* @__PURE__ */ this.$render("i-panel", {
         id: "stakingLayout",
         class: "staking-layout",
         minHeight: 290
