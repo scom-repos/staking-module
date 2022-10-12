@@ -276,7 +276,7 @@ Styles.cssRule('.token-selection', {
             '.token-name i-label > *': {
               fontSize: '0.75rem',
               marginRight: '0.5rem',
-              color: 'rgba(255,255,255,0.55)'
+              color: Theme.colors.secondary.main
             }
           }
         }
