@@ -4268,6 +4268,7 @@ var EventId;
   EventId2["chainChanged"] = "chainChanged";
   EventId2["EmitButtonStatus"] = "emitButtonStatus";
   EventId2["EmitInput"] = "emitInput";
+  EventId2["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT

@@ -20,6 +20,8 @@ interface StakingCampaign {
   customName: string,
   customDesc?: string,
   getTokenURL?: string,
+  campaignStart: BigNumber, //unix
+  campaignEnd: BigNumber, //unix
   showContractLink?: boolean,
   customColorCampaign?: string, // 1 campaign main color
   customColorBackground?: string, // 2 campign background
@@ -36,8 +38,6 @@ interface Staking {
   address?: string,
   lockTokenAddress: string,
   minLockTime: BigNumber, //in second 
-  entryStart: BigNumber, //unix
-  entryEnd: BigNumber, //unix
   perAddressCap: BigNumber,
   maxTotalLock: BigNumber,
 
@@ -67,12 +67,12 @@ interface Reward {
 //       customName: 'OpenSwap 1st Anniversary<br>Birthday Staking Campaign',
 //       customDesc: 'Wow, Time Flies.. Let\'s Go Bridge Soon<br>Stake Now!',
 //       getTokenURL: `${baseUrl}/swap`,
+//       campaignStart: new BigNumber("1663074000"), //unix
+//       campaignEnd: new BigNumber("1664283600"), //unix
 //       stakings: [{
 //         address: "0xd2eD1a54Ea2c0621DfE3EB3375a53230138EA0F3",
 //         lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
 //         minLockTime: new BigNumber("1209600"), //in second, 14 days
-//         entryStart: new BigNumber("1663074000"), //unix
-//         entryEnd: new BigNumber("1664283600"), //unix
 //         perAddressCap: new BigNumber("3000"),
 //         maxTotalLock: new BigNumber("100000"),
 //         customDesc: "Stake OSWAP, Earn OSWAP",
@@ -91,8 +91,6 @@ interface Reward {
 //         address: '0x3826C16625771f670e5a56271B2aB2b8e12B9e20',
 //         lockTokenAddress: "0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93",
 //         minLockTime: new BigNumber("2592000"), //in second, 30 days
-//         entryStart: new BigNumber("1663074000"), //unix
-//         entryEnd: new BigNumber("1664283600"), //unix
 //         perAddressCap: new BigNumber("3000"),
 //         maxTotalLock: new BigNumber("100000"),
 //         customDesc: "Stake OSWAP, Earn OSWAP",
@@ -114,12 +112,12 @@ interface Reward {
 //       customName: 'Testing 1',
 //       customDesc: 'line 1<br>line 2',
 //       getTokenURL: `${baseUrl}/swap`,
+//       campaignStart: new BigNumber("1663074000"), //unix
+//       campaignEnd: new BigNumber("1664283600"), //unix
 //       stakings: [{
 //         address: "0xcBb388017101f4a7c8710ef01415aF4F4F726E19",
 //         lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
 //         minLockTime: new BigNumber("300"), //in second, 5 mins.
-//         entryStart: new BigNumber("1662624142"), //unix
-//         entryEnd: new BigNumber("1682899200"), //unix
 //         perAddressCap: new BigNumber("100000"),
 //         maxTotalLock: new BigNumber("100000"),
 //         customDesc: "Stake OSWAP, Earn OSWAP",
@@ -138,8 +136,6 @@ interface Reward {
 //         address: '0xf9dA3743c57ec64505F27B9822BaFB0f8ab5E90d',
 //         lockTokenAddress: "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
 //         minLockTime: new BigNumber("86400"), //in second, 1 day.
-//         entryStart: new BigNumber("1662624142"), //unix
-//         entryEnd: new BigNumber("1682899200"), //unix
 //         perAddressCap: new BigNumber("100000"),
 //         maxTotalLock: new BigNumber("100000"),
 //         customDesc: "Stake OSWAP, Earn OSWAP",

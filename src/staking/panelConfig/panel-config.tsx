@@ -38,7 +38,7 @@ export class PanelConfig extends Module {
   private $eventBus: IEventBus;
   private isNew: boolean;
   private campaigns: {[chainId:number]: StakingCampaign[]};
-  private isMultiple = false;
+  private isMultiple = true;
   onConfigSave: any;
   onReset: any;
 
@@ -71,7 +71,7 @@ export class PanelConfig extends Module {
     this.updateButton();
   }
 
-  showInputCampaign = (isNew: boolean, campaign: StakingCampaign | undefined) => {
+  showInputCampaign = async (isNew: boolean, campaigns?: StakingCampaign[]) => {
     this.wrapperNetworkElm.visible = isNew;
     this.wapperCampaignsButton.visible = this.isMultiple && !isNew;
     this.groupBtnSaveElm.visible = !isNew;
@@ -80,7 +80,13 @@ export class PanelConfig extends Module {
     this.pnlInfoElm.clearInnerHTML();
     this.listCampaignButton.clearInnerHTML();
     this.campaignConfig = [];
-    this.addCampaign(0, campaign);
+    if (campaigns && campaigns.length) {
+      for (const campaign of campaigns) {
+        await this.onAddCampaign(campaign);
+      }
+    } else {
+      this.onAddCampaign();
+    }
   }
 
   onBack = () => {
@@ -127,19 +133,22 @@ export class PanelConfig extends Module {
   }
 
   private addCampaign = async (idx: number, campaign?: StakingCampaign) => {
-    for (const elm of this.campaignConfig) {
-      elm.visible = false;
+    if (idx && !campaign) {
+      for (const elm of this.campaignConfig) {
+        elm.visible = false;
+      }
     }
     const campaigns = [...this.campaignConfig];
     campaigns[idx] = new CampaignConfig();
     campaigns[idx].isNew = this.isNew;
     campaigns[idx].data = campaign;
+    campaigns[idx].visible = !(idx && campaign);
     this.campaignConfig = [...campaigns];
     this.pnlInfoElm.appendChild(this.campaignConfig[idx]);
     this.currentCampaign = idx;
   }
 
-  private onAddCampaign = async () => {
+  private onAddCampaign = async (campaign?: StakingCampaign) => {
     if (!this.isMultiple) return;
     const idx = Number(this.campaignConfig.length);
     if (!this.isNew) {
@@ -149,17 +158,20 @@ export class PanelConfig extends Module {
       const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
       icon.onClick = () => this.removeCampaign(idx);
       const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
-      button.classList.add('btn-item', 'btn-active');
+      button.classList.add('btn-item');
+      if (!campaign || !idx) {
+        button.classList.add('btn-active');
+      }
       button.onClick = () => this.onRenderCampaign(button, idx);
       const active = this.listCampaignButton.querySelector('.btn-active');
-      if (active) {
+      if (!campaign && active) {
         active.classList.remove('btn-active');
       }
       pnl.appendChild(button);
       pnl.appendChild(icon);
       this.listCampaignButton.appendChild(pnl);
     }
-    await this.addCampaign(idx);
+    await this.addCampaign(idx, campaign);
     if (!this.isNew) {
       this.btnAdd.enabled = true;
     }
@@ -245,9 +257,19 @@ export class PanelConfig extends Module {
       let result: StakingCampaign | null;
       const btn = isDownload ? this.btnDeployDownload : this.btnDeploy;
       this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
+
+      const onUpdateBtn = () => {
+        btn.rightIcon.visible = false;
+        btn.caption = isDownload ? 'Deploy and Download JSON' : 'Deploy';
+        this.updateButton();
+        this.backElm.classList.add('cursor-pointer');
+        this.backElm.onClick = () => this.onBack();
+      }
+
       const callBack = async (err: any, reply: any) => {
         if (err) {
           this.showResultMessage(this.stakingResult, 'error', err);
+          onUpdateBtn();
         } else {
           this.showResultMessage(this.stakingResult, 'success', reply);
           this.backElm.classList.remove('cursor-pointer');
@@ -261,11 +283,7 @@ export class PanelConfig extends Module {
 
       const confirmationCallBack = async (receipt: any) => {
         if (!result) return;
-        btn.rightIcon.visible = false;
-        btn.caption = isDownload ? 'Deploy and Download JSON' : 'Deploy';
-        this.updateButton();
-        this.backElm.classList.add('cursor-pointer');
-        this.backElm.onClick = () => this.onBack();
+        onUpdateBtn();
       };
 
       registerSendTxEvents({
@@ -304,9 +322,9 @@ export class PanelConfig extends Module {
           </i-hstack>
           <i-panel visible={false} id="campaignElm" width="100%">
             <i-vstack id="wapperCampaignsButton" visible={this.isMultiple} verticalAlignment="center">
-              <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
+              <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between" wrap="wrap-reverse">
                 <i-hstack id="listCampaignButton" verticalAlignment="center" />
-                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={this.onAddCampaign} />
+                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={() => this.onAddCampaign()} />
               </i-hstack>
               <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
             </i-vstack>

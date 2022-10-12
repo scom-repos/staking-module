@@ -6184,6 +6184,7 @@ __export(exports, {
   getTokenIconPath: () => getTokenIconPath,
   getTokenList: () => getTokenList,
   getTokenMap: () => getTokenMap,
+  getTokenMapData: () => getTokenMapData,
   getTokenObject: () => getTokenObject,
   getTokensDataList: () => getTokensDataList,
   getUserTokens: () => getUserTokens,
@@ -6318,6 +6319,7 @@ var EventId;
   EventId3["chainChanged"] = "chainChanged";
   EventId3["EmitButtonStatus"] = "emitButtonStatus";
   EventId3["EmitInput"] = "emitInput";
+  EventId3["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/store/wallet.ts
@@ -7520,9 +7522,9 @@ var getTokenObject = async (address, showBalance) => {
     balance
   };
 };
-var getTokenMapData = () => {
+var getTokenMapData = (targetChain) => {
   let allTokensMap = {};
-  let chainId = getChainId();
+  let chainId = targetChain || getChainId();
   if (DefaultTokens[chainId]) {
     let defaultTokenList = DefaultTokens[chainId].sort((a, b) => {
       if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {

@@ -19027,6 +19027,7 @@ var EventId;
   EventId2["chainChanged"] = "chainChanged";
   EventId2["EmitButtonStatus"] = "emitButtonStatus";
   EventId2["EmitInput"] = "emitInput";
+  EventId2["EmitNewToken"] = "emitNewToken";
 })(EventId || (EventId = {}));
 
 // src/staking-utils/API.ts
@@ -19243,7 +19244,6 @@ var composeCampaignInfoList = async (stakingCampaignInfoList, addDurationOption)
     let campaignObj = __spreadProps(__spreadValues({}, stakingCampaignInfo), {
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
-      vestingPeriod: stakingCampaignInfo.vestingPeriod,
       getTokenURL: stakingCampaignInfo.getTokenURL,
       options: durationOptionsWithExtendedInfo
     });
@@ -19513,15 +19513,16 @@ var deployCampaign = async (campaign, callback) => {
     let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
     for (const staking of campaign.stakings) {
       let stakingResult;
-      const { lockTokenAddress, maxTotalLock, minLockTime, entryStart, entryEnd, perAddressCap } = staking;
+      const { campaignStart, campaignEnd } = campaign;
+      const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
       let timeIsMoneyToken = new import_eth_wallet4.Erc20(wallet, lockTokenAddress);
       let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
       const stakingAddress = await timeIsMoney.deploy({
         token: lockTokenAddress,
         maximumTotalLock: import_eth_wallet4.Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
         minimumLockTime: minLockTime,
-        startOfEntryPeriod: entryStart,
-        endOfEntryPeriod: entryEnd,
+        startOfEntryPeriod: campaignStart,
+        endOfEntryPeriod: campaignEnd,
         perAddressCap: import_eth_wallet4.Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals)
       });
       let rewardResult = [];

@@ -118,9 +118,15 @@ export class StakingBlock extends Module implements PageBlock {
 	private getCampaign() {
 		if (this.data) {
 			const keys = Object.keys(this.data);
-			if (keys.length) {
-				return this.data[keys[0]][0]
+			let campaigns = [];
+			for (const key of keys) {
+				const arr = this.data[key].map((item: StakingCampaign) => {
+					item.chainId = Number(key)
+					return item;
+				});
+				campaigns.push(...arr)
 			}
+			return campaigns;
 		}
 		return this.data;
 	}

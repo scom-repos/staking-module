@@ -38,6 +38,9 @@ Styles.cssRule('.panel-config', {
         }
       }
     },
+    '.w-input': {
+      width: 'calc(100% - 190px) !important',
+    },
     'input': {
       $nest: {
         '&::-webkit-outer-spin-button': {
@@ -54,7 +57,6 @@ Styles.cssRule('.panel-config', {
       }
     },
     '.input-area': {
-      width: 'calc(100% - 190px) !important',
       height: '80px !important',
       borderRadius: 12,
       padding: 8,
@@ -72,7 +74,6 @@ Styles.cssRule('.panel-config', {
       }
     },
     '.input-text': {
-      width: 'calc(100% - 190px) !important',
       height: '40px !important',
       borderRadius: 12,
       paddingInline: 8,
@@ -91,15 +92,26 @@ Styles.cssRule('.panel-config', {
         },
       }
     },
+    '#lbMinLockTime': {
+      opacity: 0.8
+    },
+    'token-selection.disabled #btnToken': {
+      cursor: 'default !important',
+    },
     '.network-selection': {
       $nest: {
         '.btn-select:hover': {
           background: `${Theme.action.active} !important`,
         },
+        '.btn-select.disabled': {
+          color: `${Theme.text.primary} !important`,
+          cursor: 'default !important',
+        },
         '.modal': {
           padding: '0.75rem 0',
           background: Theme.background.paper,
-          borderRadius: 0,
+          borderRadius: 6,
+          border: `1px solid ${Theme.colors.primary.dark}`,
           $nest: {
             '& > i-vstack': {
               maxHeight: '40vh',
@@ -157,5 +169,43 @@ Styles.cssRule('.panel-config', {
         },
       },
     },
+    '@media screen and (max-width: 525px)': {
+      $nest: {
+        '.main-content': {
+          $nest: {
+            '.w-input': {
+              width: '100% !important'
+            },
+            '.row-mobile': {
+              flexWrap: 'nowrap',
+              $nest: {
+                '.lb-title': {
+                  whiteSpace: 'nowrap',
+                }
+              }
+            },
+            '.network-selection': {
+              $nest: {
+                'i-button': {
+                  maxWidth: 'inherit !important',
+                },
+                'i-modal': {
+                  width: '100%',
+                  maxWidth: 'inherit !important',
+                  $nest: {
+                    '.modal': {
+                      maxWidth: 'inherit !important',
+                    }
+                  }
+                }
+              }
+            },
+            'i-hstack': {
+              flexWrap: 'wrap',
+            },
+          }
+        }
+      }
+    }
   }
 })

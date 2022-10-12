@@ -58,6 +58,7 @@ export const enum EventId {
     chainChanged = 'chainChanged',
     EmitButtonStatus = 'emitButtonStatus',
     EmitInput = 'emitInput',
+    EmitNewToken = 'emitNewToken',
 }
 
 export interface ITokenObject {

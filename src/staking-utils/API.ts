@@ -265,7 +265,6 @@ const composeCampaignInfoList = async (stakingCampaignInfoList: StakingCampaign[
       ...stakingCampaignInfo,
       campaignName: stakingCampaignInfo.customName,
       campaignDesc: stakingCampaignInfo.customDesc,
-      vestingPeriod: stakingCampaignInfo.vestingPeriod,
       getTokenURL: stakingCampaignInfo.getTokenURL,
       options: durationOptionsWithExtendedInfo,
     }
@@ -556,15 +555,16 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
     let result: StakingCampaign = { ...campaign, stakings: [] };
     for (const staking of campaign.stakings) {
       let stakingResult: Staking;
-      const { lockTokenAddress, maxTotalLock, minLockTime, entryStart, entryEnd, perAddressCap } = staking;
+      const { campaignStart, campaignEnd } = campaign;
+      const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
       let timeIsMoneyToken = new Erc20(wallet, lockTokenAddress);
       let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
       const stakingAddress = await timeIsMoney.deploy({
         token: lockTokenAddress,
         maximumTotalLock: Utils.toDecimals(maxTotalLock, timeIsMoneyTokenDecimals),
         minimumLockTime: minLockTime,
-        startOfEntryPeriod: entryStart,
-        endOfEntryPeriod: entryEnd,
+        startOfEntryPeriod: campaignStart,
+        endOfEntryPeriod: campaignEnd,
         perAddressCap: Utils.toDecimals(perAddressCap, timeIsMoneyTokenDecimals),
       });
       let rewardResult: Reward[] = [];

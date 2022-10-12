@@ -1,5 +1,6 @@
-import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label } from '@ijstech/components';
-import { EventId } from '@staking/global';
+import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control } from '@ijstech/components';
+import { BigNumber } from '@ijstech/eth-wallet';
+import { EventId, isValidNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
 import { StakingConfig } from './staking';
 const Theme = Styles.Theme.ThemeVars;
@@ -25,6 +26,8 @@ export class CampaignConfig extends Module {
 	private inputName: Input;
 	private inputDesc: Input;
 	private inputURL: Input;
+	private inputCampaignStart: Input;
+	private inputCampaignEnd: Input;
 	private checkboxContract: Checkbox;
 	private inputMainColor: Input;
 	private inputBg: Input;
@@ -68,19 +71,23 @@ export class CampaignConfig extends Module {
 	private setupInput = () => {
 		if (this.wapperNetworkElm) {
 			this.wapperNetworkElm.visible = !this.isNew;
+			// this.inputCampaignStart.enabled = this.isNew;
+			// this.inputCampaignEnd.enabled = this.isNew;
 		}
 	}
 
 	private setupData = async () => {
 		if (this.data) {
-			const { chainId, customName, customDesc, getTokenURL, showContractLink, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
-			this.network = chainId || getChainId();
+			const { chainId, customName, customDesc, getTokenURL, campaignStart, campaignEnd, showContractLink, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
 			const interval = setInterval(async () => {
 				if (this.isInitialized) {
-					clearInterval(interval)
+					clearInterval(interval);
+					this.network = chainId || getChainId();
 					this.inputName.value = customName;
 					this.inputDesc.value = customDesc || '';
 					this.inputURL.value = getTokenURL || '';
+					this.inputCampaignStart.value = new BigNumber(campaignStart).toFixed();
+					this.inputCampaignEnd.value = new BigNumber(campaignEnd).toFixed();
 					this.checkboxContract.checked = !!showContractLink;
 					this.inputMainColor.value = customColorCampaign || '';
 					this.inputBg.value = customColorBackground || '';
@@ -138,6 +145,7 @@ export class CampaignConfig extends Module {
 			});
 			dropdownItem.onClick = () => {
 				dropdownModal.visible = false;
+				if (this.network === network.chainId) return;
 				this.btnNetwork.caption = `${network.name} (${network.chainId})`;
 				this.network = network.chainId;
 				for (const elm of this.stakingConfig) {
@@ -184,12 +192,15 @@ export class CampaignConfig extends Module {
 	}
 
 	private addStaking = async (idx: number, staking?: Staking) => {
-		for (const elm of this.stakingConfig) {
-			elm.visible = false;
+		if (idx && !staking) {
+			for (const elm of this.stakingConfig) {
+				elm.visible = false;
+			}
 		}
 		const stakings = [...this.stakingConfig];
 		stakings[idx] = new StakingConfig();
 		stakings[idx].isNew = this.isNew;
+		stakings[idx].visible = !(idx && staking);
 		this.stakingConfig = [...stakings];
 		this.pnlInfoElm.appendChild(this.stakingConfig[idx]);
 		if (!this.isNew) {
@@ -208,10 +219,13 @@ export class CampaignConfig extends Module {
 		const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
 		icon.onClick = () => this.removeStaking(idx);
 		const button = await Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
-		button.classList.add('btn-item', 'btn-active');
+		button.classList.add('btn-item');
+		if (!staking || !idx) {
+			button.classList.add('btn-active');
+		}
 		button.onClick = () => this.onRenderStaking(button, idx);
 		const active = this.listStakingButton.querySelector('.btn-active');
-		if (active) {
+		if (!staking && active) {
 			active.classList.remove('btn-active');
 		}
 		pnl.appendChild(button);
@@ -223,6 +237,14 @@ export class CampaignConfig extends Module {
 
 	private emitInput = () => {
 		application.EventBus.dispatch(EventId.EmitInput);
+	}
+
+	private onInputUnix = (input: Control) => {
+		const _input = input as Input;
+		let value = _input.value;
+		value = value.replace(/[^0-9]+/g, "");
+		_input.value = value;
+		this.emitInput();
 	}
 
 	private onInputText = () => {
@@ -240,7 +262,10 @@ export class CampaignConfig extends Module {
 	}
 
 	checkValidation = () => {
-		return !!this.inputName.value && this.isStakingValid();
+		return !!this.inputName.value &&
+			isValidNumber(this.inputCampaignStart.value) &&
+			isValidNumber(this.inputCampaignEnd.value) &&
+			this.isStakingValid();
 	}
 
 	getStakingData = () => {
@@ -258,6 +283,8 @@ export class CampaignConfig extends Module {
 			customName: this.inputName.value,
 			customDesc: this.inputDesc.value || undefined,
 			getTokenURL: this.inputURL.value || undefined,
+			campaignStart: new BigNumber(this.inputCampaignStart.value),
+			campaignEnd: new BigNumber(this.inputCampaignEnd.value),
 			showContractLink: this.checkboxContract.checked || undefined,
 			customColorCampaign: this.inputMainColor.value || undefined,
 			customColorBackground: this.inputBg.value || undefined,
@@ -287,26 +314,40 @@ export class CampaignConfig extends Module {
 							<i-label class="lb-title" caption="Network" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-panel id="networkSelection" class="network-selection" width="calc(100% - 190px)" />
+						<i-panel id="networkSelection" class="network-selection w-input" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign Name" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputName" class="input-text" onChanged={this.emitInput} />
+						<i-input id="inputName" class="input-text w-input" onChanged={this.emitInput} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Campaign Description" />
-						<i-input id="inputDesc" class="input-area" inputType="textarea" rows={3} onChanged={this.onInputText} />
+						<i-input id="inputDesc" class="input-area w-input" inputType="textarea" rows={3} onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Token Trade URL" />
-						<i-input id="inputURL" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputURL" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
-					<i-hstack gap={10} margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Campaign Start" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-input id="inputCampaignStart" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+					</i-hstack>
+					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Campaign End" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-input id="inputCampaignEnd" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+					</i-hstack>
+					<i-hstack gap={10} class="row-mobile" margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Show Contract Link" />
-						<i-vstack verticalAlignment="center" horizontalAlignment="start" width="calc(100% - 190px)">
+						<i-vstack verticalAlignment="center" horizontalAlignment="start" class="w-input">
 							<i-checkbox
 								id="checkboxContract"
 								height="auto"
@@ -316,29 +357,29 @@ export class CampaignConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Campaign Main Color" />
-						<i-input id="inputMainColor" placeholder="#f15e61" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputMainColor" placeholder="#f15e61" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Campaign Background" />
-						<i-input id="inputBg" placeholder="#ffffff26" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputBg" placeholder="#ffffff26" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Color Text" />
-						<i-input id="inputColorText" placeholder="#ffffff" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputColorText" placeholder="#ffffff" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Countdown Background" />
-						<i-input id="inputCountdownBg" placeholder="#b14781" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputCountdownBg" placeholder="#b14781" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Staking Background" />
-						<i-input id="inputStakingBg" placeholder="#ffffff07" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputStakingBg" placeholder="#ffffff07" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Staking Button" />
-						<i-input id="inputStakingBtn" placeholder="linear-gradient(90deg, #AC1D78 0%, #E04862 100%)" class="input-text" onChanged={this.onInputText} />
+						<i-input id="inputStakingBtn" placeholder="linear-gradient(90deg, #AC1D78 0%, #E04862 100%)" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
-					<i-hstack gap={10} margin={{ top: 10, bottom: 5 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack gap={10} margin={{ top: 10, bottom: 5 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between" wrap="wrap-reverse">
 						<i-hstack id="listStakingButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={() => this.onAddStaking()} />
 					</i-hstack>

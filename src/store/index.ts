@@ -362,9 +362,9 @@ export const getTokenObject = async (address: string, showBalance?: boolean) => 
   }
 }
 
-const getTokenMapData = (): TokenMapType => {
+export const getTokenMapData = (targetChain?: number): TokenMapType => {
   let allTokensMap: TokenMapType = {};
-  let chainId = getChainId();
+  let chainId = targetChain || getChainId();
   if (DefaultTokens[chainId]) {
     let defaultTokenList = DefaultTokens[chainId].sort((a, b) => {
       if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) { return -1; }

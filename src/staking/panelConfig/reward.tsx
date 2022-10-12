@@ -1,7 +1,7 @@
 import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
-import { getTokenMap, Reward } from '@staking/store';
+import { getChainId, getDefaultChainId, getTokenMapData, Reward } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -20,7 +20,7 @@ export class RewardConfig extends Module {
 	private token?: ITokenObject;
 	private inputMultiplier: Input;
 	private inputInitialReward: Input;
-	private inputVestingPeriod: Input;
+	private inputRewardVesting: Input;
 	private inputClaimDeadline: Input;
 	private inputAdmin: Input;
 	private lbErr: Label;
@@ -32,15 +32,22 @@ export class RewardConfig extends Module {
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
+	private _chainId: number;
 	private isInitialized = false;
+	private dayVal = 24 * 60 * 60;
 
 	constructor(parent?: Container, options?: any) {
 		super(parent, options);
 	}
 
 	set chainId(chainId: number) {
-		this.tokenSelection.chainId = chainId;
+		this._chainId = chainId;
+		this.tokenSelection.targetChainId = chainId;
 		this.token = undefined;
+	}
+
+	get chainId() {
+		return this._chainId || getChainId() || getDefaultChainId();
 	}
 
 	set isNew(value: boolean) {
@@ -64,25 +71,33 @@ export class RewardConfig extends Module {
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
+			// this.inputMultiplier.enabled = this.isNew;
+			// this.inputInitialReward.enabled = this.isNew;
+			// this.inputRewardVesting.enabled = this.isNew;
+			// this.inputClaimDeadline.enabled = this.isNew;
+			// this.inputAdmin.enabled = this.isNew;
+			// if (this.tokenSelection) {
+			// 	this.tokenSelection.enabled = this.isNew;
+			// }
 		}
 	}
 
 	private setupData = async () => {
 		if (this.data) {
 			const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate } = this.data;
-			const tokenMap = getTokenMap();
-			const token = tokenMap[rewardTokenAddress] || tokenMap[rewardTokenAddress.toLowerCase()];
 			const interval = setInterval(() => {
-				if (this.isInitialized) {
+				if (this.isInitialized && this.tokenSelection.isInitialized) {
 					clearInterval(interval);
+					const tokenMap = getTokenMapData(this.chainId);
+					const token = tokenMap[rewardTokenAddress] || tokenMap[rewardTokenAddress.toLowerCase()];
 					this.inputAddress.value = address;
 					this.isAddressValid = true;
 					this.token = token;
 					this.tokenSelection.token = token;
-					this.inputMultiplier.value = multiplier;
-					this.inputInitialReward.value = initialReward;
-					this.inputVestingPeriod.value = vestingPeriod;
-					this.inputClaimDeadline.value = claimDeadline;
+					this.inputMultiplier.value = new BigNumber(multiplier).toFixed();
+					this.inputInitialReward.value = new BigNumber(initialReward).toFixed();
+					this.inputRewardVesting.value = new BigNumber(vestingPeriod).dividedBy(this.dayVal).toFixed();
+					this.inputClaimDeadline.value = new BigNumber(claimDeadline).toFixed();
 					this.inputAdmin.value = admin;
 					this.isAdminValid = true;
 					this.checkboxStartDate.checked = !!isCommonStartDate;
@@ -130,7 +145,7 @@ export class RewardConfig extends Module {
 		return this.token && this.isAdminValid &&
 			isValidNumber(this.inputMultiplier.value) &&
 			isValidNumber(this.inputInitialReward.value) &&
-			isValidNumber(this.inputVestingPeriod.value) &&
+			isValidNumber(this.inputRewardVesting.value) &&
 			isValidNumber(this.inputClaimDeadline.value) &&
 			(this.isNew || this.isAddressValid);
 	}
@@ -141,7 +156,7 @@ export class RewardConfig extends Module {
 			rewardTokenAddress: this.token?.address || '',
 			multiplier: new BigNumber(this.inputMultiplier.value),
 			initialReward: new BigNumber(this.inputInitialReward.value),
-			vestingPeriod: new BigNumber(this.inputVestingPeriod.value),
+			vestingPeriod: new BigNumber(this.inputRewardVesting.value).multipliedBy(this.dayVal),
 			claimDeadline: new BigNumber(this.inputClaimDeadline.value),
 			admin: `${this.inputAdmin.value}`,
 			isCommonStartDate: this.checkboxStartDate.checked,
@@ -167,8 +182,8 @@ export class RewardConfig extends Module {
 							<i-label class="lb-title" caption="Address" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
-							<i-input id="inputAddress" class="input-text w-100" onChanged={this.onInputAddress} />
+						<i-vstack gap={4} class="w-input" verticalAlignment="center">
+							<i-input id="inputAddress" class="input-text w-input w-100" onChanged={this.onInputAddress} />
 							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
@@ -177,49 +192,49 @@ export class RewardConfig extends Module {
 							<i-label class="lb-title" caption="Reward Token Address" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-panel id="pnlTokenSelection" width="calc(100% - 190px)" />
+						<i-panel id="pnlTokenSelection" class="w-input" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Multiplier" />
+							<i-label class="lb-title" caption="Upfront Reward" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputMultiplier" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
+						<i-input id="inputInitialReward" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Initial Reward" />
+							<i-label class="lb-title" caption="Reward Factor" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputInitialReward" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputNumber(src)} />
+						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Vesting Period" />
+							<i-label class="lb-title" caption="Reward Vesting" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputVestingPeriod" placeholder="Second" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-input id="inputRewardVesting" placeholder="Day" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Claim Deadline" />
+							<i-label class="lb-title" caption="Admin Claim Deadline" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputClaimDeadline" placeholder="Unix" inputType="number" class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-input id="inputClaimDeadline" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Admin" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-vstack gap={4} width="calc(100% - 190px)" verticalAlignment="center">
-							<i-input id="inputAdmin" class="input-text w-100" onChanged={this.onInputAdmin} />
+						<i-vstack gap={4} class="w-input" verticalAlignment="center">
+							<i-input id="inputAdmin" class="input-text w-input w-100" onChanged={this.onInputAdmin} />
 							<i-label id="lbErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack class="row-mobile" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Common Start Date" />
-						<i-vstack verticalAlignment="center" horizontalAlignment="start" width="calc(100% - 190px)">
+						<i-vstack verticalAlignment="center" horizontalAlignment="start" class="w-input">
 							<i-checkbox
 								id="checkboxStartDate"
 								height="auto"
