@@ -6478,7 +6478,7 @@
         width: "480px"
       },
       ".question-icon": {
-        border: `2px solid #fff`,
+        border: `2px solid ${Theme2.divider}`,
         borderRadius: "50%",
         padding: "3px",
         opacity: "0.8"
@@ -6999,13 +6999,14 @@
           }
         },
         onPaid: async () => {
+          const caption = this.currentMode === 0 ? "Unstake" : "Stake";
           if (this.onRefresh) {
             await this.onRefresh();
+            (0, import_store3.setStakingStatus)(actionKey, false, caption);
           }
           this.inputAmount.value = "";
           this.inputAmount.enabled = true;
           this.btnMax.enabled = true;
-          const caption = this.currentMode === 0 ? "Stake" : "Unstake";
           this.btnStake.caption = caption;
           this.btnStake.rightIcon.visible = false;
           this.modalActions.visible = false;

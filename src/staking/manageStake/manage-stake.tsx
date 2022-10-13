@@ -377,13 +377,14 @@ export class ManageStake extends Module {
         }
       },
       onPaid: async () => {
+        const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
         if (this.onRefresh) {
           await this.onRefresh();
+          setStakingStatus(actionKey, false, caption);
         }
         this.inputAmount.value = '';
         this.inputAmount.enabled = true;
         this.btnMax.enabled = true;
-        const caption = this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unstake';
         this.btnStake.caption = caption;
         this.btnStake.rightIcon.visible = false;
         this.modalActions.visible = false;
