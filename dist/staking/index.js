@@ -5694,7 +5694,7 @@
 
   // src/staking/index.tsx
   var import_assets5 = __toModule(__require("@staking/assets"));
-  var import_moment2 = __toModule(require_moment());
+  var import_moment4 = __toModule(require_moment());
   var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
 
   // src/result/result.tsx
@@ -7386,6 +7386,43 @@
       "i-checkbox.is-checked .checkmark": {
         backgroundColor: Theme3.colors.secondary.light
       },
+      ".cs-datepicker": {
+        background: Theme3.input.background,
+        borderRadius: 12,
+        maxWidth: 300,
+        $nest: {
+          'input[type="text"]': {
+            background: "transparent",
+            height: "40px !important",
+            width: "100% !important",
+            border: "none",
+            padding: "1rem",
+            fontSize: "1rem",
+            textAlign: "center",
+            color: Theme3.text.primary
+          },
+          "input::placeholder": {
+            color: Theme3.docs.text
+          },
+          ".datepicker-toggle": {
+            display: "flex",
+            width: "100% !important",
+            maxWidth: 300,
+            height: "40px !important",
+            padding: 0,
+            position: "absolute",
+            top: 0,
+            margin: 0,
+            background: "transparent"
+          },
+          "i-icon": {
+            width: "100%"
+          },
+          "svg": {
+            display: "none"
+          }
+        }
+      },
       ".cursor-pointer": {
         cursor: "pointer"
       },
@@ -7458,6 +7495,7 @@
   var import_eth_wallet5 = __toModule(__require("@ijstech/eth-wallet"));
   var import_global7 = __toModule(__require("@staking/global"));
   var import_store8 = __toModule(__require("@staking/store"));
+  var import_moment3 = __toModule(require_moment());
 
   // src/staking/panelConfig/staking.tsx
   var import_components11 = __toModule(__require("@ijstech/components"));
@@ -7801,7 +7839,7 @@
     }
     set targetChainId(value) {
       this._targetChainId = value;
-      this.updateDataByChain();
+      this.updateDataByChain(true);
     }
     get tokenDataListProp() {
       return this._tokenDataListProp;
@@ -7880,11 +7918,13 @@
       }
       this.renderTokenItems();
     }
-    async updateDataByChain() {
+    async updateDataByChain(init) {
       this.tokenBalancesMap = await (0, import_store4.updateAllTokenBalances)();
       this.renderTokenItems();
-      this.updateButton();
-      this.isInitialized = true;
+      this.updateButton(init ? void 0 : this.token);
+      if (init) {
+        this.isInitialized = true;
+      }
     }
     async updateDataByNewToken() {
       this.tokenBalancesMap = (0, import_store4.getTokenBalances)();
@@ -8134,11 +8174,16 @@
       }
     }
     updateButton(token) {
+      var _a;
       const btnToken = this.btnToken;
       if (!btnToken)
         return;
       try {
         let image = btnToken.querySelector("i-image");
+        token = (_a = this.tokenDataList) == null ? void 0 : _a.find((v) => {
+          var _a2;
+          return v.address && v.address == ((_a2 = this.token) == null ? void 0 : _a2.address);
+        });
         if (!token) {
           btnToken.caption = "Select a token";
           btnToken.classList.remove("has-token");
@@ -8447,11 +8492,13 @@
   var import_eth_wallet3 = __toModule(__require("@ijstech/eth-wallet"));
   var import_global5 = __toModule(__require("@staking/global"));
   var import_store6 = __toModule(__require("@staking/store"));
+  var import_moment2 = __toModule(require_moment());
   var Theme6 = import_components10.Styles.Theme.ThemeVars;
   var RewardConfig = class extends import_components10.Module {
     constructor(parent, options) {
       super(parent, options);
       this.isAdminValid = false;
+      this._campaignEndLockTime = 0;
       this.isInitialized = false;
       this.unit = 1;
       this.hourVal = 60 * 60;
@@ -8476,7 +8523,7 @@
       };
       this.setupData = async () => {
         if (this.data) {
-          const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate } = this.data;
+          const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate, vestingStartDate } = this.data;
           const interval = setInterval(() => {
             if (this.isInitialized && this.tokenSelection.isInitialized) {
               clearInterval(interval);
@@ -8493,6 +8540,10 @@
               this.inputAdmin.value = admin;
               this.isAdminValid = true;
               this.checkboxStartDate.checked = !!isCommonStartDate;
+              this.onCheckCommonStartDate();
+              if (isCommonStartDate) {
+                this.setStartDate(vestingStartDate);
+              }
               this.emitInput();
             }
           }, 200);
@@ -8540,8 +8591,58 @@
         this.pnlTimeSelection.appendChild(this.btnTime);
         this.pnlTimeSelection.appendChild(dropdownModal);
       };
+      this.checkStartDate = () => {
+        if (!this.inputVestingStartDate)
+          return;
+        const startDateElm = this.inputVestingStartDate.querySelector('input[type="datetime-local"]');
+        if (startDateElm) {
+          const minDate = import_moment2.default.unix(this.campaignEndLockTime);
+          const val = minDate.add(60, "seconds");
+          if (this.campaignEndLockTime) {
+            startDateElm.min = val.format("YYYY-MM-DD HH:mm:ss");
+          }
+          if (this.vestingStartDate && this.vestingStartDate <= this.campaignEndLockTime) {
+            this.lbStartDateErr.visible = true;
+            this.lbStartDateErr.caption = `The start date should be greater than <b>${val.format(import_global5.DefaultDateTimeFormat)}</b>`;
+          } else {
+            this.lbStartDateErr.visible = false;
+          }
+        }
+      };
+      this.setStartDate = (value) => {
+        const startDate = new import_eth_wallet3.BigNumber(value || 0).toNumber();
+        this.vestingStartDate = startDate;
+        const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]');
+        startTextElm.value = startDate ? import_moment2.default.unix(startDate).format(import_global5.DefaultDateTimeFormat) : "";
+        this.emitInput();
+      };
+      this.setAttrDatePicker = () => {
+        this.inputVestingStartDate.dateTimeFormat = import_global5.DefaultDateTimeFormat;
+        this.inputVestingStartDate.onChanged = (datepickerElm) => this.changeStartDate(datepickerElm.inputElm.value);
+        const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]');
+        if (startTextElm) {
+          startTextElm.placeholder = import_global5.DefaultDateTimeFormat;
+        }
+        this.checkStartDate();
+      };
+      this.changeStartDate = (value) => {
+        const date = (0, import_moment2.default)(value, import_global5.DefaultDateTimeFormat);
+        this.vestingStartDate = date.unix();
+        if (this.vestingStartDate <= this.campaignEndLockTime) {
+          const minDate = import_moment2.default.unix(this.campaignEndLockTime).add(60, "seconds");
+          this.lbStartDateErr.visible = true;
+          this.lbStartDateErr.caption = `The start date should be greater than <b>${minDate.format(import_global5.DefaultDateTimeFormat)}</b>`;
+        } else {
+          this.lbStartDateErr.visible = false;
+        }
+        this.emitInput();
+      };
       this.emitInput = () => {
         import_components10.application.EventBus.dispatch(import_global5.EventId.EmitInput);
+      };
+      this.onCheckCommonStartDate = () => {
+        this.wrapperStartDateElm.visible = this.checkboxStartDate.checked;
+        this.emitInput();
       };
       this.onInputToken = (token) => {
         this.token = token;
@@ -8549,6 +8650,25 @@
       };
       this.onInputNumber = (input) => {
         (0, import_global5.limitInputNumber)(input, 18);
+        this.emitInput();
+      };
+      this.checkInitialReward = () => {
+        const initialReward = Number(this.inputInitialReward.value);
+        if (isNaN(initialReward))
+          return false;
+        return initialReward >= 0 && initialReward <= 1;
+      };
+      this.onInputInitalReward = (input) => {
+        const _value = input.value;
+        if ((0, import_global5.isInvalidInput)(_value)) {
+          this.inputInitialReward.value = "0";
+        }
+        if (!this.checkInitialReward()) {
+          this.lbErrInitialReward.visible = true;
+          this.lbErrInitialReward.caption = "The upfront reward ratio must be between 0 and 1";
+        } else {
+          this.lbErrInitialReward.visible = false;
+        }
         this.emitInput();
       };
       this.onInputUnix = (input) => {
@@ -8569,7 +8689,7 @@
         this.emitInput();
       };
       this.checkValidation = () => {
-        return this.token && this.isAdminValid && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputInitialReward.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (0, import_global5.isValidNumber)(this.inputClaimDeadline.value) && (this.isNew || this.isAddressValid);
+        return this.token && this.isAdminValid && this.checkInitialReward() && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (0, import_global5.isValidNumber)(this.inputClaimDeadline.value) && (!this.checkboxStartDate.checked || this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime)) && (this.isNew || this.isAddressValid);
       };
       this.getData = () => {
         var _a;
@@ -8581,15 +8701,17 @@
           vestingPeriod: new import_eth_wallet3.BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
           claimDeadline: new import_eth_wallet3.BigNumber(this.inputClaimDeadline.value),
           admin: `${this.inputAdmin.value}`,
-          isCommonStartDate: this.checkboxStartDate.checked
+          isCommonStartDate: this.checkboxStartDate.checked,
+          vestingStartDate: new import_eth_wallet3.BigNumber(this.vestingStartDate || 0)
         };
         return reward;
       };
     }
     set chainId(chainId) {
       this._chainId = chainId;
-      this.tokenSelection.targetChainId = chainId;
+      this.tokenSelection.token = void 0;
       this.token = void 0;
+      this.tokenSelection.targetChainId = chainId;
     }
     get chainId() {
       return this._chainId || (0, import_store6.getChainId)() || (0, import_store6.getDefaultChainId)();
@@ -8608,11 +8730,19 @@
     get data() {
       return this._data;
     }
+    set campaignEndLockTime(value) {
+      this._campaignEndLockTime = value;
+      this.checkStartDate();
+    }
+    get campaignEndLockTime() {
+      return this._campaignEndLockTime;
+    }
     async init() {
       super.init();
       this.tokenSelection = new TokenSelection();
       this.tokenSelection.onSelectToken = this.onInputToken;
       this.pnlTokenSelection.appendChild(this.tokenSelection);
+      this.setAttrDatePicker();
       await this.renderTimeButton();
       this.setupInput();
       this.isInitialized = true;
@@ -8676,12 +8806,12 @@
         verticalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         class: "lb-title",
-        caption: "Upfront Reward"
+        caption: "Reward Factor"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme6.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
-        id: "inputInitialReward",
+        id: "inputMultiplier",
         inputType: "number",
         class: "input-text w-input",
         onChanged: (src) => this.onInputNumber(src)
@@ -8694,16 +8824,26 @@
         verticalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         class: "lb-title",
-        caption: "Reward Factor"
+        caption: "Upfront Reward Ratio"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme6.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-input", {
-        id: "inputMultiplier",
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-input", {
+        id: "inputInitialReward",
+        placeholder: "0 <= Reward Ratio <= 1",
         inputType: "number",
         class: "input-text w-input",
-        onChanged: (src) => this.onInputNumber(src)
-      })), /* @__PURE__ */ this.$render("i-hstack", {
+        onChanged: (src) => this.onInputInitalReward(src)
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbErrInitialReward",
+        visible: false,
+        font: { color: Theme6.colors.primary.main, size: "12px" }
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -8791,7 +8931,38 @@
       }, /* @__PURE__ */ this.$render("i-checkbox", {
         id: "checkboxStartDate",
         height: "auto",
-        checked: false
+        checked: false,
+        onChanged: this.onCheckCommonStartDate
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
+        id: "wrapperStartDateElm",
+        visible: false,
+        gap: 10,
+        verticalAlignment: "center",
+        horizontalAlignment: "space-between"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 4,
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        class: "lb-title",
+        caption: "Vesting Start Date"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        caption: "*",
+        font: { color: Theme6.colors.primary.main, size: "16px" }
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-datepicker", {
+        id: "inputVestingStartDate",
+        width: "100%",
+        height: 40,
+        type: "dateTime",
+        class: "cs-datepicker"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbStartDateErr",
+        visible: false,
+        font: { color: Theme6.colors.primary.main, size: "12px" }
       })))));
     }
   };
@@ -8844,7 +9015,6 @@
               this.token = token;
               this.tokenSelection.token = token;
               this.inputLockingTime.value = lockingTime.dividedBy(this.hourVal).toFixed();
-              this.lbMinLockTime.caption = lockingTime.isEqualTo(1) ? "1 second" : `${(0, import_global6.formatNumber)(minLockTime)} seconds`;
               this.inputPerAddressCap.value = new import_eth_wallet4.BigNumber(perAddressCap).toFixed();
               this.inputMaxTotalLock.value = new import_eth_wallet4.BigNumber(maxTotalLock).toFixed();
               this.inputDesc.value = customDesc || "";
@@ -8900,7 +9070,7 @@
             dropdownModal.visible = false;
             this.btnTime.caption = unit.name;
             this.unit = unit.value;
-            this.updateMinLockTime();
+            this.updateCampaignEndLockTime();
           };
           vstack.appendChild(dropdownItem);
         }
@@ -9000,6 +9170,7 @@
           this.rewardConfig[idx].chainId = this.chainId;
         }
         this.rewardConfig[idx].data = reward;
+        this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
         this.currentReward = idx;
         this.emitInput();
       };
@@ -9043,12 +9214,8 @@
         let value = _input.value;
         value = value.replace(/[^0-9]+/g, "");
         _input.value = value;
-        this.updateMinLockTime();
+        this.updateCampaignEndLockTime();
         this.emitInput();
-      };
-      this.updateMinLockTime = () => {
-        const val = new import_eth_wallet4.BigNumber(this.inputLockingTime.value || 0);
-        this.lbMinLockTime.caption = `${(0, import_global6.formatNumber)(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
       };
       this.onInputNumber = (input) => {
         (0, import_global6.limitInputNumber)(input, 18);
@@ -9080,7 +9247,7 @@
         const staking = {
           address: this.inputAddress.value,
           lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
-          minLockTime: new import_eth_wallet4.BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
+          minLockTime: this.minLockTime,
           perAddressCap: new import_eth_wallet4.BigNumber(this.inputPerAddressCap.value),
           maxTotalLock: new import_eth_wallet4.BigNumber(this.inputMaxTotalLock.value),
           customDesc: this.inputDesc.value,
@@ -9092,8 +9259,9 @@
     }
     set chainId(chainId) {
       this._chainId = chainId;
-      this.tokenSelection.targetChainId = chainId;
+      this.tokenSelection.token = void 0;
       this.token = void 0;
+      this.tokenSelection.targetChainId = chainId;
       for (const elm of this.rewardConfig) {
         elm.chainId = chainId;
       }
@@ -9115,6 +9283,25 @@
     get data() {
       return this._data;
     }
+    set campaignEnd(value) {
+      this._campaignEnd = value;
+      this.updateCampaignEndLockTime();
+    }
+    get campaignEnd() {
+      return this._campaignEnd || 0;
+    }
+    get minLockTime() {
+      if (this.inputLockingTime) {
+        return new import_eth_wallet4.BigNumber(this.inputLockingTime.value || 0).multipliedBy(this.unit).multipliedBy(this.hourVal);
+      }
+      return new import_eth_wallet4.BigNumber(0);
+    }
+    updateCampaignEndLockTime() {
+      const val = this.minLockTime.plus(this.campaignEnd).toNumber();
+      for (const reward of this.rewardConfig) {
+        reward.campaignEndLockTime = val;
+      }
+    }
     async init() {
       super.init();
       this.tokenSelection = new TokenSelection();
@@ -9129,7 +9316,7 @@
       return /* @__PURE__ */ this.$render("i-panel", {
         class: "custom-scroll",
         display: "block",
-        minHeight: 800
+        minHeight: 750
       }, /* @__PURE__ */ this.$render("i-vstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9205,24 +9392,6 @@
         id: "pnlTimeSelection",
         class: "network-selection",
         width: 80
-      }))), /* @__PURE__ */ this.$render("i-hstack", {
-        class: "row-mobile",
-        gap: 10,
-        margin: { top: 5, bottom: 5 },
-        verticalAlignment: "center",
-        horizontalAlignment: "space-between"
-      }, /* @__PURE__ */ this.$render("i-label", {
-        class: "lb-title",
-        caption: "Min Lock Time"
-      }), /* @__PURE__ */ this.$render("i-vstack", {
-        class: "w-input",
-        verticalAlignment: "center",
-        horizontalAlignment: "start"
-      }, /* @__PURE__ */ this.$render("i-label", {
-        id: "lbMinLockTime",
-        class: "lb-title",
-        font: { size: "16px" },
-        caption: "0 seconds"
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9340,8 +9509,14 @@
               this.inputName.value = customName;
               this.inputDesc.value = customDesc || "";
               this.inputURL.value = getTokenURL || "";
-              this.inputCampaignStart.value = new import_eth_wallet5.BigNumber(campaignStart).toFixed();
-              this.inputCampaignEnd.value = new import_eth_wallet5.BigNumber(campaignEnd).toFixed();
+              const start = new import_eth_wallet5.BigNumber(campaignStart).toNumber();
+              const end = new import_eth_wallet5.BigNumber(campaignEnd).toNumber();
+              this.campaignStart = start;
+              this.campaignEnd = end;
+              const startElm = this.inputCampaignStart.querySelector('input[type="text"]');
+              const endElm = this.inputCampaignEnd.querySelector('input[type="text"]');
+              startElm.value = import_moment3.default.unix(start).format(import_global7.DefaultDateTimeFormat);
+              endElm.value = import_moment3.default.unix(end).format(import_global7.DefaultDateTimeFormat);
               this.checkboxContract.checked = !!showContractLink;
               this.inputMainColor.value = customColorCampaign || "";
               this.inputBg.value = customColorBackground || "";
@@ -9367,6 +9542,58 @@
             }
           }, 200);
         }
+      };
+      this.setAttrDatePicker = () => {
+        this.inputCampaignStart.dateTimeFormat = import_global7.DefaultDateTimeFormat;
+        this.inputCampaignEnd.dateTimeFormat = import_global7.DefaultDateTimeFormat;
+        this.inputCampaignStart.onChanged = (datepickerElm) => this.changeStartDate(datepickerElm.inputElm.value);
+        this.inputCampaignEnd.onChanged = (datepickerElm) => this.changeEndDate(datepickerElm.inputElm.value);
+        const startTextElm = this.inputCampaignStart.querySelector('input[type="text"]');
+        const endTextElm = this.inputCampaignEnd.querySelector('input[type="text"]');
+        if (startTextElm) {
+          startTextElm.placeholder = import_global7.DefaultDateTimeFormat;
+        }
+        if (endTextElm) {
+          endTextElm.placeholder = import_global7.DefaultDateTimeFormat;
+        }
+      };
+      this.checkCampaignDate = () => {
+        const date = (0, import_moment3.default)();
+        if (this.campaignEnd && this.campaignStart >= this.campaignEnd) {
+          this.lbCampaignStartErr.visible = true;
+          this.lbCampaignStartErr.caption = `The campaign start must be before the campaign end`;
+        } else {
+          this.lbCampaignStartErr.visible = false;
+        }
+        if (this.campaignStart >= this.campaignEnd) {
+          this.lbCampaignEndErr.visible = true;
+          this.lbCampaignEndErr.caption = `The campaign end must be after the campaign start`;
+        } else {
+          this.lbCampaignEndErr.visible = false;
+        }
+      };
+      this.changeStartDate = (value) => {
+        const inputEndDate = this.inputCampaignEnd.querySelector('input[type="datetime-local"]');
+        const date = (0, import_moment3.default)(value, import_global7.DefaultDateTimeFormat);
+        this.campaignStart = date.unix();
+        if (inputEndDate) {
+          inputEndDate.min = date.add(60, "seconds").format("YYYY-MM-DD HH:mm:ss");
+          this.checkCampaignDate();
+        }
+        this.emitInput();
+      };
+      this.changeEndDate = (value) => {
+        const inputStartDate = this.inputCampaignStart.querySelector('input[type="datetime-local"]');
+        const date = (0, import_moment3.default)(value, import_global7.DefaultDateTimeFormat);
+        this.campaignEnd = date.unix();
+        if (inputStartDate) {
+          inputStartDate.max = date.subtract(60, "seconds").format("YYYY-MM-DD HH:mm:ss");
+          this.checkCampaignDate();
+        }
+        for (const staking of this.stakingConfig) {
+          staking.campaignEnd = this.campaignEnd;
+        }
+        this.emitInput();
       };
       this.renderNetworkButton = async () => {
         const vstack = await import_components12.VStack.create({ gap: 8 });
@@ -9489,13 +9716,6 @@
       this.emitInput = () => {
         import_components12.application.EventBus.dispatch(import_global7.EventId.EmitInput);
       };
-      this.onInputUnix = (input) => {
-        const _input = input;
-        let value = _input.value;
-        value = value.replace(/[^0-9]+/g, "");
-        _input.value = value;
-        this.emitInput();
-      };
       this.onInputText = () => {
       };
       this.isStakingValid = () => {
@@ -9509,7 +9729,7 @@
         return true;
       };
       this.checkValidation = () => {
-        return !!this.inputName.value && (0, import_global7.isValidNumber)(this.inputCampaignStart.value) && (0, import_global7.isValidNumber)(this.inputCampaignEnd.value) && this.isStakingValid();
+        return !!this.inputName.value && this.campaignStart && this.campaignStart < this.campaignEnd && this.isStakingValid();
       };
       this.getStakingData = () => {
         const stakingData = [];
@@ -9525,8 +9745,8 @@
           customName: this.inputName.value,
           customDesc: this.inputDesc.value || void 0,
           getTokenURL: this.inputURL.value || void 0,
-          campaignStart: new import_eth_wallet5.BigNumber(this.inputCampaignStart.value),
-          campaignEnd: new import_eth_wallet5.BigNumber(this.inputCampaignEnd.value),
+          campaignStart: new import_eth_wallet5.BigNumber(this.campaignStart),
+          campaignEnd: new import_eth_wallet5.BigNumber(this.campaignEnd),
           showContractLink: this.checkboxContract.checked || void 0,
           customColorCampaign: this.inputMainColor.value || void 0,
           customColorBackground: this.inputBg.value || void 0,
@@ -9561,6 +9781,7 @@
     async init() {
       this.network = (0, import_store8.getChainId)() || (0, import_store8.getDefaultChainId)();
       super.init();
+      this.setAttrDatePicker();
       this.setupInput();
       await this.renderNetworkButton();
       this.isInitialized = true;
@@ -9643,13 +9864,22 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme8.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-input", {
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-datepicker", {
         id: "inputCampaignStart",
-        placeholder: "Unix",
-        inputType: "number",
-        class: "input-text w-input",
-        onChanged: (src) => this.onInputUnix(src)
-      })), /* @__PURE__ */ this.$render("i-hstack", {
+        width: "100%",
+        height: 40,
+        type: "dateTime",
+        class: "cs-datepicker"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbCampaignStartErr",
+        visible: false,
+        font: { color: Theme8.colors.primary.main, size: "12px" }
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -9662,13 +9892,22 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme8.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-input", {
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-datepicker", {
         id: "inputCampaignEnd",
-        placeholder: "Unix",
-        inputType: "number",
-        class: "input-text w-input",
-        onChanged: (src) => this.onInputUnix(src)
-      })), /* @__PURE__ */ this.$render("i-hstack", {
+        width: "100%",
+        height: 40,
+        type: "dateTime",
+        class: "cs-datepicker"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbCampaignEndErr",
+        visible: false,
+        font: { color: Theme8.colors.primary.main, size: "12px" }
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         class: "row-mobile",
         margin: { top: 5, bottom: 5 },
@@ -10028,7 +10267,7 @@
             this.onConfigSave({ [chainId]: [__spreadValues({}, result)] });
             confirmationCallBack(true);
             if (isDownload) {
-              this.onDownload(__spreadValues({}, result));
+              this.onDownload({ [chainId]: [__spreadValues({}, result)] });
             }
           }
         }
@@ -10487,8 +10726,8 @@
           const isSimplified = campaign.isSimplified;
           const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
           const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
-          let isStarted = (0, import_moment2.default)(activeStartTime).diff((0, import_moment2.default)()) <= 0;
-          let isClosed = (0, import_moment2.default)(activeEndTime).diff((0, import_moment2.default)()) <= 0;
+          let isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+          let isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
           let totalTokens = 0;
           let availableQty = 0;
           let totalLocked = {};
@@ -10582,8 +10821,8 @@
             }
           };
           const setEndRemainingTime = () => {
-            isStarted = (0, import_moment2.default)(activeStartTime).diff((0, import_moment2.default)()) <= 0;
-            isClosed = (0, import_moment2.default)(activeEndTime).diff((0, import_moment2.default)()) <= 0;
+            isStarted = (0, import_moment4.default)(activeStartTime).diff((0, import_moment4.default)()) <= 0;
+            isClosed = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)()) <= 0;
             if (isStarted && !isClosed) {
               activeTimerRow.visible = true;
             } else {
@@ -10595,9 +10834,9 @@
                 clearInterval(this.listActiveTimer[idx]);
               }
             } else {
-              const days = (0, import_moment2.default)(activeEndTime).diff((0, import_moment2.default)(), "days");
-              const hours = (0, import_moment2.default)(activeEndTime).diff((0, import_moment2.default)(), "hours") - days * 24;
-              const mins = (0, import_moment2.default)(activeEndTime).diff((0, import_moment2.default)(), "minutes") - days * 24 * 60 - hours * 60;
+              const days = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "days");
+              const hours = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "hours") - days * 24;
+              const mins = (0, import_moment4.default)(activeEndTime).diff((0, import_moment4.default)(), "minutes") - days * 24 * 60 - hours * 60;
               endDays.caption = `${days}`;
               endHours.caption = `${hours}`;
               endMins.caption = `${mins}`;
@@ -10650,7 +10889,7 @@
             },
             {
               title: "Campaign Start:",
-              value: (0, import_moment2.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
+              value: (0, import_moment4.default)(activeStartTime).utc().format("YYYY-MM-DD HH:mm:ss z"),
               isHidden: isStarted || isSimplified,
               img: import_assets5.default.fullPath("img/staking/stopwatch.svg")
             },
@@ -10812,14 +11051,14 @@
                   class: "bold",
                   caption: reward.vestingEnd ? reward.vestingEnd.format("YYYY-MM-DD HH:mm:ss") : "TBC"
                 })));
-                const passClaimStartTime = !(reward.claimStartTime && (0, import_moment2.default)().diff(import_moment2.default.unix(reward.claimStartTime)) < 0);
+                const passClaimStartTime = !(reward.claimStartTime && (0, import_moment4.default)().diff(import_moment4.default.unix(reward.claimStartTime)) < 0);
                 let rewardClaimable = `0 ${rewardSymbol}`;
                 if (passClaimStartTime) {
                   rewardClaimable = `${(0, import_global9.formatNumber)(reward.claimable)} ${rewardSymbol}`;
                 }
                 let startClaimingText = "";
                 if (!(!reward.claimStartTime || passClaimStartTime)) {
-                  const claimStart = import_moment2.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
+                  const claimStart = import_moment4.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
                   startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                 }
                 rowRewardsClaimable.appendChild(/* @__PURE__ */ this.$render("i-hstack", {

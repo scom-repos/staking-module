@@ -297,7 +297,7 @@ export class PanelConfig extends Module {
         this.onConfigSave({[chainId]: [{ ...result }]});
         confirmationCallBack(true)
         if (isDownload) {
-          this.onDownload({ ...result });
+          this.onDownload({[chainId]: [{ ...result }]});
         }
       }
     }

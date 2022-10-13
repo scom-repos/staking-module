@@ -1,7 +1,8 @@
-import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack, VStack, Modal, Button } from '@ijstech/components';
+import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack, VStack, Modal, Button, Datepicker } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
+import { DefaultDateTimeFormat, EventId, isAddressValid, isInvalidInput, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenMapData, Reward } from '@staking/store';
+import moment from 'moment';
 import { TokenSelection } from '../../token-selection';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -20,15 +21,21 @@ export class RewardConfig extends Module {
 	private token?: ITokenObject;
 	private inputMultiplier: Input;
 	private inputInitialReward: Input;
+	private lbErrInitialReward: Label;
 	private inputRewardVesting: Input;
 	private inputClaimDeadline: Input;
 	private inputAdmin: Input;
 	private lbErr: Label;
 	private isAdminValid = false;
 	private checkboxStartDate: Checkbox;
+	private wrapperStartDateElm: HStack;
+	private inputVestingStartDate: Datepicker;
+	private vestingStartDate: number;
+	private lbStartDateErr: Label;
 	private wrapperAddressElm: HStack;
 	private _isNew: boolean;
 	private _data?: Reward;
+	private _campaignEndLockTime: number = 0;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
@@ -60,8 +67,9 @@ export class RewardConfig extends Module {
 
 	set chainId(chainId: number) {
 		this._chainId = chainId;
-		this.tokenSelection.targetChainId = chainId;
+		this.tokenSelection.token = undefined;
 		this.token = undefined;
+		this.tokenSelection.targetChainId = chainId;
 	}
 
 	get chainId() {
@@ -86,6 +94,15 @@ export class RewardConfig extends Module {
 		return this._data;
 	}
 
+	set campaignEndLockTime(value: number) {
+		this._campaignEndLockTime = value;
+		this.checkStartDate();
+	}
+
+	get campaignEndLockTime() {
+		return this._campaignEndLockTime;
+	}
+
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
@@ -102,7 +119,7 @@ export class RewardConfig extends Module {
 
 	private setupData = async () => {
 		if (this.data) {
-			const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate } = this.data;
+			const { address, rewardTokenAddress, multiplier, initialReward, vestingPeriod, claimDeadline, admin, isCommonStartDate, vestingStartDate } = this.data;
 			const interval = setInterval(() => {
 				if (this.isInitialized && this.tokenSelection.isInitialized) {
 					clearInterval(interval);
@@ -119,6 +136,10 @@ export class RewardConfig extends Module {
 					this.inputAdmin.value = admin;
 					this.isAdminValid = true;
 					this.checkboxStartDate.checked = !!isCommonStartDate;
+					this.onCheckCommonStartDate();
+					if (isCommonStartDate) {
+						this.setStartDate(vestingStartDate);
+					}
 					this.emitInput();
 				}
 			}, 200);
@@ -165,8 +186,62 @@ export class RewardConfig extends Module {
 		this.pnlTimeSelection.appendChild(dropdownModal);
 	}
 
+	private checkStartDate = () => {
+		if (!this.inputVestingStartDate) return;
+		const startDateElm = this.inputVestingStartDate.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+		if (startDateElm) {
+			const minDate = moment.unix(this.campaignEndLockTime);
+			const val = minDate.add(60, 'seconds');
+			if (this.campaignEndLockTime) {
+				startDateElm.min = val.format('YYYY-MM-DD HH:mm:ss');
+			}
+			if (this.vestingStartDate && this.vestingStartDate <= this.campaignEndLockTime) {
+				this.lbStartDateErr.visible = true;
+				this.lbStartDateErr.caption = `The start date should be greater than <b>${val.format(DefaultDateTimeFormat)}</b>`;
+			} else {
+				this.lbStartDateErr.visible = false;
+			}
+    }
+	}
+
+	private setStartDate = (value?: number | BigNumber) => {
+		const startDate = new BigNumber(value || 0).toNumber();
+		this.vestingStartDate = startDate;
+		const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]') as HTMLInputElement;
+		startTextElm.value = startDate ? moment.unix(startDate).format(DefaultDateTimeFormat) : '';
+		this.emitInput();
+	}
+
+	private setAttrDatePicker = () => {
+		this.inputVestingStartDate.dateTimeFormat = DefaultDateTimeFormat;
+    this.inputVestingStartDate.onChanged = (datepickerElm: any) => this.changeStartDate(datepickerElm.inputElm.value);
+    const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]') as HTMLInputElement;
+    if (startTextElm) {
+      startTextElm.placeholder = DefaultDateTimeFormat;
+    }
+		this.checkStartDate();
+  }
+
+	private changeStartDate = (value: any) => {
+    const date = moment(value, DefaultDateTimeFormat);
+		this.vestingStartDate = date.unix();
+		if (this.vestingStartDate <= this.campaignEndLockTime) {
+			const minDate = moment.unix(this.campaignEndLockTime).add(60, 'seconds');
+			this.lbStartDateErr.visible = true;
+			this.lbStartDateErr.caption = `The start date should be greater than <b>${minDate.format(DefaultDateTimeFormat)}</b>`;
+		} else {
+			this.lbStartDateErr.visible = false;
+		}
+		this.emitInput();
+  }
+
 	private emitInput = () => {
 		application.EventBus.dispatch(EventId.EmitInput);
+	}
+
+	private onCheckCommonStartDate = () => {
+		this.wrapperStartDateElm.visible = this.checkboxStartDate.checked;
+		this.emitInput();
 	}
 
 	private onInputToken = (token: ITokenObject) => {
@@ -176,6 +251,26 @@ export class RewardConfig extends Module {
 
 	private onInputNumber = (input: Control) => {
 		limitInputNumber(input, 18);
+		this.emitInput();
+	}
+
+	private checkInitialReward = () => {
+		const initialReward = Number(this.inputInitialReward.value);
+		if (isNaN(initialReward)) return false;
+		return initialReward >= 0 && initialReward <= 1;
+	}
+
+	private onInputInitalReward = (input: Control) => {
+		const _value = (input as Input).value;
+		if (isInvalidInput(_value)) {
+			this.inputInitialReward.value = '0';
+		}
+		if (!this.checkInitialReward()) {
+			this.lbErrInitialReward.visible = true;
+			this.lbErrInitialReward.caption = 'The upfront reward ratio must be between 0 and 1';
+		} else {
+			this.lbErrInitialReward.visible = false;
+		}
 		this.emitInput();
 	}
 
@@ -201,10 +296,11 @@ export class RewardConfig extends Module {
 
 	checkValidation = () => {
 		return this.token && this.isAdminValid &&
+			this.checkInitialReward() &&
 			isValidNumber(this.inputMultiplier.value) &&
-			isValidNumber(this.inputInitialReward.value) &&
 			isValidNumber(this.inputRewardVesting.value) &&
 			isValidNumber(this.inputClaimDeadline.value) &&
+			(!this.checkboxStartDate.checked || (this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime))) &&
 			(this.isNew || this.isAddressValid);
 	}
 
@@ -218,6 +314,7 @@ export class RewardConfig extends Module {
 			claimDeadline: new BigNumber(this.inputClaimDeadline.value),
 			admin: `${this.inputAdmin.value}`,
 			isCommonStartDate: this.checkboxStartDate.checked,
+			vestingStartDate: new BigNumber(this.vestingStartDate || 0)
 		}
 		return reward;
 	}
@@ -227,6 +324,7 @@ export class RewardConfig extends Module {
 		this.tokenSelection = new TokenSelection();
 		this.tokenSelection.onSelectToken = this.onInputToken;
 		this.pnlTokenSelection.appendChild(this.tokenSelection);
+		this.setAttrDatePicker();
 		await this.renderTimeButton();
 		this.setupInput();
 		this.isInitialized = true;
@@ -255,17 +353,20 @@ export class RewardConfig extends Module {
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Upfront Reward" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
-						</i-hstack>
-						<i-input id="inputInitialReward" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Factor" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
+					</i-hstack>
+					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Upfront Reward Ratio" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+						<i-input id="inputInitialReward" placeholder="0 <= Reward Ratio <= 1" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputInitalReward(src)} />
+							<i-label id="lbErrInitialReward" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
@@ -301,7 +402,18 @@ export class RewardConfig extends Module {
 								id="checkboxStartDate"
 								height="auto"
 								checked={false}
+								onChanged={this.onCheckCommonStartDate}
 							/>
+						</i-vstack>
+					</i-hstack>
+					<i-hstack id="wrapperStartDateElm" visible={false} gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Vesting Start Date" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+							<i-datepicker id="inputVestingStartDate" width="100%" height={40} type="dateTime" class="cs-datepicker" />
+							<i-label id="lbStartDateErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 				</i-vstack>

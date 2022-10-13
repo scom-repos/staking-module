@@ -1,7 +1,8 @@
-import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control } from '@ijstech/components';
+import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId, isValidNumber } from '@staking/global';
+import { DefaultDateTimeFormat, EventId } from '@staking/global';
 import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
+import moment from 'moment';
 import { StakingConfig } from './staking';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -26,8 +27,10 @@ export class CampaignConfig extends Module {
 	private inputName: Input;
 	private inputDesc: Input;
 	private inputURL: Input;
-	private inputCampaignStart: Input;
-	private inputCampaignEnd: Input;
+	private inputCampaignStart: Datepicker;
+	private inputCampaignEnd: Datepicker;
+	private lbCampaignStartErr: Label;
+	private lbCampaignEndErr: Label;
 	private checkboxContract: Checkbox;
 	private inputMainColor: Input;
 	private inputBg: Input;
@@ -37,6 +40,8 @@ export class CampaignConfig extends Module {
 	private inputStakingBtn: Input;
 	private _isNew: boolean;
 	private _data?: StakingCampaign;
+	private campaignStart: number;
+	private campaignEnd: number;
 	private wapperNetworkElm: HStack;
 	private isInitialized = false;
 
@@ -86,8 +91,14 @@ export class CampaignConfig extends Module {
 					this.inputName.value = customName;
 					this.inputDesc.value = customDesc || '';
 					this.inputURL.value = getTokenURL || '';
-					this.inputCampaignStart.value = new BigNumber(campaignStart).toFixed();
-					this.inputCampaignEnd.value = new BigNumber(campaignEnd).toFixed();
+					const start = new BigNumber(campaignStart).toNumber();
+					const end = new BigNumber(campaignEnd).toNumber();
+					this.campaignStart = start;
+					this.campaignEnd = end;
+					const startElm = this.inputCampaignStart.querySelector('input[type="text"]') as HTMLInputElement
+					const endElm = this.inputCampaignEnd.querySelector('input[type="text"]') as HTMLInputElement
+					startElm.value = moment.unix(start).format(DefaultDateTimeFormat);
+					endElm.value = moment.unix(end).format(DefaultDateTimeFormat);
 					this.checkboxContract.checked = !!showContractLink;
 					this.inputMainColor.value = customColorCampaign || '';
 					this.inputBg.value = customColorBackground || '';
@@ -115,7 +126,80 @@ export class CampaignConfig extends Module {
 		}
 	}
 
-	renderNetworkButton = async () => {
+	private setAttrDatePicker = () => {
+		this.inputCampaignStart.dateTimeFormat = DefaultDateTimeFormat;
+		this.inputCampaignEnd.dateTimeFormat = DefaultDateTimeFormat;
+    this.inputCampaignStart.onChanged = (datepickerElm: any) => this.changeStartDate(datepickerElm.inputElm.value);
+    this.inputCampaignEnd.onChanged = (datepickerElm: any) => this.changeEndDate(datepickerElm.inputElm.value);
+		// const minDate = moment();
+    const startTextElm = this.inputCampaignStart.querySelector('input[type="text"]') as HTMLInputElement;
+    // const startDateElm = this.inputCampaignStart.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+    const endTextElm = this.inputCampaignEnd.querySelector('input[type="text"]') as HTMLInputElement;
+    // const endDateElm = this.inputCampaignEnd.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+		// if (startDateElm) {
+    //   startDateElm.min = minDate.add(300, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+    // }
+    if (startTextElm) {
+      startTextElm.placeholder = DefaultDateTimeFormat;
+    }
+		// if (endDateElm) {
+    //   endDateElm.min = minDate.add(360, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+    // }
+    if (endTextElm) {
+      endTextElm.placeholder = DefaultDateTimeFormat;
+    }
+  }
+
+	private checkCampaignDate = () => {
+		const date = moment();
+		// if (date.unix() > this.campaignStart) {
+		// 	this.lbCampaignStartErr.visible = true;
+		// 	this.lbCampaignStartErr.caption = `The campaign start must be after <b>${date.add(300, 'seconds').format(DefaultDateTimeFormat)}</b>`;
+		// } else
+		if (this.campaignEnd && this.campaignStart >= this.campaignEnd) {
+			this.lbCampaignStartErr.visible = true;
+			this.lbCampaignStartErr.caption = `The campaign start must be before the campaign end`;
+		} else {
+			this.lbCampaignStartErr.visible = false;
+		}
+		// if (this.campaignEnd <= date.unix()) {
+		// 	this.lbCampaignEndErr.visible = true;
+		// 	this.lbCampaignEndErr.caption = `The campaign end must be after the <b>${date.add(360, 'seconds').format(DefaultDateTimeFormat)}</b>`;
+		// } else
+		if (this.campaignStart >= this.campaignEnd) {
+			this.lbCampaignEndErr.visible = true;
+			this.lbCampaignEndErr.caption = `The campaign end must be after the campaign start`;
+		} else {
+			this.lbCampaignEndErr.visible = false;
+		}
+	}
+
+	private changeStartDate = (value: any) => {
+    const inputEndDate = this.inputCampaignEnd.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+    const date = moment(value, DefaultDateTimeFormat);
+		this.campaignStart = date.unix();
+		if (inputEndDate) {
+      inputEndDate.min = date.add(60, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+			this.checkCampaignDate();
+    }
+		this.emitInput();
+  }
+
+	private changeEndDate = (value: any) => {
+		const inputStartDate = this.inputCampaignStart.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+    const date = moment(value, DefaultDateTimeFormat);
+		this.campaignEnd = date.unix();
+		if (inputStartDate) {
+      inputStartDate.max = date.subtract(60, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+			this.checkCampaignDate();
+    }
+		for (const staking of this.stakingConfig) {
+			staking.campaignEnd = this.campaignEnd;
+		}
+		this.emitInput();
+	}
+
+	private renderNetworkButton = async () => {
 		const vstack = await VStack.create({ gap: 8 });
 		const dropdownModal = await Modal.create({
 			showBackdrop: false,
@@ -239,14 +323,6 @@ export class CampaignConfig extends Module {
 		application.EventBus.dispatch(EventId.EmitInput);
 	}
 
-	private onInputUnix = (input: Control) => {
-		const _input = input as Input;
-		let value = _input.value;
-		value = value.replace(/[^0-9]+/g, "");
-		_input.value = value;
-		this.emitInput();
-	}
-
 	private onInputText = () => {
 
 	}
@@ -263,8 +339,9 @@ export class CampaignConfig extends Module {
 
 	checkValidation = () => {
 		return !!this.inputName.value &&
-			isValidNumber(this.inputCampaignStart.value) &&
-			isValidNumber(this.inputCampaignEnd.value) &&
+			this.campaignStart &&
+			// this.campaignStart >= moment().unix() &&
+			this.campaignStart < this.campaignEnd &&
 			this.isStakingValid();
 	}
 
@@ -283,8 +360,8 @@ export class CampaignConfig extends Module {
 			customName: this.inputName.value,
 			customDesc: this.inputDesc.value || undefined,
 			getTokenURL: this.inputURL.value || undefined,
-			campaignStart: new BigNumber(this.inputCampaignStart.value),
-			campaignEnd: new BigNumber(this.inputCampaignEnd.value),
+			campaignStart: new BigNumber(this.campaignStart),
+			campaignEnd: new BigNumber(this.campaignEnd),
 			showContractLink: this.checkboxContract.checked || undefined,
 			customColorCampaign: this.inputMainColor.value || undefined,
 			customColorBackground: this.inputBg.value || undefined,
@@ -300,6 +377,7 @@ export class CampaignConfig extends Module {
 	async init() {
 		this.network = getChainId() || getDefaultChainId();
 		super.init();
+		this.setAttrDatePicker();
 		this.setupInput();
 		await this.renderNetworkButton();
 		this.isInitialized = true;
@@ -336,14 +414,20 @@ export class CampaignConfig extends Module {
 							<i-label class="lb-title" caption="Campaign Start" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputCampaignStart" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+							<i-datepicker id="inputCampaignStart" width="100%" height={40} type="dateTime" class="cs-datepicker" />
+							<i-label id="lbCampaignStartErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign End" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputCampaignEnd" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+							<i-datepicker id="inputCampaignEnd" width="100%" height={40} type="dateTime" class="cs-datepicker" />
+							<i-label id="lbCampaignEndErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} class="row-mobile" margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Show Contract Link" />

@@ -59,6 +59,7 @@ interface Reward {
   claimDeadline: BigNumber, //unix
   admin: string, // can only withdraw remaining fund after claimDeadline.
   isCommonStartDate?: boolean,
+  vestingStartDate?: BigNumber //unix
 }
 
 // const StakingCampaignByChainId:{[chainId:number]:StakingCampaign[]} = {

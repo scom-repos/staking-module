@@ -19509,7 +19509,6 @@ var deployCampaign = async (campaign, callback) => {
   try {
     let wallet = (0, import_store.getWallet)();
     let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
-    let rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet);
     let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
     for (const staking of campaign.stakings) {
       let stakingResult;
@@ -19527,10 +19526,10 @@ var deployCampaign = async (campaign, callback) => {
       });
       let rewardResult = [];
       for (const reward of staking.rewards) {
-        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, claimDeadline, admin } = reward;
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline, admin } = reward;
         let rewardToken = new import_eth_wallet4.Erc20(wallet, rewardTokenAddress);
         let rewardTokenDecimals = await rewardToken.decimals;
-        const rewardAddress = await rewardsContract.deploy({
+        let params = {
           timeIsMoney: timeIsMoney.address,
           token: rewardTokenAddress,
           multiplier: import_eth_wallet4.Utils.toDecimals(multiplier, rewardTokenDecimals),
@@ -19538,7 +19537,17 @@ var deployCampaign = async (campaign, callback) => {
           vestingPeriod,
           claimDeadline,
           admin
-        });
+        };
+        let rewardsContract;
+        if (isCommonStartDate) {
+          rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet);
+          params = __spreadProps(__spreadValues({}, params), {
+            vestingStartDate: import_eth_wallet4.Utils.toDecimals(vestingStartDate || 0, rewardTokenDecimals)
+          });
+        } else {
+          rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet);
+        }
+        const rewardAddress = await rewardsContract.deploy(params);
         rewardResult.push(__spreadProps(__spreadValues({}, reward), { address: rewardAddress }));
       }
       ;

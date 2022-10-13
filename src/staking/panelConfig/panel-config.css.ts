@@ -143,6 +143,44 @@ Styles.cssRule('.panel-config', {
     'i-checkbox.is-checked .checkmark': {
       backgroundColor: Theme.colors.secondary.light
     },
+    '.cs-datepicker': {
+      background: Theme.input.background,
+      borderRadius: 12,
+      maxWidth: 300,
+      $nest: {
+        'input[type="text"]': {
+          background: 'transparent',
+          height: '40px !important',
+          width: '100% !important',
+          border: 'none',
+          padding: '1rem',
+          fontSize: '1rem',
+          textAlign: 'center',
+          color: Theme.text.primary,
+        },
+        'input::placeholder': {
+          //@ts-ignore
+          color: Theme.docs.text,
+        },
+        '.datepicker-toggle': {
+          display: 'flex',
+          width: '100% !important',
+          maxWidth: 300,
+          height: '40px !important',
+          padding: 0,
+          position: 'absolute',
+          top: 0,
+          margin: 0,
+          background: 'transparent',
+        },
+        'i-icon': {
+          width: '100%',
+        },
+        'svg': {
+          display: 'none',
+        }
+      },
+    },
     '.cursor-pointer': {
       cursor: 'pointer',
     },

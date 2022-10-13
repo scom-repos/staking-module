@@ -1,6 +1,6 @@
 import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId, formatNumber, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
+import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenMapData, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
@@ -32,13 +32,14 @@ export class StakingConfig extends Module {
 	private currentReward = 0;
 	private _chainId: number;
 	private inputLockingTime: Input;
-	private lbMinLockTime: Label;
+	// private lbMinLockTime: Label;
 	private inputPerAddressCap: Input;
 	private inputMaxTotalLock: Input;
 	private inputDesc: Input;
 	private wrapperAddressElm: HStack;
 	private _isNew: boolean;
 	private _data?: Staking;
+	private _campaignEnd: number;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
@@ -66,8 +67,9 @@ export class StakingConfig extends Module {
 
 	set chainId(chainId: number) {
 		this._chainId = chainId;
-		this.tokenSelection.targetChainId = chainId;
+		this.tokenSelection.token = undefined;
 		this.token = undefined;
+		this.tokenSelection.targetChainId = chainId;
 		for (const elm of this.rewardConfig) {
 			elm.chainId = chainId;
 		}
@@ -93,6 +95,29 @@ export class StakingConfig extends Module {
 
 	get data() {
 		return this._data;
+	}
+
+	set campaignEnd(value: number) {
+		this._campaignEnd = value;
+		this.updateCampaignEndLockTime();
+	}
+
+	get campaignEnd() {
+		return this._campaignEnd || 0;
+	}
+
+	get minLockTime() {
+		if (this.inputLockingTime) {
+			return new BigNumber(this.inputLockingTime.value || 0).multipliedBy(this.unit).multipliedBy(this.hourVal);
+		}
+		return new BigNumber(0);
+	}
+
+	private updateCampaignEndLockTime() {
+		const val = this.minLockTime.plus(this.campaignEnd).toNumber();
+		for (const reward of this.rewardConfig) {
+			reward.campaignEndLockTime = val;
+		}
 	}
 
 	private setupInput = () => {
@@ -128,7 +153,7 @@ export class StakingConfig extends Module {
 					this.token = token;
 					this.tokenSelection.token = token;
 					this.inputLockingTime.value = lockingTime.dividedBy(this.hourVal).toFixed();
-					this.lbMinLockTime.caption = lockingTime.isEqualTo(1) ? '1 second' : `${formatNumber(minLockTime)} seconds`;
+					// this.lbMinLockTime.caption = lockingTime.isEqualTo(1) ? '1 second' : `${formatNumber(minLockTime)} seconds`;
 					this.inputPerAddressCap.value = new BigNumber(perAddressCap).toFixed();
 					this.inputMaxTotalLock.value = new BigNumber(maxTotalLock).toFixed();
 					this.inputDesc.value = customDesc || '';
@@ -182,7 +207,8 @@ export class StakingConfig extends Module {
 				dropdownModal.visible = false;
 				this.btnTime.caption = unit.name;
 				this.unit = unit.value;
-				this.updateMinLockTime();
+				this.updateCampaignEndLockTime();
+				// this.updateMinLockTime();
 			};
 			vstack.appendChild(dropdownItem);
 		}
@@ -283,6 +309,7 @@ export class StakingConfig extends Module {
 			this.rewardConfig[idx].chainId = this.chainId;
 		}
 		this.rewardConfig[idx].data = reward;
+		this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
 		this.currentReward = idx;
 		this.emitInput();
 	}
@@ -331,14 +358,15 @@ export class StakingConfig extends Module {
 		let value = _input.value;
 		value = value.replace(/[^0-9]+/g, "");
 		_input.value = value;
-		this.updateMinLockTime();
+		// this.updateMinLockTime();
+		this.updateCampaignEndLockTime();
 		this.emitInput();
 	}
 
-	private updateMinLockTime = () => {
-		const val = new BigNumber(this.inputLockingTime.value || 0);
-		this.lbMinLockTime.caption = `${formatNumber(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
-	}
+	// private updateMinLockTime = () => {
+	// 	const val = new BigNumber(this.inputLockingTime.value || 0);
+	// 	this.lbMinLockTime.caption = `${formatNumber(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
+	// }
 
 	private onInputNumber = (input: Control) => {
 		limitInputNumber(input, 18);
@@ -377,7 +405,7 @@ export class StakingConfig extends Module {
 		const staking: Staking = {
 			address: this.inputAddress.value,
 			lockTokenAddress: this.token?.address || '',
-			minLockTime: new BigNumber(this.inputLockingTime.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
+			minLockTime: this.minLockTime,
 			perAddressCap: new BigNumber(this.inputPerAddressCap.value),
 			maxTotalLock: new BigNumber(this.inputMaxTotalLock.value),
 			customDesc: this.inputDesc.value,
@@ -400,7 +428,7 @@ export class StakingConfig extends Module {
 
 	render() {
 		return (
-			<i-panel class="custom-scroll" display="block" minHeight={800}>
+			<i-panel class="custom-scroll" display="block" minHeight={750}>
 				<i-vstack gap={10} verticalAlignment="center" class="main-content">
 					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
@@ -429,12 +457,12 @@ export class StakingConfig extends Module {
 							<i-panel id="pnlTimeSelection" class="network-selection" width={80} />
 						</i-hstack>
 					</i-hstack>
-					<i-hstack class="row-mobile" gap={10} margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
+					{/* <i-hstack class="row-mobile" gap={10} margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Min Lock Time" />
 						<i-vstack class="w-input" verticalAlignment="center" horizontalAlignment="start">
 							<i-label id="lbMinLockTime" class="lb-title" font={{ size: '16px' }} caption="0 seconds" />
 						</i-vstack>
-					</i-hstack>
+					</i-hstack> */}
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Max Total Lock" />

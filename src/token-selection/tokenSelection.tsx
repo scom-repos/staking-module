@@ -85,7 +85,7 @@ export class TokenSelection extends Module {
 
   set targetChainId(value: number) {
     this._targetChainId = value;
-    this.updateDataByChain();
+    this.updateDataByChain(true);
   }
 
   get tokenDataListProp(): Array<ITokenObject> {
@@ -183,11 +183,13 @@ export class TokenSelection extends Module {
     this.renderTokenItems();
   }
 
-  private async updateDataByChain() {
+  private async updateDataByChain(init?: boolean) {
     this.tokenBalancesMap = await updateAllTokenBalances();
     this.renderTokenItems();
-    this.updateButton();
-    this.isInitialized = true;
+    this.updateButton(init ? undefined : this.token);
+    if (init) {
+      this.isInitialized = true;
+    }
   }
 
   private async updateDataByNewToken() {
@@ -468,9 +470,7 @@ export class TokenSelection extends Module {
     if (!btnToken) return;
     try {
       let image: Image = btnToken.querySelector('i-image') as Image;
-      // if (!token) {
-      //   token = this.tokenDataList?.find((v: ITokenObject) => (v.address && v.address == this.token?.address) || (v.symbol == this.token?.symbol))
-      // }
+      token = this.tokenDataList?.find((v: ITokenObject) => (v.address && v.address == this.token?.address))
       if (!token) {
         btnToken.caption = 'Select a token';
         btnToken.classList.remove('has-token');

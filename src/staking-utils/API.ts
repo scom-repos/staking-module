@@ -551,7 +551,6 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
   try {
     let wallet = getWallet();
     let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
-    let rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);
     let result: StakingCampaign = { ...campaign, stakings: [] };
     for (const staking of campaign.stakings) {
       let stakingResult: Staking;
@@ -569,18 +568,29 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
       });
       let rewardResult: Reward[] = [];
       for (const reward of staking.rewards) {
-        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, claimDeadline, admin } = reward;
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline, admin } = reward;
         let rewardToken = new Erc20(wallet, rewardTokenAddress);
         let rewardTokenDecimals = await rewardToken.decimals;
-        const rewardAddress = await rewardsContract.deploy({
-          timeIsMoney: timeIsMoney.address,
-          token: rewardTokenAddress,
-          multiplier: Utils.toDecimals(multiplier, rewardTokenDecimals),
-          initialReward: Utils.toDecimals(initialReward, rewardTokenDecimals),
-          vestingPeriod,
-          claimDeadline,
-          admin,
-        });
+        let params: any = {
+            timeIsMoney: timeIsMoney.address,
+            token: rewardTokenAddress,
+            multiplier: Utils.toDecimals(multiplier, rewardTokenDecimals),
+            initialReward: Utils.toDecimals(initialReward, rewardTokenDecimals),
+            vestingPeriod,
+            claimDeadline,
+            admin,
+        }
+        let rewardsContract;
+        if (isCommonStartDate) {
+          rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet);
+          params = {
+            ...params,
+            vestingStartDate: Utils.toDecimals(vestingStartDate || 0, rewardTokenDecimals)
+          }
+        } else {
+          rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);
+        }
+        const rewardAddress = await rewardsContract.deploy(params);
         rewardResult.push({ ...reward, address: rewardAddress });
       };
       stakingResult = { ...staking, address: stakingAddress, rewards: rewardResult };
