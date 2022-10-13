@@ -1,4 +1,5 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.manage-stake', {
   $nest: {
@@ -36,13 +37,12 @@ Styles.cssRule('.manage-stake', {
       alignItems: 'center',
       paddingBottom: '1rem',
       marginBottom: '1rem',
-      borderBottom: '2px solid var(--divider)',
+      borderBottom: `2px solid ${Theme.divider}`,
     },
     '.main-content': {
       fontSize: '.875rem',
       $nest: {
         'i-label > *': {
-          color: '#fff',
           fontSize: '1rem',
           wordBreak: 'normal'
         },
@@ -70,7 +70,7 @@ Styles.cssRule('.manage-stake', {
           }
         },
         '.input--token-box': {
-          border: `1px solid ${'#fff'}`,
+          border: `1px solid ${Theme.divider}`,
           borderRadius: '5px',
           padding: '0.75rem',
         },
@@ -81,8 +81,8 @@ Styles.cssRule('.manage-stake', {
           marginRight: '0.25rem',
         },
         '.text-normal > *': {
-          fontWeight: 'normal !important',
-          fontSize: '1rem !important',
+          fontWeight: 'normal',
+          fontSize: '1rem',
         },
         '.btn-max': {
           display: 'flex',
@@ -105,15 +105,14 @@ Styles.cssRule('.manage-stake', {
           border: 'none',
           width: '100% !important',
           backgroundColor: 'transparent',
-          color: '#fff',
           fontSize: '1.25rem',
           textAlign: 'left'
         },
       }
     },
-    '.text-yellow *': {
-      color: `#f6c958 !important`,
-      fontSize: '1.25rem !important',
+    '.text-yellow': {
+      color: Theme.text.third,
+      fontSize: '1.25rem',
       fontWeight: 'bold',
     },
     '.mr-025': {

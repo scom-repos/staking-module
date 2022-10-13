@@ -6453,6 +6453,7 @@
 
   // src/staking/manageStake/manage-stake.css.ts
   var import_components4 = __toModule(__require("@ijstech/components"));
+  var Theme2 = import_components4.Styles.Theme.ThemeVars;
   import_components4.Styles.cssRule(".manage-stake", {
     $nest: {
       "input": {
@@ -6489,13 +6490,12 @@
         alignItems: "center",
         paddingBottom: "1rem",
         marginBottom: "1rem",
-        borderBottom: "2px solid var(--divider)"
+        borderBottom: `2px solid ${Theme2.divider}`
       },
       ".main-content": {
         fontSize: ".875rem",
         $nest: {
           "i-label > *": {
-            color: "#fff",
             fontSize: "1rem",
             wordBreak: "normal"
           },
@@ -6523,7 +6523,7 @@
             }
           },
           ".input--token-box": {
-            border: `1px solid ${"#fff"}`,
+            border: `1px solid ${Theme2.divider}`,
             borderRadius: "5px",
             padding: "0.75rem"
           },
@@ -6534,8 +6534,8 @@
             marginRight: "0.25rem"
           },
           ".text-normal > *": {
-            fontWeight: "normal !important",
-            fontSize: "1rem !important"
+            fontWeight: "normal",
+            fontSize: "1rem"
           },
           ".btn-max": {
             display: "flex",
@@ -6558,15 +6558,14 @@
             border: "none",
             width: "100% !important",
             backgroundColor: "transparent",
-            color: "#fff",
             fontSize: "1.25rem",
             textAlign: "left"
           }
         }
       },
-      ".text-yellow *": {
-        color: `#f6c958 !important`,
-        fontSize: "1.25rem !important",
+      ".text-yellow": {
+        color: Theme2.text.third,
+        fontSize: "1.25rem",
         fontWeight: "bold"
       },
       ".mr-025": {
@@ -6674,7 +6673,7 @@
 
   // src/staking/manageStake/manage-stake.tsx
   var import_moment = __toModule(require_moment());
-  var Theme2 = import_components5.Styles.Theme.ThemeVars;
+  var Theme3 = import_components5.Styles.Theme.ThemeVars;
   var CurrentMode;
   (function(CurrentMode2) {
     CurrentMode2[CurrentMode2["STAKE"] = 0] = "STAKE";
@@ -7045,7 +7044,7 @@
       }, /* @__PURE__ */ this.$render("i-vstack", {
         id: "loadingElm",
         class: "i-loading-overlay",
-        background: { color: Theme2.background.modal }
+        background: { color: Theme3.background.modal }
       }, /* @__PURE__ */ this.$render("i-vstack", {
         class: "i-loading-spinner",
         horizontalAlignment: "center",
@@ -7062,7 +7061,7 @@
       }, /* @__PURE__ */ this.$render("i-icon", {
         width: 20,
         height: 20,
-        fill: "#fff",
+        fill: Theme3.text.primary,
         class: "cursor-pointer pointer",
         name: "arrow-left",
         onClick: this.closeStakeModal
@@ -7073,7 +7072,7 @@
       }), /* @__PURE__ */ this.$render("i-icon", {
         width: 20,
         height: 20,
-        fill: "#fff",
+        fill: Theme3.text.primary,
         class: "question-icon",
         name: "question",
         tooltip: {
@@ -7102,7 +7101,7 @@
       }), /* @__PURE__ */ this.$render("i-icon", {
         width: 18,
         height: 18,
-        fill: "#fff",
+        fill: Theme3.text.primary,
         class: "question-icon",
         name: "question",
         tooltip: {
@@ -7243,9 +7242,9 @@
 
   // src/staking/panelConfig/panel-config.css.ts
   var import_components6 = __toModule(__require("@ijstech/components"));
-  var Theme3 = import_components6.Styles.Theme.ThemeVars;
+  var Theme4 = import_components6.Styles.Theme.ThemeVars;
   import_components6.Styles.cssRule(".panel-config", {
-    background: Theme3.background.main,
+    background: Theme4.background.main,
     padding: "1rem",
     margin: "auto",
     $nest: {
@@ -7271,12 +7270,12 @@
         }
       },
       ".btn-item": {
-        background: `${Theme3.colors.secondary.main} !important`,
+        background: `${Theme4.colors.secondary.main} !important`,
         borderRadius: 0,
-        color: Theme3.colors.primary.contrastText,
+        color: Theme4.colors.primary.contrastText,
         $nest: {
           "&.btn-active": {
-            background: `${Theme3.colors.primary.main} !important`,
+            background: `${Theme4.colors.primary.main} !important`,
             cursor: "default"
           }
         }
@@ -7303,7 +7302,7 @@
         height: "80px !important",
         borderRadius: 12,
         padding: 8,
-        background: Theme3.input.background,
+        background: Theme4.input.background,
         $nest: {
           "textarea": {
             width: "100% !important",
@@ -7320,7 +7319,7 @@
         height: "40px !important",
         borderRadius: 12,
         paddingInline: 8,
-        background: Theme3.input.background,
+        background: Theme4.input.background,
         $nest: {
           "&.w-100": {
             width: "100% !important"
@@ -7344,17 +7343,17 @@
       ".network-selection": {
         $nest: {
           ".btn-select:hover": {
-            background: `${Theme3.action.active} !important`
+            background: `${Theme4.action.active} !important`
           },
           ".btn-select.disabled": {
-            color: `${Theme3.text.primary} !important`,
+            color: `${Theme4.text.primary} !important`,
             cursor: "default !important"
           },
           ".modal": {
             padding: "0.75rem 0",
-            background: Theme3.background.paper,
+            background: Theme4.background.paper,
             borderRadius: 6,
-            border: `1px solid ${Theme3.colors.primary.dark}`,
+            border: `1px solid ${Theme4.colors.primary.dark}`,
             $nest: {
               "& > i-vstack": {
                 maxHeight: "40vh",
@@ -7364,15 +7363,15 @@
                 boxShadow: "none"
               },
               "i-button:hover": {
-                background: `${Theme3.action.hover} !important`
+                background: `${Theme4.action.hover} !important`
               }
             }
           }
         }
       },
       "i-checkbox .checkmark": {
-        backgroundColor: Theme3.input.background,
-        border: `1px solid ${Theme3.colors.primary.light}`,
+        backgroundColor: Theme4.input.background,
+        border: `1px solid ${Theme4.colors.primary.light}`,
         borderRadius: 6,
         width: 20,
         height: 20,
@@ -7384,10 +7383,10 @@
         }
       },
       "i-checkbox.is-checked .checkmark": {
-        backgroundColor: Theme3.colors.secondary.light
+        backgroundColor: Theme4.colors.secondary.light
       },
       ".cs-datepicker": {
-        background: Theme3.input.background,
+        background: Theme4.input.background,
         borderRadius: 12,
         maxWidth: 300,
         $nest: {
@@ -7399,10 +7398,10 @@
             padding: "1rem",
             fontSize: "1rem",
             textAlign: "center",
-            color: Theme3.text.primary
+            color: Theme4.text.primary
           },
           "input::placeholder": {
-            color: Theme3.docs.text
+            color: Theme4.docs.text
           },
           ".datepicker-toggle": {
             display: "flex",
@@ -7435,7 +7434,7 @@
             width: "5px"
           },
           "&::-webkit-scrollbar-thumb": {
-            background: Theme3.colors.primary.main,
+            background: Theme4.colors.primary.main,
             borderRadius: "5px"
           }
         }
@@ -7511,7 +7510,7 @@
 
   // src/token-selection/tokenSelection.css.ts
   var import_components7 = __toModule(__require("@ijstech/components"));
-  var Theme4 = import_components7.Styles.Theme.ThemeVars;
+  var Theme5 = import_components7.Styles.Theme.ThemeVars;
   import_components7.Styles.cssRule(".token-selection", {
     $nest: {
       "#tokenSearch": {
@@ -7521,17 +7520,17 @@
         $nest: {
           ".i-checkbox_label": {
             fontSize: "1.5rem",
-            color: Theme4.text.third,
+            color: Theme5.text.third,
             width: "150px !important"
           },
           ".checkmark": {
             height: "30px",
             width: "30px",
             background: "none",
-            border: `3px solid ${Theme4.colors.primary.light}`
+            border: `3px solid ${Theme5.colors.primary.light}`
           },
           ".checkmark:after": {
-            border: `3px solid ${Theme4.colors.primary.light}`,
+            border: `3px solid ${Theme5.colors.primary.light}`,
             height: "16px",
             left: "7.5px",
             top: "0px",
@@ -7544,7 +7543,7 @@
       ".btn-source-panel": {
         padding: "5px",
         display: "inline-block",
-        background: Theme4.background.gradient,
+        background: Theme5.background.gradient,
         borderRadius: "5px"
       },
       ".token-import-input": {
@@ -7561,19 +7560,19 @@
         }
       },
       ".pnl-token-import": {
-        border: `2px solid ${Theme4.colors.primary.light}`,
+        border: `2px solid ${Theme5.colors.primary.light}`,
         borderRadius: "0.75rem",
         margin: "1rem 0",
         padding: "1.25rem 1rem 1rem"
       },
       ".i-modal_header > i-icon": {
-        fill: `${Theme4.colors.primary.main} !important`
+        fill: `${Theme5.colors.primary.main} !important`
       },
       "i-icon": {
         display: "inline-block"
       },
       ".btn-import": {
-        background: Theme4.background.gradient,
+        background: Theme5.background.gradient,
         borderRadius: "5px",
         color: "#fff",
         fontSize: "1rem",
@@ -7583,7 +7582,7 @@
         width: "3px"
       },
       "::-webkit-scrollbar-thumb": {
-        background: Theme4.colors.primary.main,
+        background: Theme5.colors.primary.main,
         borderRadius: "5px"
       },
       ".ml-auto": {
@@ -7595,10 +7594,10 @@
         width: "max-content",
         padding: "0.25rem 0.5rem",
         boxShadow: "none",
-        background: Theme4.background.gradient,
+        background: Theme5.background.gradient,
         $nest: {
           "&:hover": {
-            background: Theme4.background.gradient,
+            background: Theme5.background.gradient,
             opacity: 0.9
           },
           "&.disabled": {
@@ -7616,12 +7615,12 @@
           "&.has-token": {
             background: "transparent",
             fontWeight: "bold",
-            color: Theme4.text.third,
+            color: Theme5.text.third,
             paddingRight: "0",
             $nest: {
               "> i-icon": {
                 marginRight: "-7px",
-                fill: Theme4.colors.primary.main
+                fill: Theme5.colors.primary.main
               }
             }
           }
@@ -7631,7 +7630,7 @@
         marginRight: "0.25rem"
       },
       "#btnToken": {
-        background: Theme4.input.background,
+        background: Theme5.input.background,
         height: "40px",
         width: "100%",
         padding: "0.5rem 0.75rem",
@@ -7646,12 +7645,12 @@
       ".bg-modal": {
         $nest: {
           ".modal": {
-            background: Theme4.background.modal,
+            background: Theme5.background.modal,
             width: 500,
             maxWidth: "100%",
             padding: "0.75rem 1rem",
             borderRadius: "1rem",
-            color: Theme4.text.primary,
+            color: Theme5.text.primary,
             marginTop: 40
           }
         }
@@ -7664,13 +7663,13 @@
           ".i-modal_header": {
             marginBottom: "1.5rem",
             paddingBottom: "0.5rem",
-            borderBottom: `2px solid ${Theme4.divider}`,
-            color: Theme4.colors.primary.main,
+            borderBottom: `2px solid ${Theme5.divider}`,
+            color: Theme5.colors.primary.main,
             fontSize: "1.25rem",
             fontWeight: 700
           },
           ".i-modal_header > i-icon": {
-            fill: `${Theme4.colors.primary.main} !important`
+            fill: `${Theme5.colors.primary.main} !important`
           },
           ".search": {
             position: "relative",
@@ -7705,7 +7704,7 @@
             marginBlock: "0.5rem",
             $nest: {
               "i-label *": {
-                color: Theme4.colors.primary.main,
+                color: Theme5.colors.primary.main,
                 fontSize: "1rem"
               },
               ".token-section": {
@@ -7716,7 +7715,7 @@
                 width: "10px",
                 height: "14px",
                 display: "flex",
-                fill: Theme4.text.primary,
+                fill: Theme5.text.primary,
                 position: "absolute",
                 right: "0"
               },
@@ -7727,7 +7726,7 @@
                 bottom: "2px"
               },
               ".icon-sorted": {
-                fill: Theme4.colors.primary.main
+                fill: Theme5.colors.primary.main
               }
             }
           },
@@ -7745,7 +7744,7 @@
                 cursor: "pointer",
                 $nest: {
                   "&:hover": {
-                    borderColor: Theme4.colors.primary.main
+                    borderColor: Theme5.colors.primary.main
                   },
                   "i-image": {
                     marginRight: "0.5rem"
@@ -7787,7 +7786,7 @@
               ".token-name i-label > *": {
                 fontSize: "0.75rem",
                 marginRight: "0.5rem",
-                color: Theme4.colors.secondary.main
+                color: Theme5.colors.secondary.main
               }
             }
           }
@@ -7804,7 +7803,7 @@
   });
 
   // src/token-selection/tokenSelection.tsx
-  var Theme5 = import_components8.Styles.Theme.ThemeVars;
+  var Theme6 = import_components8.Styles.Theme.ThemeVars;
   var TokenSelection = class extends import_components8.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -8079,7 +8078,7 @@
         name: "copy",
         width: "14px",
         height: "14px",
-        fill: Theme5.text.primary,
+        fill: Theme6.text.primary,
         margin: { right: 8 },
         tooltip: { content: `${token.symbol} has been copied`, trigger: "click" },
         onClick: () => import_components8.application.copyToClipboard(token.address || ""),
@@ -8262,7 +8261,7 @@
         id: "btnToken",
         enabled: false,
         class: "custom-btn",
-        rightIcon: { name: "caret-down", fill: Theme5.colors.primary.main },
+        rightIcon: { name: "caret-down", fill: Theme6.colors.primary.main },
         caption: "Select a token",
         onClick: () => this.showModal()
       })), /* @__PURE__ */ this.$render("i-modal", {
@@ -8493,7 +8492,7 @@
   var import_global5 = __toModule(__require("@staking/global"));
   var import_store6 = __toModule(__require("@staking/store"));
   var import_moment2 = __toModule(require_moment());
-  var Theme6 = import_components10.Styles.Theme.ThemeVars;
+  var Theme7 = import_components10.Styles.Theme.ThemeVars;
   var RewardConfig = class extends import_components10.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -8559,10 +8558,10 @@
         });
         this.btnTime = await import_components10.Button.create({
           caption: "Hour(s)",
-          background: { color: Theme6.input.background },
+          background: { color: Theme7.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme6.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: Theme7.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 80
@@ -8767,7 +8766,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -8780,7 +8779,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme6.colors.primary.main, size: "12px" }
+        font: { color: Theme7.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -8793,7 +8792,7 @@
         caption: "Reward Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         class: "w-input"
@@ -8809,7 +8808,7 @@
         caption: "Reward Factor"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMultiplier",
         inputType: "number",
@@ -8827,7 +8826,7 @@
         caption: "Upfront Reward Ratio"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -8842,7 +8841,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbErrInitialReward",
         visible: false,
-        font: { color: Theme6.colors.primary.main, size: "12px" }
+        font: { color: Theme7.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -8855,7 +8854,7 @@
         caption: "Reward Vesting"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 4,
         class: "w-input",
@@ -8883,7 +8882,7 @@
         caption: "Admin Claim Deadline"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputClaimDeadline",
         placeholder: "Unix",
@@ -8902,7 +8901,7 @@
         caption: "Admin"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -8915,7 +8914,7 @@
         id: "lbErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme6.colors.primary.main, size: "12px" }
+        font: { color: Theme7.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         class: "row-mobile",
         gap: 10,
@@ -8947,7 +8946,7 @@
         caption: "Vesting Start Date"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme6.colors.primary.main, size: "16px" }
+        font: { color: Theme7.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -8962,7 +8961,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbStartDateErr",
         visible: false,
-        font: { color: Theme6.colors.primary.main, size: "12px" }
+        font: { color: Theme7.colors.primary.main, size: "12px" }
       })))));
     }
   };
@@ -8971,7 +8970,7 @@
   ], RewardConfig);
 
   // src/staking/panelConfig/staking.tsx
-  var Theme7 = import_components11.Styles.Theme.ThemeVars;
+  var Theme8 = import_components11.Styles.Theme.ThemeVars;
   var StakingConfig = class extends import_components11.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -9046,10 +9045,10 @@
         });
         this.btnTime = await import_components11.Button.create({
           caption: "Hour(s)",
-          background: { color: Theme7.input.background },
+          background: { color: Theme8.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme7.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 80
@@ -9094,10 +9093,10 @@
         const type = import_store7.LockTokenTypeList.find((f) => f.value === this.lockType);
         this.btnType = await import_components11.Button.create({
           caption: (type == null ? void 0 : type.name) || "Select Type",
-          background: { color: Theme7.input.background },
+          background: { color: Theme8.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme7.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 300
@@ -9179,7 +9178,7 @@
         const idx = Number(this.rewardConfig.length);
         const pnl = await import_components11.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components11.Icon.create({ name: "times", fill: Theme7.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components11.Icon.create({ name: "times", fill: Theme8.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeReward(idx);
         const button = await import_components11.Button.create({ caption: `Reward ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item");
@@ -9334,7 +9333,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -9347,7 +9346,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme7.colors.primary.main, size: "12px" }
+        font: { color: Theme8.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9360,7 +9359,7 @@
         caption: "Lock Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         class: "w-input"
@@ -9376,7 +9375,7 @@
         caption: "Locking Time"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 4,
         class: "w-input",
@@ -9404,7 +9403,7 @@
         caption: "Max Total Lock"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMaxTotalLock",
         inputType: "number",
@@ -9422,7 +9421,7 @@
         caption: "Per Address Cap"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputPerAddressCap",
         inputType: "number",
@@ -9452,7 +9451,7 @@
         caption: "Lock Token Type"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: Theme8.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "typeSelection",
         class: "network-selection w-input"
@@ -9476,7 +9475,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme7.colors.primary.light }
+        background: { color: Theme8.colors.primary.light }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       })));
@@ -9487,7 +9486,7 @@
   ], StakingConfig);
 
   // src/staking/panelConfig/campaign.tsx
-  var Theme8 = import_components12.Styles.Theme.ThemeVars;
+  var Theme9 = import_components12.Styles.Theme.ThemeVars;
   var CampaignConfig = class extends import_components12.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -9607,10 +9606,10 @@
         const networkObj = listNetwork.find((f) => f.chainId === this.network);
         this.btnNetwork = await import_components12.Button.create({
           caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
-          background: { color: Theme8.input.background },
+          background: { color: Theme9.input.background },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: Theme9.colors.primary.main },
           width: "100%",
           height: 40,
           maxWidth: 300
@@ -9695,7 +9694,7 @@
         const idx = Number(this.stakingConfig.length);
         const pnl = await import_components12.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components12.Icon.create({ name: "times", fill: Theme8.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components12.Icon.create({ name: "times", fill: Theme9.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeStaking(idx);
         const button = await import_components12.Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item");
@@ -9806,7 +9805,7 @@
         caption: "Network"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: Theme9.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "networkSelection",
         class: "network-selection w-input"
@@ -9822,7 +9821,7 @@
         caption: "Campaign Name"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: Theme9.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputName",
         class: "input-text w-input",
@@ -9863,7 +9862,7 @@
         caption: "Campaign Start"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: Theme9.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -9878,7 +9877,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbCampaignStartErr",
         visible: false,
-        font: { color: Theme8.colors.primary.main, size: "12px" }
+        font: { color: Theme9.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9891,7 +9890,7 @@
         caption: "Campaign End"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: Theme9.colors.primary.main, size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -9906,7 +9905,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbCampaignEndErr",
         visible: false,
-        font: { color: Theme8.colors.primary.main, size: "12px" }
+        font: { color: Theme9.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         class: "row-mobile",
@@ -10016,7 +10015,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme8.colors.primary.light }
+        background: { color: Theme9.colors.primary.light }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       })));
@@ -10029,7 +10028,7 @@
   // src/staking/panelConfig/panel-config.tsx
   var import_store9 = __toModule(__require("@staking/store"));
   var import_staking_utils2 = __toModule(__require("@staking/staking-utils"));
-  var Theme9 = import_components13.Styles.Theme.ThemeVars;
+  var Theme10 = import_components13.Styles.Theme.ThemeVars;
   var PanelConfig = class extends import_components13.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -10135,7 +10134,7 @@
           this.btnAdd.enabled = false;
           const pnl = await import_components13.Panel.create({ position: "relative" });
           pnl.classList.add("pnl-label");
-          const icon = await import_components13.Icon.create({ name: "times", fill: Theme9.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+          const icon = await import_components13.Icon.create({ name: "times", fill: Theme10.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
           icon.onClick = () => this.removeCampaign(idx);
           const button = await import_components13.Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
           button.classList.add("btn-item");
@@ -10298,7 +10297,7 @@
         onClick: this.onBack
       }, /* @__PURE__ */ this.$render("i-icon", {
         name: "arrow-left",
-        fill: Theme9.text.primary,
+        fill: Theme10.text.primary,
         width: 20,
         height: 20
       }), /* @__PURE__ */ this.$render("i-label", {
@@ -10340,7 +10339,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme9.colors.primary.light }
+        background: { color: Theme10.colors.primary.light }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperNetworkElm",
         width: "100%",
@@ -10349,7 +10348,7 @@
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         id: "lbNetworkName",
-        font: { color: Theme9.colors.primary.main, size: "20px", bold: true }
+        font: { color: Theme10.colors.primary.main, size: "20px", bold: true }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -10395,14 +10394,14 @@
         horizontalAlignment: "start"
       }, /* @__PURE__ */ this.$render("i-label", {
         caption: "Note: You need to confirm on your wallet for each staking/reward!",
-        font: { size: "12px", color: Theme9.colors.secondary.main }
+        font: { size: "12px", color: Theme10.colors.secondary.main }
       })), /* @__PURE__ */ this.$render("i-button", {
         id: "btnDeploy",
         caption: "Deploy",
         enabled: false,
         width: 200,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: Theme9.colors.primary.contrastText },
+        rightIcon: { spin: true, visible: false, fill: Theme10.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign()
       }), /* @__PURE__ */ this.$render("i-button", {
@@ -10411,7 +10410,7 @@
         enabled: false,
         width: 300,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: Theme9.colors.primary.contrastText },
+        rightIcon: { spin: true, visible: false, fill: Theme10.colors.primary.contrastText },
         class: "btn-os",
         onClick: () => this.onDeployCampaign(true)
       })))))));
@@ -10423,7 +10422,7 @@
 
   // src/staking/index.tsx
   var import_time_is_money_sdk = __toModule(require_lib());
-  var Theme10 = import_components14.Styles.Theme.ThemeVars;
+  var Theme11 = import_components14.Styles.Theme.ThemeVars;
   var StakingBlock = class extends import_components14.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -10633,7 +10632,7 @@
         this.noCampaignSection.clearInnerHTML();
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
           class: "no-campaign",
-          background: { color: Theme10.background.modal }
+          background: { color: Theme11.background.modal }
         }, /* @__PURE__ */ this.$render("i-vstack", {
           gap: 10,
           verticalAlignment: "center"

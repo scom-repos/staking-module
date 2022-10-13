@@ -431,7 +431,7 @@ export class ManageStake extends Module {
                     </i-vstack>
                   </i-vstack>
                   <i-panel class="manage-header">
-                    <i-icon width={20} height={20} fill="#fff" class="cursor-pointer pointer" name="arrow-left" onClick={this.closeStakeModal} />
+                    <i-icon width={20} height={20} fill={Theme.text.primary} class="cursor-pointer pointer" name="arrow-left" onClick={this.closeStakeModal} />
                     <i-label
                       id="lbTitle"
                       caption="Create Locked Staking"
@@ -440,7 +440,7 @@ export class ManageStake extends Module {
                     <i-icon
                       width={20}
                       height={20}
-                      fill="#fff"
+                      fill={Theme.text.primary}
                       class="question-icon"
                       name="question"
                       tooltip={{
@@ -461,7 +461,7 @@ export class ManageStake extends Module {
                           <i-icon
                             width={18}
                             height={18}
-                            fill="#fff"
+                            fill={Theme.text.primary}
                             class="question-icon"
                             name="question"
                             tooltip={{
