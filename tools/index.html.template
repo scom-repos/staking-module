@@ -28,6 +28,7 @@
       Styles.Theme.defaultTheme.text.primary = "#fff";
       Styles.Theme.defaultTheme.input.fontColor = "#fff";
       Styles.Theme.defaultTheme.input.background = "#000";
+      Styles.Theme.defaultTheme.divider = "#fff";
       Styles.Theme.applyTheme(Styles.Theme.defaultTheme);
 
       let module = await application.newModule('./staking/index.js', {{scconfig}})
