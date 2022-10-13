@@ -8662,13 +8662,12 @@
         const date = (0, import_moment2.default)(value, import_global5.DefaultDateTimeFormat);
         this.adminClaimDeadline = date.unix();
         const minDate = (0, import_moment2.default)().add(300, "seconds");
-        if (this.adminClaimDeadline <= minDate.unix()) {
+        if (this.adminClaimDeadline <= minDate.unix() && this.isNew) {
           this.lbErrAdminClaimDeadline.visible = true;
           this.lbErrAdminClaimDeadline.caption = `The admin claim deadline should be greater than <b>${minDate.format(import_global5.DefaultDateTimeFormat)}</b>`;
         } else {
           this.lbErrAdminClaimDeadline.visible = false;
         }
-        console.log(this.adminClaimDeadline);
         this.emitInput();
       };
       this.emitInput = () => {

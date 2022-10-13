@@ -263,13 +263,12 @@ export class RewardConfig extends Module {
 		const date = moment(value, DefaultDateTimeFormat);
 		this.adminClaimDeadline = date.unix();
 		const minDate = moment().add(300, 'seconds');
-		if (this.adminClaimDeadline <= minDate.unix()) {
+		if (this.adminClaimDeadline <= minDate.unix() && this.isNew) {
 			this.lbErrAdminClaimDeadline.visible = true;
 			this.lbErrAdminClaimDeadline.caption = `The admin claim deadline should be greater than <b>${minDate.format(DefaultDateTimeFormat)}</b>`;
 		} else {
 			this.lbErrAdminClaimDeadline.visible = false;
 		}
-		console.log(this.adminClaimDeadline)
 		this.emitInput();
 	}
 
