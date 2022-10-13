@@ -32,7 +32,6 @@ export class StakingConfig extends Module {
 	private currentReward = 0;
 	private _chainId: number;
 	private inputLockingTime: Input;
-	// private lbMinLockTime: Label;
 	private inputPerAddressCap: Input;
 	private inputMaxTotalLock: Input;
 	private inputDesc: Input;
@@ -208,7 +207,6 @@ export class StakingConfig extends Module {
 				this.btnTime.caption = unit.name;
 				this.unit = unit.value;
 				this.updateCampaignEndLockTime();
-				// this.updateMinLockTime();
 			};
 			vstack.appendChild(dropdownItem);
 		}
@@ -358,15 +356,9 @@ export class StakingConfig extends Module {
 		let value = _input.value;
 		value = value.replace(/[^0-9]+/g, "");
 		_input.value = value;
-		// this.updateMinLockTime();
 		this.updateCampaignEndLockTime();
 		this.emitInput();
 	}
-
-	// private updateMinLockTime = () => {
-	// 	const val = new BigNumber(this.inputLockingTime.value || 0);
-	// 	this.lbMinLockTime.caption = `${formatNumber(val.multipliedBy(this.unit).multipliedBy(this.hourVal))} seconds`;
-	// }
 
 	private onInputNumber = (input: Control) => {
 		limitInputNumber(input, 18);
@@ -457,12 +449,6 @@ export class StakingConfig extends Module {
 							<i-panel id="pnlTimeSelection" class="network-selection" width={80} />
 						</i-hstack>
 					</i-hstack>
-					{/* <i-hstack class="row-mobile" gap={10} margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Min Lock Time" />
-						<i-vstack class="w-input" verticalAlignment="center" horizontalAlignment="start">
-							<i-label id="lbMinLockTime" class="lb-title" font={{ size: '16px' }} caption="0 seconds" />
-						</i-vstack>
-					</i-hstack> */}
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Max Total Lock" />

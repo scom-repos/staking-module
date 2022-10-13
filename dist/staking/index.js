@@ -8536,7 +8536,7 @@
               this.inputMultiplier.value = new import_eth_wallet3.BigNumber(multiplier).toFixed();
               this.inputInitialReward.value = new import_eth_wallet3.BigNumber(initialReward).toFixed();
               this.inputRewardVesting.value = new import_eth_wallet3.BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
-              this.inputClaimDeadline.value = new import_eth_wallet3.BigNumber(claimDeadline).toFixed();
+              this.setAdminClaimDeadline(claimDeadline);
               this.inputAdmin.value = admin;
               this.isAdminValid = true;
               this.checkboxStartDate.checked = !!isCommonStartDate;
@@ -8613,15 +8613,36 @@
         const startDate = new import_eth_wallet3.BigNumber(value || 0).toNumber();
         this.vestingStartDate = startDate;
         const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]');
-        startTextElm.value = startDate ? import_moment2.default.unix(startDate).format(import_global5.DefaultDateTimeFormat) : "";
+        if (startDate) {
+          startTextElm.value = import_moment2.default.unix(startDate).format(import_global5.DefaultDateTimeFormat);
+        }
+        this.emitInput();
+      };
+      this.setAdminClaimDeadline = (value) => {
+        const date = new import_eth_wallet3.BigNumber(value || 0).toNumber();
+        this.adminClaimDeadline = date;
+        const elm = this.inputAdminClaimDeadline.querySelector('input[type="text"]');
+        if (date) {
+          elm.value = import_moment2.default.unix(date).format(import_global5.DefaultDateTimeFormat);
+        }
         this.emitInput();
       };
       this.setAttrDatePicker = () => {
         this.inputVestingStartDate.dateTimeFormat = import_global5.DefaultDateTimeFormat;
+        this.inputAdminClaimDeadline.dateTimeFormat = import_global5.DefaultDateTimeFormat;
         this.inputVestingStartDate.onChanged = (datepickerElm) => this.changeStartDate(datepickerElm.inputElm.value);
+        this.inputAdminClaimDeadline.onChanged = (datepickerElm) => this.changeAdminClaimDeadline(datepickerElm.inputElm.value);
         const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]');
         if (startTextElm) {
           startTextElm.placeholder = import_global5.DefaultDateTimeFormat;
+        }
+        const adminTextElm = this.inputAdminClaimDeadline.querySelector('input[type="text"]');
+        if (adminTextElm) {
+          adminTextElm.placeholder = import_global5.DefaultDateTimeFormat;
+        }
+        const adminDateElm = this.inputAdminClaimDeadline.querySelector('input[type="datetime-local"]');
+        if (adminDateElm) {
+          adminDateElm.min = (0, import_moment2.default)().add(300, "seconds").format("YYYY-MM-DD HH:mm:ss");
         }
         this.checkStartDate();
       };
@@ -8635,6 +8656,19 @@
         } else {
           this.lbStartDateErr.visible = false;
         }
+        this.emitInput();
+      };
+      this.changeAdminClaimDeadline = (value) => {
+        const date = (0, import_moment2.default)(value, import_global5.DefaultDateTimeFormat);
+        this.adminClaimDeadline = date.unix();
+        const minDate = (0, import_moment2.default)().add(300, "seconds");
+        if (this.adminClaimDeadline <= minDate.unix()) {
+          this.lbErrAdminClaimDeadline.visible = true;
+          this.lbErrAdminClaimDeadline.caption = `The admin claim deadline should be greater than <b>${minDate.format(import_global5.DefaultDateTimeFormat)}</b>`;
+        } else {
+          this.lbErrAdminClaimDeadline.visible = false;
+        }
+        console.log(this.adminClaimDeadline);
         this.emitInput();
       };
       this.emitInput = () => {
@@ -8689,7 +8723,7 @@
         this.emitInput();
       };
       this.checkValidation = () => {
-        return this.token && this.isAdminValid && this.checkInitialReward() && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (0, import_global5.isValidNumber)(this.inputClaimDeadline.value) && (!this.checkboxStartDate.checked || this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime)) && (this.isNew || this.isAddressValid);
+        return this.token && this.isAdminValid && this.checkInitialReward() && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (!this.isNew || this.adminClaimDeadline && this.adminClaimDeadline > (0, import_moment2.default)().unix()) && (!this.checkboxStartDate.checked || this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime)) && (this.isNew || this.isAddressValid);
       };
       this.getData = () => {
         var _a;
@@ -8699,7 +8733,7 @@
           multiplier: new import_eth_wallet3.BigNumber(this.inputMultiplier.value),
           initialReward: new import_eth_wallet3.BigNumber(this.inputInitialReward.value),
           vestingPeriod: new import_eth_wallet3.BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
-          claimDeadline: new import_eth_wallet3.BigNumber(this.inputClaimDeadline.value),
+          claimDeadline: new import_eth_wallet3.BigNumber(this.adminClaimDeadline),
           admin: `${this.inputAdmin.value}`,
           isCommonStartDate: this.checkboxStartDate.checked,
           vestingStartDate: new import_eth_wallet3.BigNumber(this.vestingStartDate || 0)
@@ -8884,13 +8918,22 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
         font: { color: Theme7.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-input", {
-        id: "inputClaimDeadline",
-        placeholder: "Unix",
-        inputType: "number",
-        class: "input-text w-input",
-        onChanged: (src) => this.onInputUnix(src)
-      })), /* @__PURE__ */ this.$render("i-hstack", {
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-datepicker", {
+        id: "inputAdminClaimDeadline",
+        width: "100%",
+        height: 40,
+        type: "dateTime",
+        class: "cs-datepicker"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbErrAdminClaimDeadline",
+        visible: false,
+        font: { color: Theme7.colors.primary.main, size: "12px" }
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"

@@ -23,7 +23,9 @@ export class RewardConfig extends Module {
 	private inputInitialReward: Input;
 	private lbErrInitialReward: Label;
 	private inputRewardVesting: Input;
-	private inputClaimDeadline: Input;
+	private inputAdminClaimDeadline: Datepicker;
+	private adminClaimDeadline: number;
+	private lbErrAdminClaimDeadline: Label;
 	private inputAdmin: Input;
 	private lbErr: Label;
 	private isAdminValid = false;
@@ -109,7 +111,7 @@ export class RewardConfig extends Module {
 			// this.inputMultiplier.enabled = this.isNew;
 			// this.inputInitialReward.enabled = this.isNew;
 			// this.inputRewardVesting.enabled = this.isNew;
-			// this.inputClaimDeadline.enabled = this.isNew;
+			// this.inputAdminClaimDeadline.enabled = this.isNew;
 			// this.inputAdmin.enabled = this.isNew;
 			// if (this.tokenSelection) {
 			// 	this.tokenSelection.enabled = this.isNew;
@@ -132,7 +134,7 @@ export class RewardConfig extends Module {
 					this.inputMultiplier.value = new BigNumber(multiplier).toFixed();
 					this.inputInitialReward.value = new BigNumber(initialReward).toFixed();
 					this.inputRewardVesting.value = new BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
-					this.inputClaimDeadline.value = new BigNumber(claimDeadline).toFixed();
+					this.setAdminClaimDeadline(claimDeadline);
 					this.inputAdmin.value = admin;
 					this.isAdminValid = true;
 					this.checkboxStartDate.checked = !!isCommonStartDate;
@@ -208,17 +210,39 @@ export class RewardConfig extends Module {
 		const startDate = new BigNumber(value || 0).toNumber();
 		this.vestingStartDate = startDate;
 		const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]') as HTMLInputElement;
-		startTextElm.value = startDate ? moment.unix(startDate).format(DefaultDateTimeFormat) : '';
+		if (startDate) {
+			startTextElm.value = moment.unix(startDate).format(DefaultDateTimeFormat)
+		}
+		this.emitInput();
+	}
+
+	private setAdminClaimDeadline = (value: number | BigNumber) => {
+		const date = new BigNumber(value || 0).toNumber();
+		this.adminClaimDeadline = date;
+		const elm = this.inputAdminClaimDeadline.querySelector('input[type="text"]') as HTMLInputElement;
+		if (date) {
+			elm.value = moment.unix(date).format(DefaultDateTimeFormat);
+		}
 		this.emitInput();
 	}
 
 	private setAttrDatePicker = () => {
 		this.inputVestingStartDate.dateTimeFormat = DefaultDateTimeFormat;
-    this.inputVestingStartDate.onChanged = (datepickerElm: any) => this.changeStartDate(datepickerElm.inputElm.value);
-    const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]') as HTMLInputElement;
+		this.inputAdminClaimDeadline.dateTimeFormat = DefaultDateTimeFormat;
+		this.inputVestingStartDate.onChanged = (datepickerElm: any) => this.changeStartDate(datepickerElm.inputElm.value);
+		this.inputAdminClaimDeadline.onChanged = (datepickerElm: any) => this.changeAdminClaimDeadline(datepickerElm.inputElm.value);
+		const startTextElm = this.inputVestingStartDate.querySelector('input[type="text"]') as HTMLInputElement;
     if (startTextElm) {
       startTextElm.placeholder = DefaultDateTimeFormat;
     }
+		const adminTextElm = this.inputAdminClaimDeadline.querySelector('input[type="text"]') as HTMLInputElement;
+		if (adminTextElm) {
+			adminTextElm.placeholder = DefaultDateTimeFormat;
+		}
+		const adminDateElm = this.inputAdminClaimDeadline.querySelector('input[type="datetime-local"]') as HTMLInputElement;
+		if (adminDateElm) {
+			adminDateElm.min = moment().add(300, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+		}
 		this.checkStartDate();
   }
 
@@ -234,6 +258,20 @@ export class RewardConfig extends Module {
 		}
 		this.emitInput();
   }
+
+	private changeAdminClaimDeadline = (value: any) => {
+		const date = moment(value, DefaultDateTimeFormat);
+		this.adminClaimDeadline = date.unix();
+		const minDate = moment().add(300, 'seconds');
+		if (this.adminClaimDeadline <= minDate.unix()) {
+			this.lbErrAdminClaimDeadline.visible = true;
+			this.lbErrAdminClaimDeadline.caption = `The admin claim deadline should be greater than <b>${minDate.format(DefaultDateTimeFormat)}</b>`;
+		} else {
+			this.lbErrAdminClaimDeadline.visible = false;
+		}
+		console.log(this.adminClaimDeadline)
+		this.emitInput();
+	}
 
 	private emitInput = () => {
 		application.EventBus.dispatch(EventId.EmitInput);
@@ -299,7 +337,7 @@ export class RewardConfig extends Module {
 			this.checkInitialReward() &&
 			isValidNumber(this.inputMultiplier.value) &&
 			isValidNumber(this.inputRewardVesting.value) &&
-			isValidNumber(this.inputClaimDeadline.value) &&
+			(!this.isNew || (this.adminClaimDeadline && this.adminClaimDeadline > moment().unix())) &&
 			(!this.checkboxStartDate.checked || (this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime))) &&
 			(this.isNew || this.isAddressValid);
 	}
@@ -311,7 +349,7 @@ export class RewardConfig extends Module {
 			multiplier: new BigNumber(this.inputMultiplier.value),
 			initialReward: new BigNumber(this.inputInitialReward.value),
 			vestingPeriod: new BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
-			claimDeadline: new BigNumber(this.inputClaimDeadline.value),
+			claimDeadline: new BigNumber(this.adminClaimDeadline),
 			admin: `${this.inputAdmin.value}`,
 			isCommonStartDate: this.checkboxStartDate.checked,
 			vestingStartDate: new BigNumber(this.vestingStartDate || 0)
@@ -383,7 +421,10 @@ export class RewardConfig extends Module {
 							<i-label class="lb-title" caption="Admin Claim Deadline" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputClaimDeadline" placeholder="Unix" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputUnix(src)} />
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+							<i-datepicker id="inputAdminClaimDeadline" width="100%" height={40} type="dateTime" class="cs-datepicker" />
+							<i-label id="lbErrAdminClaimDeadline" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
