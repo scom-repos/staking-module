@@ -25,7 +25,7 @@ Styles.cssRule('.manage-stake', {
       width: '480px',
     },
     '.question-icon': {
-      border: `2px solid #fff`,
+      border: `2px solid ${Theme.divider}`,
       borderRadius: '50%',
       padding: '3px',
       opacity: '0.8'
