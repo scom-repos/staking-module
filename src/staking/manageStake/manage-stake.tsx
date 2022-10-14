@@ -341,6 +341,8 @@ export class ManageStake extends Module {
       },
       onApproving: async (token: ITokenObject, receipt?: string) => {
         if (receipt) {
+          this.modalStake.closeOnBackdropClick = false;
+          this.modalActions.closeOnBackdropClick = false;
           this.showResultMessage(this.stakingResult, 'success', receipt);
           this.btnApprove.caption = `Approving`;
           this.btnApprove.enabled = false;
@@ -404,6 +406,10 @@ export class ManageStake extends Module {
   init() {
     super.init();
     this.stakingResult = new Result();
+    this.stakingResult.onCustomClose = () => {
+      this.modalStake.closeOnBackdropClick = true;
+      this.modalActions.closeOnBackdropClick = true;
+    }    
     this.appendChild(this.stakingResult);
   }
 

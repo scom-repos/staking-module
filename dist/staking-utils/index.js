@@ -19508,9 +19508,9 @@ var getApprovalModelAction = (contractAddress, options) => {
 var deployCampaign = async (campaign, callback) => {
   try {
     let wallet = (0, import_store.getWallet)();
-    let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
     let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
     for (const staking of campaign.stakings) {
+      let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
       let stakingResult;
       const { campaignStart, campaignEnd } = campaign;
       const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;

@@ -550,9 +550,9 @@ const getApprovalModelAction = (contractAddress: string, options: IERC20Approval
 const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
   try {
     let wallet = getWallet();
-    let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
     let result: StakingCampaign = { ...campaign, stakings: [] };
     for (const staking of campaign.stakings) {
+      let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
       let stakingResult: Staking;
       const { campaignStart, campaignEnd } = campaign;
       const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;

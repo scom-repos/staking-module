@@ -25,6 +25,7 @@ export class Result extends Module {
   private confirmModal: Modal;
   private mainContent: Panel;
   private _message: any;
+  public onCustomClose: any;
 
   get message(): IMessage {
     return this._message;
@@ -42,7 +43,12 @@ export class Result extends Module {
 	async init(){
 		this.classList.add(styleClass);
 		super.init();
-    this.confirmModal.onClose = () => this.onCloseRedirect();
+    this.confirmModal.onClose = () => {
+      if (this.onCustomClose) {
+        this.onCustomClose();
+      }
+      this.onCloseRedirect();
+    }
   }
 
   closeModal() {

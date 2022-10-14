@@ -5775,7 +5775,12 @@
     async init() {
       this.classList.add(result_css_default);
       super.init();
-      this.confirmModal.onClose = () => this.onCloseRedirect();
+      this.confirmModal.onClose = () => {
+        if (this.onCustomClose) {
+          this.onCustomClose();
+        }
+        this.onCloseRedirect();
+      };
     }
     closeModal() {
       this.confirmModal.visible = false;
@@ -6972,6 +6977,8 @@
         },
         onApproving: async (token, receipt) => {
           if (receipt) {
+            this.modalStake.closeOnBackdropClick = false;
+            this.modalActions.closeOnBackdropClick = false;
             this.showResultMessage(this.stakingResult, "success", receipt);
             this.btnApprove.caption = `Approving`;
             this.btnApprove.enabled = false;
@@ -7034,6 +7041,10 @@
     init() {
       super.init();
       this.stakingResult = new Result();
+      this.stakingResult.onCustomClose = () => {
+        this.modalStake.closeOnBackdropClick = true;
+        this.modalActions.closeOnBackdropClick = true;
+      };
       this.appendChild(this.stakingResult);
     }
     render() {
