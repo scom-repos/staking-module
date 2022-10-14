@@ -10962,10 +10962,12 @@
             height: "25px",
             url: import_assets5.default.fullPath(this.tokenIcon)
           }), /* @__PURE__ */ this.$render("i-label", {
-            caption: campaign.campaignName
+            caption: campaign.campaignName,
+            wordBreak: "break-all"
           })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
             class: "campaign-description",
-            caption: campaign.campaignDesc || ""
+            caption: campaign.campaignDesc || "",
+            wordBreak: "break-all"
           })), /* @__PURE__ */ this.$render("i-panel", null, rowItems.filter((f) => !f.isHidden).map((v) => {
             return /* @__PURE__ */ this.$render("i-hstack", {
               verticalAlignment: "start",
@@ -11184,7 +11186,8 @@
               font: { color: campaign.customColorCampaign || "#f15e61" },
               caption: durationDays < 1 ? "< 1 Day" : `${durationDays} Days`
             })), /* @__PURE__ */ this.$render("i-label", {
-              caption: option.customDesc || ""
+              caption: option.customDesc || "",
+              wordBreak: "break-all"
             })), /* @__PURE__ */ this.$render("i-panel", {
               class: "img-custom"
             }, option.lockTokenType === import_store10.LockTokenType.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {

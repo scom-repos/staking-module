@@ -626,10 +626,10 @@ export class StakingBlock extends Module implements PageBlock {
 							{stickerSection}
 							<i-hstack verticalAlignment='center' class="campaign-name">
 								<i-image width="25px" height="25px" url={Assets.fullPath(this.tokenIcon)} />
-								<i-label caption={campaign.campaignName} />
+								<i-label caption={campaign.campaignName} wordBreak="break-all" />
 							</i-hstack>
 							<i-hstack>
-								<i-label class="campaign-description" caption={campaign.campaignDesc || ''} />
+								<i-label class="campaign-description" caption={campaign.campaignDesc || ''} wordBreak="break-all" />
 							</i-hstack>
 							<i-panel>
 								{
@@ -824,7 +824,7 @@ export class StakingBlock extends Module implements PageBlock {
 											}
 											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
 										</i-hstack >
-										<i-label caption={option.customDesc || ''} />
+										<i-label caption={option.customDesc || ''} wordBreak="break-all" />
 									</i-panel>
 									<i-panel class="img-custom">
 										{
