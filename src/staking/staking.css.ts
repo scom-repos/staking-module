@@ -226,6 +226,10 @@ Styles.cssRule('.staking-component', {
             'i-image': {
               marginRight: '0.25rem',
             },
+            'i-label': {
+              overflow: 'hidden',
+              overflowWrap: 'break-word'
+            },
             'i-label > *': {
               fontSize: '1.25rem',
               fontWeight: '700',
@@ -233,8 +237,13 @@ Styles.cssRule('.staking-component', {
           },
         },
         '.campaign-description': {
-          display: 'flex',
           paddingBlock: '2.5rem',
+          overflow: 'hidden',
+          overflowWrap: 'break-word'
+        },
+        '.staking-description': {
+          overflow: 'hidden',
+          overflowWrap: 'break-word'
         },
         '.row-item': {
           marginBlock: '0.15rem',
