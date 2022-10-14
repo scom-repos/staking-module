@@ -19542,7 +19542,7 @@ var deployCampaign = async (campaign, callback) => {
         if (isCommonStartDate) {
           rewardsContract = new import_time_is_money_sdk.Contracts.RewardsCommonStartDate(wallet);
           params = __spreadProps(__spreadValues({}, params), {
-            vestingStartDate: import_eth_wallet4.Utils.toDecimals(vestingStartDate || 0, rewardTokenDecimals)
+            vestingStartDate
           });
         } else {
           rewardsContract = new import_time_is_money_sdk.Contracts.Rewards(wallet);

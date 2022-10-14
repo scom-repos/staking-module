@@ -585,7 +585,7 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
           rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet);
           params = {
             ...params,
-            vestingStartDate: Utils.toDecimals(vestingStartDate || 0, rewardTokenDecimals)
+            vestingStartDate,
           }
         } else {
           rewardsContract = new TimeIsMoneyContracts.Rewards(wallet);

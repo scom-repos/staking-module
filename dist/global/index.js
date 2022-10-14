@@ -4135,7 +4135,7 @@ var renderBalanceTooltip = (params, tokenMap, isBold) => {
   return data;
 };
 var replacer = (key, value) => {
-  if (["minLockTime", "entryStart", "entryEnd", "perAddressCap", "maxTotalLock", "multiplier", "initialReward", "vestingPeriod", "claimDeadline"].includes(key)) {
+  if (["minLockTime", "campaignStart", "campaignEnd", "perAddressCap", "maxTotalLock", "multiplier", "initialReward", "vestingPeriod", "claimDeadline", "vestingStartDate"].includes(key)) {
     const val = Number(value);
     return isNaN(val) ? value : val;
   }
