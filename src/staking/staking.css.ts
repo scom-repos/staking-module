@@ -348,7 +348,6 @@ Styles.cssRule('.staking-component', {
         '.container-custom': {
           display: 'flex',
           alignItems: 'stretch',
-          marginBottom: '1rem',
         },
         '.row-custom': {
           width: '100%',
