@@ -6020,7 +6020,6 @@
     fontStyle: "normal"
   });
   import_components3.Styles.cssRule(".staking-component", {
-    padding: "1rem",
     $nest: {
       "*": {
         fontFamily: "Proxima Nova"

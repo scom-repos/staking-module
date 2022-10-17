@@ -67,7 +67,6 @@ Styles.fontFace({
 })
 
 Styles.cssRule('.staking-component', {
-  padding: '1rem',
   $nest: {
     '*': {
       fontFamily: 'Proxima Nova',
