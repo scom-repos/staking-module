@@ -6300,8 +6300,7 @@
           },
           ".container-custom": {
             display: "flex",
-            alignItems: "stretch",
-            marginBottom: "1rem"
+            alignItems: "stretch"
           },
           ".row-custom": {
             width: "100%"
