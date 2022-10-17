@@ -216,8 +216,6 @@ Styles.cssRule('.staking-component', {
           position: 'relative',
           height: '100%',
           minHeight: '485px',
-          borderTopLeftRadius: '26px',
-          borderBottomLeftRadius: '26px',
           padding: '2.5rem 0.75rem',
         },
         '.campaign-name': {
@@ -353,19 +351,12 @@ Styles.cssRule('.staking-component', {
           marginBottom: '1rem',
         },
         '.row-custom': {
-          margin: '1rem',
-          borderRadius: '26px',
           width: '100%',
         },
         '.column-custom': {
           width: '25%',
-          padding: '0 1rem',
-          height: '100%',
-          $nest: {
-            '&:first-child': {
-              marginLeft: '-30px'
-            },
-          },
+          padding: '0',
+          height: '100%'
         },
         '.img-custom': {
           display: 'flex',
@@ -470,24 +461,13 @@ Styles.cssRule('.staking-component', {
         '.wrapper': {
           $nest: {
             '.banner': {
-              borderRadius: '26px',
               minHeight: 'auto',
               height: 'auto'
-            },
-            '.row-custom': {
-              maxWidth: '520px',
-              margin: '1rem auto',
             },
             '.column-custom': {
               width: '100%',
               height: 'auto',
-              margin: '1rem 0',
-              $nest: {
-                '&:first-child': {
-                  margin: '0',
-                  padding: '0',
-                },
-              },
+              margin: '1rem 0'
             },
           },
         },
