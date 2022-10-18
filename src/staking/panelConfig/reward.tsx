@@ -1,6 +1,6 @@
 import { Styles, Container, Panel, customElements, ControlElement, Module, Input, Label, Checkbox, Control, application, HStack, VStack, Modal, Button, Datepicker } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { DefaultDateTimeFormat, EventId, isAddressValid, isInvalidInput, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
+import { DefaultDateTimeFormat, EventId, formatNumber, isAddressValid, isInvalidInput, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenMapData, Reward } from '@staking/store';
 import moment from 'moment';
 import { TokenSelection } from '../../token-selection';
@@ -38,12 +38,15 @@ export class RewardConfig extends Module {
 	private _isNew: boolean;
 	private _data?: Reward;
 	private _campaignEndLockTime: number = 0;
+	private _maxTotal: number = 0;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
 	private _chainId: number;
 	private isInitialized = false;
 
+	private wrapperRewardNeededElm: HStack;
+	private lbMaxReward: Label;
 	private pnlTimeSelection: Panel;
 	private btnTime: Button;
 	private unit: number = 1;
@@ -105,9 +108,19 @@ export class RewardConfig extends Module {
 		return this._campaignEndLockTime;
 	}
 
+	set maxTotal(value: number) {
+		this._maxTotal = value;
+		this.updateMaxReward();
+	}
+
+	get maxTotal() {
+		return this._maxTotal || 0;
+	}
+
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
+			this.wrapperRewardNeededElm.visible = this.isNew;
 			// this.inputMultiplier.enabled = this.isNew;
 			// this.inputInitialReward.enabled = this.isNew;
 			// this.inputRewardVesting.enabled = this.isNew;
@@ -145,6 +158,19 @@ export class RewardConfig extends Module {
 					this.emitInput();
 				}
 			}, 200);
+		}
+	}
+
+	get maxReward() {
+		return new BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
+	}
+
+	updateMaxReward = () => {
+		if (!this.lbMaxReward) return;
+		if (this.token) {
+			this.lbMaxReward.caption = `${formatNumber(this.maxReward)} ${this.token.symbol || ''}`;
+		} else {
+			this.lbMaxReward.caption = '-';
 		}
 	}
 
@@ -283,11 +309,13 @@ export class RewardConfig extends Module {
 
 	private onInputToken = (token: ITokenObject) => {
 		this.token = token;
+		this.updateMaxReward();
 		this.emitInput();
 	}
 
 	private onInputNumber = (input: Control) => {
 		limitInputNumber(input, 18);
+		this.updateMaxReward();
 		this.emitInput();
 	}
 
@@ -351,7 +379,8 @@ export class RewardConfig extends Module {
 			claimDeadline: new BigNumber(this.adminClaimDeadline),
 			admin: `${this.inputAdmin.value}`,
 			isCommonStartDate: this.checkboxStartDate.checked,
-			vestingStartDate: new BigNumber(this.vestingStartDate || 0)
+			vestingStartDate: new BigNumber(this.vestingStartDate || 0),
+			rewardAmount: this.maxReward
 		}
 		return reward;
 	}
@@ -394,6 +423,15 @@ export class RewardConfig extends Module {
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
+					</i-hstack>
+					<i-hstack id="wrapperRewardNeededElm" visible={false} gap={10} margin={{ top: 8, bottom: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Reward Needed" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} class="w-input" verticalAlignment="center">
+							<i-label id="lbMaxReward" caption="-" class="lb-title w-100" />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">

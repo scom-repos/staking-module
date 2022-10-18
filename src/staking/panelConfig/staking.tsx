@@ -1,7 +1,7 @@
 import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Control, application, Label } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber } from '@staking/global';
-import { getChainId, getDefaultChainId, getTokenMapData, LockTokenType, LockTokenTypeList, Reward, Staking } from '@staking/store';
+import { getChainId, getDefaultChainId, getTokenMapData, LockTokenType, LockTokenTypeList, Reward, RewardNeeded, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
 const Theme = Styles.Theme.ThemeVars;
@@ -116,6 +116,13 @@ export class StakingConfig extends Module {
 		const val = this.minLockTime.plus(this.campaignEnd).toNumber();
 		for (const reward of this.rewardConfig) {
 			reward.campaignEndLockTime = val;
+		}
+	}
+
+	private updateMaxReward() {
+		const val = this.inputMaxTotalLock.value;
+		for (const reward of this.rewardConfig) {
+			reward.maxTotal = val;
 		}
 	}
 
@@ -308,6 +315,7 @@ export class StakingConfig extends Module {
 		}
 		this.rewardConfig[idx].data = reward;
 		this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
+		this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;
 		this.currentReward = idx;
 		this.emitInput();
 	}
@@ -360,6 +368,12 @@ export class StakingConfig extends Module {
 		this.emitInput();
 	}
 
+	private onInputMaxTotalLock = (input: Control) => {
+		limitInputNumber(input, 18);
+		this.updateMaxReward();
+		this.emitInput();
+	}
+
 	private onInputNumber = (input: Control) => {
 		limitInputNumber(input, 18);
 		this.emitInput();
@@ -386,14 +400,17 @@ export class StakingConfig extends Module {
 
 	getRewardData = () => {
 		const rewardData: Reward[] = [];
+		const totalRewards: RewardNeeded[] = [];
 		for (const reward of this.rewardConfig) {
 			const data = reward.getData();
 			rewardData.push(data);
+			totalRewards.push({ value: data.rewardAmount || new BigNumber(0), tokenAddress: data.rewardTokenAddress })
 		}
-		return rewardData;
+		return { rewardData, totalRewards };
 	}
 
 	getData = () => {
+		const reward = this.getRewardData();
 		const staking: Staking = {
 			address: this.inputAddress.value,
 			lockTokenAddress: this.token?.address || '',
@@ -402,7 +419,8 @@ export class StakingConfig extends Module {
 			maxTotalLock: new BigNumber(this.inputMaxTotalLock.value),
 			customDesc: this.inputDesc.value,
 			lockTokenType: this.lockType,
-			rewards: this.getRewardData()
+			rewards: reward.rewardData,
+			totalRewardAmount: reward.totalRewards,
 		}
 		return staking;
 	}
@@ -454,7 +472,7 @@ export class StakingConfig extends Module {
 							<i-label class="lb-title" caption="Max Total Lock" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputMaxTotalLock" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
+						<i-input id="inputMaxTotalLock" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputMaxTotalLock(src)} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">

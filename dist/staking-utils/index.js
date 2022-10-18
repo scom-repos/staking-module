@@ -19506,9 +19506,10 @@ var getApprovalModelAction = (contractAddress, options) => {
   return approvalModelAction;
 };
 var deployCampaign = async (campaign, callback) => {
+  let listTransferReward = [];
+  let wallet = (0, import_store.getWallet)();
+  let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
   try {
-    let wallet = (0, import_store.getWallet)();
-    let result = __spreadProps(__spreadValues({}, campaign), { stakings: [] });
     for (const staking of campaign.stakings) {
       let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
       let stakingResult;
@@ -19549,18 +19550,34 @@ var deployCampaign = async (campaign, callback) => {
         }
         const rewardAddress = await rewardsContract.deploy(params);
         rewardResult.push(__spreadProps(__spreadValues({}, reward), { address: rewardAddress }));
+        listTransferReward.push({
+          to: rewardAddress,
+          value: import_eth_wallet4.Utils.toDecimals(maxTotalLock.multipliedBy(multiplier), rewardTokenDecimals),
+          rewardTokenAddress
+        });
       }
       ;
       stakingResult = __spreadProps(__spreadValues({}, staking), { address: stakingAddress, rewards: rewardResult });
       result.stakings.push(stakingResult);
     }
-    return result;
   } catch (error) {
     if (callback) {
       callback(error, null);
     }
     return null;
   }
+  try {
+    for (const transferReward of listTransferReward) {
+      const { to, value, rewardTokenAddress } = transferReward;
+      const contract = new import_sdk2.Contracts.OSWAP_ERC20(wallet, rewardTokenAddress);
+      await contract.transfer_send({ to, value });
+    }
+  } catch (error) {
+    if (callback) {
+      callback(error, null);
+    }
+  }
+  return result;
 };
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT

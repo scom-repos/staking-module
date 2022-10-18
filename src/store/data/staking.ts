@@ -33,6 +33,11 @@ interface StakingCampaign {
   stakings: Staking[],
 }
 
+interface RewardNeeded {
+  value: BigNumber,
+  tokenAddress: string,
+}
+
 interface Staking {
   //contract
   address?: string,
@@ -45,15 +50,17 @@ interface Staking {
   customDesc?: string,
   lockTokenType: LockTokenType,
   decimalsOffset?: number,
+  totalRewardAmount?: RewardNeeded[], // total reward needed
 
   rewards: Reward[]
 }
 
 interface Reward {
   //contract
-  address?:string,
-  rewardTokenAddress:string,
+  address?: string,
+  rewardTokenAddress: string,
   multiplier: BigNumber, //lockAmount * multiplier = rewardAmount
+  rewardAmount?: BigNumber, // reward needed
   initialReward: BigNumber, // 0 <= initialReward <= 1; lockAmount * initialReward = initialRewardAmount;
   vestingPeriod: BigNumber, // in second
   claimDeadline: BigNumber, //unix
@@ -165,6 +172,7 @@ export {
   StakingCampaign,
   Staking,
   Reward,
+  RewardNeeded,
   LockTokenType,
   LockTokenTypeList,
   USDPeggedTokenAddressMap

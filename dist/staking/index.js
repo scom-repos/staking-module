@@ -6355,21 +6355,6 @@
             justifyContent: "center",
             fontWeight: 700
           },
-          ".view-contract": {
-            fontWeight: "bold",
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "1rem",
-            $nest: {
-              "a": {
-                display: "flex",
-                alignItems: "center"
-              },
-              "i-label": {
-                marginRight: "0.25rem"
-              }
-            }
-          },
           ".no-campaign": {
             padding: "3rem 2rem",
             display: "flex",
@@ -8497,6 +8482,7 @@
       super(parent, options);
       this.isAdminValid = false;
       this._campaignEndLockTime = 0;
+      this._maxTotal = 0;
       this.isInitialized = false;
       this.unit = 1;
       this.hourVal = 60 * 60;
@@ -8517,6 +8503,7 @@
       this.setupInput = () => {
         if (this.wrapperAddressElm) {
           this.wrapperAddressElm.visible = !this.isNew;
+          this.wrapperRewardNeededElm.visible = this.isNew;
         }
       };
       this.setupData = async () => {
@@ -8545,6 +8532,15 @@
               this.emitInput();
             }
           }, 200);
+        }
+      };
+      this.updateMaxReward = () => {
+        if (!this.lbMaxReward)
+          return;
+        if (this.token) {
+          this.lbMaxReward.caption = `${(0, import_global5.formatNumber)(this.maxReward)} ${this.token.symbol || ""}`;
+        } else {
+          this.lbMaxReward.caption = "-";
         }
       };
       this.renderTimeButton = async () => {
@@ -8677,10 +8673,12 @@
       };
       this.onInputToken = (token) => {
         this.token = token;
+        this.updateMaxReward();
         this.emitInput();
       };
       this.onInputNumber = (input) => {
         (0, import_global5.limitInputNumber)(input, 18);
+        this.updateMaxReward();
         this.emitInput();
       };
       this.checkInitialReward = () => {
@@ -8733,7 +8731,8 @@
           claimDeadline: new import_eth_wallet3.BigNumber(this.adminClaimDeadline),
           admin: `${this.inputAdmin.value}`,
           isCommonStartDate: this.checkboxStartDate.checked,
-          vestingStartDate: new import_eth_wallet3.BigNumber(this.vestingStartDate || 0)
+          vestingStartDate: new import_eth_wallet3.BigNumber(this.vestingStartDate || 0),
+          rewardAmount: this.maxReward
         };
         return reward;
       };
@@ -8767,6 +8766,16 @@
     }
     get campaignEndLockTime() {
       return this._campaignEndLockTime;
+    }
+    set maxTotal(value) {
+      this._maxTotal = value;
+      this.updateMaxReward();
+    }
+    get maxTotal() {
+      return this._maxTotal || 0;
+    }
+    get maxReward() {
+      return new import_eth_wallet3.BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
     }
     async init() {
       super.init();
@@ -8847,6 +8856,30 @@
         class: "input-text w-input",
         onChanged: (src) => this.onInputNumber(src)
       })), /* @__PURE__ */ this.$render("i-hstack", {
+        id: "wrapperRewardNeededElm",
+        visible: false,
+        gap: 10,
+        margin: { top: 8, bottom: 8 },
+        verticalAlignment: "center",
+        horizontalAlignment: "space-between"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 4,
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        class: "lb-title",
+        caption: "Reward Needed"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        caption: "*",
+        font: { color: Theme7.colors.primary.main, size: "16px" }
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        class: "w-input",
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        id: "lbMaxReward",
+        caption: "-",
+        class: "lb-title w-100"
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -9211,6 +9244,7 @@
         }
         this.rewardConfig[idx].data = reward;
         this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
+        this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;
         this.currentReward = idx;
         this.emitInput();
       };
@@ -9257,6 +9291,11 @@
         this.updateCampaignEndLockTime();
         this.emitInput();
       };
+      this.onInputMaxTotalLock = (input) => {
+        (0, import_global6.limitInputNumber)(input, 18);
+        this.updateMaxReward();
+        this.emitInput();
+      };
       this.onInputNumber = (input) => {
         (0, import_global6.limitInputNumber)(input, 18);
         this.emitInput();
@@ -9276,14 +9315,17 @@
       };
       this.getRewardData = () => {
         const rewardData = [];
+        const totalRewards = [];
         for (const reward of this.rewardConfig) {
           const data = reward.getData();
           rewardData.push(data);
+          totalRewards.push({ value: data.rewardAmount || new import_eth_wallet4.BigNumber(0), tokenAddress: data.rewardTokenAddress });
         }
-        return rewardData;
+        return { rewardData, totalRewards };
       };
       this.getData = () => {
         var _a;
+        const reward = this.getRewardData();
         const staking = {
           address: this.inputAddress.value,
           lockTokenAddress: ((_a = this.token) == null ? void 0 : _a.address) || "",
@@ -9292,7 +9334,8 @@
           maxTotalLock: new import_eth_wallet4.BigNumber(this.inputMaxTotalLock.value),
           customDesc: this.inputDesc.value,
           lockTokenType: this.lockType,
-          rewards: this.getRewardData()
+          rewards: reward.rewardData,
+          totalRewardAmount: reward.totalRewards
         };
         return staking;
       };
@@ -9340,6 +9383,12 @@
       const val = this.minLockTime.plus(this.campaignEnd).toNumber();
       for (const reward of this.rewardConfig) {
         reward.campaignEndLockTime = val;
+      }
+    }
+    updateMaxReward() {
+      const val = this.inputMaxTotalLock.value;
+      for (const reward of this.rewardConfig) {
+        reward.maxTotal = val;
       }
     }
     async init() {
@@ -9449,7 +9498,7 @@
         id: "inputMaxTotalLock",
         inputType: "number",
         class: "input-text w-input",
-        onChanged: (src) => this.onInputNumber(src)
+        onChanged: (src) => this.onInputMaxTotalLock(src)
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9768,8 +9817,42 @@
         }
         return true;
       };
+      this.checkBalances = () => {
+        if (!this.isNew)
+          return true;
+        const stakings = this.getStakingData();
+        let listRewardNeeded = {};
+        for (const staking of stakings) {
+          const totalRewards = staking.totalRewardAmount;
+          if (totalRewards) {
+            for (const rewardNeeded of totalRewards) {
+              const { tokenAddress, value } = rewardNeeded;
+              if (listRewardNeeded[tokenAddress]) {
+                listRewardNeeded[tokenAddress] = new import_eth_wallet5.BigNumber(listRewardNeeded[tokenAddress]).plus(value);
+              } else {
+                listRewardNeeded[tokenAddress] = value;
+              }
+            }
+          }
+        }
+        const tokenMap = (0, import_store8.getTokenMap)();
+        let isValid = true;
+        let invalidTokens = [];
+        for (const key of Object.keys(listRewardNeeded)) {
+          const token = tokenMap[key.toLowerCase()];
+          const amount = listRewardNeeded[key];
+          const balance = (0, import_store8.getTokenBalance)(token);
+          if (amount.gt(balance)) {
+            invalidTokens.push(token.symbol);
+            isValid = false;
+          }
+        }
+        this.lbErrBalance.caption = `Insufficient ${invalidTokens.join(", ")} balance${invalidTokens.length > 1 ? "s" : ""}`;
+        this.lbErrBalance.visible = !isValid;
+        return isValid;
+      };
       this.checkValidation = () => {
-        return !!this.inputName.value && this.campaignStart && this.campaignStart < this.campaignEnd && this.isStakingValid();
+        return this.checkBalances() && !!this.inputName.value && this.campaignStart && this.campaignStart < this.campaignEnd && this.isStakingValid();
       };
       this.getStakingData = () => {
         const stakingData = [];
@@ -10059,6 +10142,12 @@
         background: { color: Theme9.colors.primary.light }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbErrBalance",
+        visible: false,
+        font: { size: "14px", color: Theme9.colors.secondary.main, bold: true },
+        display: "flex",
+        margin: { top: 10 }
       })));
     }
   };
@@ -10649,9 +10738,10 @@
         }
       };
       this.updateButtonStatus = async (data) => {
+        var _a;
         if (data) {
           const { value, key, text } = data;
-          const elm = this.stakingElm.querySelector(key);
+          const elm = (_a = this.stakingElm) == null ? void 0 : _a.querySelector(key);
           if (elm) {
             elm.rightIcon.visible = value;
             elm.caption = text;
@@ -11056,18 +11146,22 @@
               class: "ml-auto",
               caption: `${(0, import_global9.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
             }));
-            const rowRewardsLocked = await import_components14.Panel.create();
-            const rowRewardsVesting = await import_components14.Panel.create();
-            const rowRewardsVestingEnd = await import_components14.Panel.create();
-            const rowRewardsClaimable = await import_components14.Panel.create();
-            const rowRewardsClaimBtn = await import_components14.Panel.create();
+            const rowRewrads = await import_components14.Panel.create();
             if (isClaim) {
               claimStakedRow.classList.add("mb-1");
               for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
                 const reward = option.rewardsData[idx2];
                 const rewardToken2 = this.getRewardToken(reward.rewardTokenAddress);
                 const rewardSymbol = rewardToken2.symbol || "";
-                rowRewardsLocked.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                if (idx2) {
+                  rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+                    margin: { bottom: 16 },
+                    width: "100%",
+                    height: 2,
+                    background: { color: Theme11.divider }
+                  }));
+                }
+                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Locked:`
@@ -11075,7 +11169,7 @@
                   class: "bold",
                   caption: `${(0, import_global9.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
                 })));
-                rowRewardsVesting.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Vesting Start:`
@@ -11083,7 +11177,7 @@
                   class: "bold",
                   caption: reward.vestingStart ? reward.vestingStart.format("YYYY-MM-DD HH:mm:ss") : "TBC"
                 })));
-                rowRewardsVestingEnd.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Vesting End:`
@@ -11101,7 +11195,7 @@
                   const claimStart = import_moment4.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
                   startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                 }
-                rowRewardsClaimable.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Claimable:`
@@ -11111,6 +11205,24 @@
                 }), startClaimingText ? /* @__PURE__ */ this.$render("i-label", {
                   caption: startClaimingText
                 }) : []));
+                if (campaign.showContractLink) {
+                  rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                    gap: 4,
+                    class: "pointer",
+                    width: "fit-content",
+                    margin: { top: 12, bottom: -4, left: "auto", right: "auto" },
+                    onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, reward.address)
+                  }, /* @__PURE__ */ this.$render("i-label", {
+                    font: { bold: true },
+                    caption: "View Staking Contract"
+                  }), /* @__PURE__ */ this.$render("i-icon", {
+                    name: "external-link-alt",
+                    width: "14",
+                    height: "14",
+                    fill: campaign.customColorText || "#fff",
+                    class: "inline-block"
+                  })));
+                }
                 const btnClaim = await import_components14.Button.create({
                   rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: false },
                   caption: `Claim ${rewardSymbol}`,
@@ -11121,15 +11233,11 @@
                 btnClaim.id = `btnClaim-${idx2}-${option.address}`;
                 btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
                 btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-                rowRewardsClaimBtn.appendChild(btnClaim);
+                rowRewrads.appendChild(btnClaim);
               }
               ;
             } else {
-              rowRewardsLocked.visible = false;
-              rowRewardsVesting.visible = false;
-              rowRewardsVestingEnd.visible = false;
-              rowRewardsClaimable.visible = false;
-              rowRewardsClaimBtn.visible = false;
+              rowRewrads.visible = false;
             }
             const rowOptionItems = !isClaim ? [
               {
@@ -11266,31 +11374,48 @@
             }), /* @__PURE__ */ this.$render("i-panel", {
               class: isClaim ? "hidden" : "custom-divider",
               border: { top: { color: `${campaign.customColorCampaign || "#f15e61"} !important` } }
-            }), claimStakedRow, btnUnstake, rowRewardsLocked, rowRewardsVesting, rowRewardsVestingEnd, rowRewardsClaimable, rowRewardsClaimBtn, rewardOptions.map((rewardOption) => {
-              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
-              const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
-              return /* @__PURE__ */ this.$render("i-hstack", {
-                horizontalAlignment: "space-between"
-              }, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: "You Earned"
-              }), /* @__PURE__ */ this.$render("i-label", {
-                caption: `${earnedQty} ${earnedSymbol}`
-              }));
-            })), /* @__PURE__ */ this.$render("i-label", {
-              visible: !!campaign.showContractLink,
-              class: "view-contract pointer",
-              margin: { top: isClaim ? 0 : "auto" },
+            }), claimStakedRow, isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
+              gap: 4,
+              class: "pointer",
+              width: "fit-content",
+              margin: { top: -12, bottom: 12, left: "auto", right: "auto" },
               onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, option.address)
             }, /* @__PURE__ */ this.$render("i-label", {
-              caption: "View Contract"
+              font: { bold: true },
+              caption: "View Staking Contract"
             }), /* @__PURE__ */ this.$render("i-icon", {
               name: "external-link-alt",
               width: "14",
               height: "14",
               fill: campaign.customColorText || "#fff",
               class: "inline-block"
-            }))));
+            })) : [], btnUnstake, rowRewrads, rewardOptions.map((rewardOption) => {
+              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
+              const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
+              return /* @__PURE__ */ this.$render("i-hstack", {
+                horizontalAlignment: "space-between"
+              }, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: "You Earned:"
+              }), /* @__PURE__ */ this.$render("i-label", {
+                caption: `${earnedQty} ${earnedSymbol}`
+              }));
+            })), !isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
+              gap: 4,
+              class: "pointer",
+              width: "fit-content",
+              margin: { top: 16, left: "auto", right: "auto" },
+              onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, option.address)
+            }, /* @__PURE__ */ this.$render("i-label", {
+              font: { bold: true },
+              caption: "View Staking Contract"
+            }), /* @__PURE__ */ this.$render("i-icon", {
+              name: "external-link-alt",
+              width: "14",
+              height: "14",
+              fill: campaign.customColorText || "#fff",
+              class: "inline-block"
+            })) : []));
           }))));
         }
         ;

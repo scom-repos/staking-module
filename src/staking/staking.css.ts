@@ -402,21 +402,6 @@ Styles.cssRule('.staking-component', {
           justifyContent: 'center',
           fontWeight: 700,
         },
-        '.view-contract': {
-          fontWeight: 'bold',
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '1rem',
-          $nest: {
-            'a': {
-              display: 'flex',
-              alignItems: 'center',
-            },
-            'i-label': {
-              marginRight: '0.25rem',
-            },
-          },
-        },
         '.no-campaign': {
           padding: '3rem 2rem',
           display: 'flex',

@@ -1,7 +1,7 @@
 import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { DefaultDateTimeFormat, EventId } from '@staking/global';
-import { getChainId, getDefaultChainId, Networks, Staking, StakingCampaign } from '@staking/store';
+import { getChainId, getDefaultChainId, getTokenBalance, getTokenMap, Networks, Staking, StakingCampaign } from '@staking/store';
 import moment from 'moment';
 import { StakingConfig } from './staking';
 const Theme = Styles.Theme.ThemeVars;
@@ -43,6 +43,7 @@ export class CampaignConfig extends Module {
 	private campaignStart: number;
 	private campaignEnd: number;
 	private wapperNetworkElm: HStack;
+	private lbErrBalance: Label;
 	private isInitialized = false;
 
 	constructor(parent?: Container, options?: any) {
@@ -337,8 +338,43 @@ export class CampaignConfig extends Module {
 		return true;
 	}
 
+	private checkBalances = () => {
+		if (!this.isNew) return true;
+		const stakings = this.getStakingData();
+		let listRewardNeeded: {[key: string]: BigNumber } = {};
+		for (const staking of stakings) {
+			const totalRewards = staking.totalRewardAmount;
+			if (totalRewards) {
+				for (const rewardNeeded of totalRewards) {
+					const { tokenAddress, value } = rewardNeeded;
+					if (listRewardNeeded[tokenAddress]) {
+						listRewardNeeded[tokenAddress] = new BigNumber(listRewardNeeded[tokenAddress]).plus(value);
+					} else {
+						listRewardNeeded[tokenAddress] = value;
+					}
+				}
+			}
+		}
+		const tokenMap = getTokenMap();
+		let isValid = true;
+		let invalidTokens = [];
+		for (const key of Object.keys(listRewardNeeded)) {
+			const token = tokenMap[key.toLowerCase()];
+			const amount = listRewardNeeded[key];
+			const balance = getTokenBalance(token);
+			if (amount.gt(balance)) {
+				invalidTokens.push(token.symbol);
+				isValid = false;
+			}
+		}
+		this.lbErrBalance.caption = `Insufficient ${invalidTokens.join(', ')} balance${invalidTokens.length > 1 ? 's' : ''}`;
+		this.lbErrBalance.visible = !isValid;
+		return isValid;
+	}
+
 	checkValidation = () => {
-		return !!this.inputName.value &&
+		return this.checkBalances() &&
+			!!this.inputName.value &&
 			this.campaignStart &&
 			// this.campaignStart >= moment().unix() &&
 			this.campaignStart < this.campaignEnd &&
@@ -469,6 +505,7 @@ export class CampaignConfig extends Module {
 					</i-hstack>
 					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
 					<i-panel id="pnlInfoElm" />
+					<i-label id="lbErrBalance" visible={false} font={{ size: '14px', color: Theme.colors.secondary.main, bold: true }} display="flex" margin={{ top: 10 }} />
 				</i-vstack>
 			</i-panel>
 		)

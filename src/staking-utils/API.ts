@@ -548,9 +548,10 @@ const getApprovalModelAction = (contractAddress: string, options: IERC20Approval
 }
 
 const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
+  let listTransferReward: any[] = [];
+  let wallet = getWallet();
+  let result: StakingCampaign = { ...campaign, stakings: [] };
   try {
-    let wallet = getWallet();
-    let result: StakingCampaign = { ...campaign, stakings: [] };
     for (const staking of campaign.stakings) {
       let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
       let stakingResult: Staking;
@@ -592,17 +593,34 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
         }
         const rewardAddress = await rewardsContract.deploy(params);
         rewardResult.push({ ...reward, address: rewardAddress });
+        listTransferReward.push({
+          to: rewardAddress,
+          value: Utils.toDecimals(maxTotalLock.multipliedBy(multiplier), rewardTokenDecimals),
+          rewardTokenAddress,
+        });
       };
       stakingResult = { ...staking, address: stakingAddress, rewards: rewardResult };
       result.stakings.push(stakingResult);
     }
-    return result;
   } catch (error) {
     if (callback) {
       callback(error, null);
     }
     return null;
   }
+  try {
+    // Transfer max reward from the admin to the reward contract.
+    for (const transferReward of listTransferReward) {
+      const { to, value, rewardTokenAddress } = transferReward;
+      const contract = new Contracts.OSWAP_ERC20(wallet, rewardTokenAddress);
+      await contract.transfer_send({ to, value });
+    }
+  } catch (error) {
+    if (callback) {
+      callback(error, null);
+    }
+  }
+  return result;
 }
 
 export {

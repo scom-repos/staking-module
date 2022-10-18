@@ -332,7 +332,7 @@ export class StakingBlock extends Module implements PageBlock {
 	private updateButtonStatus = async (data: any) => {
 		if (data) {
 			const { value, key, text } = data;
-			const elm = this.stakingElm.querySelector(key) as Button;
+			const elm = this.stakingElm?.querySelector(key) as Button;
 			if (elm) {
 				elm.rightIcon.visible = value;
 				elm.caption = text;
@@ -712,31 +712,31 @@ export class StakingBlock extends Module implements PageBlock {
 							claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked:" />);
 							claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(option.stakeQty)} ${lockedTokenSymbol}`} />);
 
-							const rowRewardsLocked = await Panel.create();
-							const rowRewardsVesting = await Panel.create();
-							const rowRewardsVestingEnd = await Panel.create();
-							const rowRewardsClaimable = await Panel.create();
-							const rowRewardsClaimBtn = await Panel.create();
-
+							const rowRewrads = await Panel.create();
 							if (isClaim) {
 								claimStakedRow.classList.add('mb-1');
 								for (let idx = 0; idx < option.rewardsData.length; idx++) {
 									const reward = option.rewardsData[idx];
 									const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
 									const rewardSymbol = rewardToken.symbol || '';
-									rowRewardsLocked.appendChild(
+									if (idx) {
+										rowRewrads.appendChild(
+											<i-panel margin={{ bottom: 16 }} width="100%" height={2} background={{ color: Theme.divider }} />
+										)
+									}
+									rowRewrads.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Locked:`} />
 											<i-label class="bold" caption={`${formatNumber(reward.vestedReward)} ${rewardSymbol}`} />
 										</i-hstack>
 									);
-									rowRewardsVesting.appendChild(
+									rowRewrads.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Vesting Start:`} />
 											<i-label class="bold" caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
 										</i-hstack>
 									);
-									rowRewardsVestingEnd.appendChild(
+									rowRewrads.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Vesting End:`} />
 											<i-label class="bold" caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
@@ -752,13 +752,21 @@ export class StakingBlock extends Module implements PageBlock {
 										const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
 										startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
 									}
-									rowRewardsClaimable.appendChild(
+									rowRewrads.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Claimable:`} />
 											<i-label class="bold" caption={rewardClaimable} />
 											{startClaimingText ? <i-label caption={startClaimingText} /> : []}
 										</i-hstack>
 									);
+									if (campaign.showContractLink) {
+										rowRewrads.appendChild(
+											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 12, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, reward.address)}>
+												<i-label font={{ bold: true }} caption="View Staking Contract" />
+												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+											</i-hstack>
+										)
+									}
 									const btnClaim = await Button.create({
 										rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: false },
 										caption: `Claim ${rewardSymbol}`,
@@ -769,14 +777,10 @@ export class StakingBlock extends Module implements PageBlock {
 									btnClaim.id = `btnClaim-${idx}-${option.address}`;
 									btnClaim.classList.add('btn-os', 'btn-stake', 'mt-1');
 									btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-									rowRewardsClaimBtn.appendChild(btnClaim);
+									rowRewrads.appendChild(btnClaim);
 								};
 							} else {
-								rowRewardsLocked.visible = false;
-								rowRewardsVesting.visible = false;
-								rowRewardsVestingEnd.visible = false;
-								rowRewardsClaimable.visible = false;
-								rowRewardsClaimBtn.visible = false;
+								rowRewrads.visible = false;
 							}
 
 							const rowOptionItems = !isClaim ? [
@@ -899,27 +903,33 @@ export class StakingBlock extends Module implements PageBlock {
 										}
 										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} border={{ top: { color: `${campaign.customColorCampaign || '#f15e61'} !important` } }} />
 										{claimStakedRow}
+										{
+											isClaim && !!campaign.showContractLink ?
+											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: -12, bottom: 12, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+												<i-label font={{ bold: true }} caption="View Staking Contract" />
+												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+											</i-hstack> : []
+										}
 										{btnUnstake}
-										{rowRewardsLocked}
-										{rowRewardsVesting}
-										{rowRewardsVestingEnd}
-										{rowRewardsClaimable}
-										{rowRewardsClaimBtn}
+										{rowRewrads}
 										{
 											rewardOptions.map((rewardOption: any) => {
 												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(rewardOption.multiplier));
 												const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
 												return <i-hstack horizontalAlignment="space-between">
-													<i-label class="mr-025" caption="You Earned" />
+													<i-label class="mr-025" caption="You Earned:" />
 													<i-label caption={`${earnedQty} ${earnedSymbol}`} />
 												</i-hstack>
 											})
 										}
 									</i-panel>
-									<i-label visible={!!campaign.showContractLink} class="view-contract pointer" margin={{ top: isClaim ? 0 : 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-										<i-label caption="View Contract" />
-										<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-									</i-label>
+									{
+										!isClaim && !!campaign.showContractLink ?
+										<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 16, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+												<i-label font={{ bold: true }} caption="View Staking Contract" />
+												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+										</i-hstack> : []
+									}
 								</i-panel>
 							</i-vstack>
 						}))

@@ -44,6 +44,7 @@ export {
   StakingCampaign,
   Staking,
   Reward,
+  RewardNeeded,
   LockTokenType,
   LockTokenTypeList,
   USDPeggedTokenAddressMap,
