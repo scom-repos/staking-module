@@ -6342,14 +6342,10 @@
               }
             }
           },
-          ".custom-divider": {
-            borderTop: "2px solid",
-            marginBlock: "1rem"
-          },
           ".btn-stake": {
             width: "100%",
             padding: "0.625rem 0",
-            marginBottom: "25px",
+            marginBottom: "10px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -6711,6 +6707,7 @@
         this.approvalModelAction.checkAllowance(this.lockedTokenObject, this.inputAmount.value);
       };
       this.renderStakingInfo = async (info) => {
+        var _a;
         if (!info || !Object.keys(info).length) {
           clearInterval(this.timer);
           this.lbDuration.caption = "-";
@@ -6750,13 +6747,15 @@
           vaultToken: vaultTokenData
         };
         this.lockedTokenObject = getLockedTokenObject(info, tokenInfo, this.tokenMap);
+        const defaultDecimalsOffset = 18 - (((_a = this.lockedTokenObject) == null ? void 0 : _a.decimals) || 18);
         const symbol = getLockedTokenSymbol(info, this.lockedTokenObject);
         this.tokenSymbol = symbol;
         this.lbDuration.caption = info.duration;
-        this.perAddressCap = info.perAddressCap;
-        this.maxQty = info.maxTotalLock;
-        this.stakeQty = info.stakeQty;
-        this.availableQty = new import_eth_wallet.BigNumber(info.maxTotalLock).minus(info.totalLocked).toFixed();
+        this.perAddressCap = new import_eth_wallet.BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
+        this.maxQty = new import_eth_wallet.BigNumber(info.maxTotalLock).shiftedBy(defaultDecimalsOffset).toNumber();
+        this.stakeQty = new import_eth_wallet.BigNumber(info.stakeQty).shiftedBy(defaultDecimalsOffset).toFixed();
+        const totalLocked = new import_eth_wallet.BigNumber(info.totalLocked).shiftedBy(defaultDecimalsOffset);
+        this.availableQty = new import_eth_wallet.BigNumber(this.maxQty).minus(totalLocked).toFixed();
         this.lbMaxQty.caption = `${(0, import_global2.formatNumber)(this.maxQty)} ${symbol}`;
         this.lbAvailableQty.caption = `${(0, import_global2.formatNumber)(this.availableQty)} ${symbol}`;
         this.btnApprove.visible = false;
@@ -6790,9 +6789,9 @@
           this.lbTimer.caption = `Please note that you will forfeit your rewards by unstaking. You are not eligible for rewards until <b>${maturity}</b>`;
           this.sectionEarnedQty.innerHTML = "";
           info.rewards.forEach((rewardOption) => {
-            var _a, _b;
+            var _a2, _b;
             const earnedQty = (0, import_global2.formatNumber)(totalCredit.times(rewardOption.rate));
-            const rewardSymbol = ((_b = this.tokenMap[(_a = rewardOption.tokenAddress) == null ? void 0 : _a.toLowerCase()]) == null ? void 0 : _b.symbol) || "";
+            const rewardSymbol = ((_b = this.tokenMap[(_a2 = rewardOption.tokenAddress) == null ? void 0 : _a2.toLowerCase()]) == null ? void 0 : _b.symbol) || "";
             this.sectionEarnedQty.appendChild(/* @__PURE__ */ this.$render("i-vstack", {
               class: "w-50"
             }, /* @__PURE__ */ this.$render("i-label", {
@@ -6813,22 +6812,18 @@
           this.colYourStakeQty.visible = false;
           this.sectionEarnedQty.visible = false;
           if (!!tokenAddress) {
-            const decimals = info.decimalsOffset || 0;
             if (lockTokenType == import_store3.LockTokenType.ERC20_Token) {
+              await (0, import_store3.setTokenBalances)();
               let balances = (0, import_store3.getTokenBalances)();
-              if (!Object.keys(balances).length) {
-                await (0, import_store3.setTokenBalances)();
-                balances = (0, import_store3.getTokenBalances)();
-              }
               this.tokenBalances = Object.keys(balances).reduce((accumulator, key) => {
                 accumulator[key.toLowerCase()] = balances[key];
                 return accumulator;
               }, {});
               this.balance = this.tokenBalances[tokenAddress] || "0";
             } else if (lockTokenType == import_store3.LockTokenType.LP_Token) {
-              this.balance = new import_eth_wallet.BigNumber(lpTokenData.balance || 0).shiftedBy(decimals).toFixed();
+              this.balance = new import_eth_wallet.BigNumber(lpTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
             } else if (lockTokenType == import_store3.LockTokenType.VAULT_Token) {
-              this.balance = new import_eth_wallet.BigNumber(vaultTokenData.balance || 0).shiftedBy(decimals).toFixed();
+              this.balance = new import_eth_wallet.BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
             }
             this.btnMax.visible = true;
             this.btnMax.enabled = new import_eth_wallet.BigNumber(this.balance).gt(0);
@@ -6895,15 +6890,12 @@
       this.approvalModelAction = (0, import_staking_utils.getApprovalModelAction)(this.address, {
         sender: this,
         payAction: async () => {
-          var _a;
           if (this.modalActions.visible) {
             this.modalActions.visible = false;
           }
           this.showResultMessage(this.stakingResult, "warning", `${this.currentMode === 0 ? "Stake" : "Unlock"} ${this.tokenSymbol}`);
           if (this.currentMode === 0) {
-            const decimals = ((_a = this.stakingInfo) == null ? void 0 : _a.decimalsOffset) || 0;
-            const amount = new import_eth_wallet.BigNumber(this.inputAmount.value).shiftedBy(-decimals).toFixed();
-            (0, import_staking_utils.lockToken)(this.lockedTokenObject, amount, this.address);
+            (0, import_staking_utils.lockToken)(this.lockedTokenObject, this.inputAmount.value, this.address);
           } else {
             (0, import_staking_utils.withdrawToken)(this.address);
           }
@@ -6952,6 +6944,7 @@
           }
         },
         onApproved: async (token) => {
+          await (0, import_store3.setTokenBalances)();
           this.btnApprove.rightIcon.visible = false;
           this.btnApprove.visible = false;
           this.btnMax.enabled = new import_eth_wallet.BigNumber(this.balance).gt(0);
@@ -6980,6 +6973,7 @@
         onPaid: async () => {
           const caption = this.currentMode === 0 ? "Unstake" : "Stake";
           if (this.onRefresh) {
+            await (0, import_store3.setTokenBalances)();
             await this.onRefresh();
             (0, import_store3.setStakingStatus)(actionKey, false, caption);
           }
@@ -8543,6 +8537,15 @@
           this.lbMaxReward.caption = "-";
         }
       };
+      this.updateRate = () => {
+        if (!this.lbRate || !this.inputMultiplier)
+          return;
+        if (this.stakingToken && this.token && this.inputMultiplier.value) {
+          this.lbRate.caption = `<span class="mr-0-5">1 ${this.stakingToken.symbol}</span> : <span class="ml-0-5">${this.inputMultiplier.value} ${this.token.symbol}</span>`;
+        } else {
+          this.lbRate.caption = "-";
+        }
+      };
       this.renderTimeButton = async () => {
         const vstack = await import_components10.VStack.create({ gap: 8 });
         const dropdownModal = await import_components10.Modal.create({
@@ -8638,6 +8641,7 @@
         if (adminDateElm) {
           adminDateElm.min = (0, import_moment2.default)().add(300, "seconds").format("YYYY-MM-DD HH:mm:ss");
         }
+        this.setAdminClaimDeadline((0, import_moment2.default)("31/12/9999 23:59:59", import_global5.DefaultDateTimeFormat).unix());
         this.checkStartDate();
       };
       this.changeStartDate = (value) => {
@@ -8674,11 +8678,13 @@
       this.onInputToken = (token) => {
         this.token = token;
         this.updateMaxReward();
+        this.updateRate();
         this.emitInput();
       };
-      this.onInputNumber = (input) => {
+      this.onInputMultiplier = (input) => {
         (0, import_global5.limitInputNumber)(input, 18);
         this.updateMaxReward();
+        this.updateRate();
         this.emitInput();
       };
       this.checkInitialReward = () => {
@@ -8774,7 +8780,17 @@
     get maxTotal() {
       return this._maxTotal || 0;
     }
+    set stakingToken(token) {
+      this._stakingToken = token;
+      this.updateRate();
+    }
+    get stakingToken() {
+      return this._stakingToken;
+    }
     get maxReward() {
+      return new import_eth_wallet3.BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
+    }
+    get rate() {
       return new import_eth_wallet3.BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
     }
     async init() {
@@ -8854,8 +8870,30 @@
         id: "inputMultiplier",
         inputType: "number",
         class: "input-text w-input",
-        onChanged: (src) => this.onInputNumber(src)
+        onChanged: (src) => this.onInputMultiplier(src)
       })), /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 10,
+        margin: { top: 8 },
+        verticalAlignment: "center",
+        horizontalAlignment: "space-between"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 4,
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        class: "lb-title",
+        caption: "Rate"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        font: { color: Theme7.colors.primary.main, size: "16px" }
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        class: "w-input",
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        id: "lbRate",
+        caption: "-",
+        class: "lb-title w-100",
+        font: { color: Theme7.text.third }
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperRewardNeededElm",
         visible: false,
         gap: 10,
@@ -8878,7 +8916,8 @@
       }, /* @__PURE__ */ this.$render("i-label", {
         id: "lbMaxReward",
         caption: "-",
-        class: "lb-title w-100"
+        class: "lb-title w-100",
+        font: { color: Theme7.text.third }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9245,6 +9284,7 @@
         this.rewardConfig[idx].data = reward;
         this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
         this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;
+        this.rewardConfig[idx].stakingToken = this.token;
         this.currentReward = idx;
         this.emitInput();
       };
@@ -9281,6 +9321,7 @@
       };
       this.onInputToken = (token) => {
         this.token = token;
+        this.updateStakingToken();
         this.emitInput();
       };
       this.onInputLockingTime = (input) => {
@@ -9347,6 +9388,7 @@
       this.tokenSelection.targetChainId = chainId;
       for (const elm of this.rewardConfig) {
         elm.chainId = chainId;
+        elm.stakingToken = void 0;
       }
     }
     get chainId() {
@@ -9389,6 +9431,11 @@
       const val = this.inputMaxTotalLock.value;
       for (const reward of this.rewardConfig) {
         reward.maxTotal = val;
+      }
+    }
+    updateStakingToken() {
+      for (const reward of this.rewardConfig) {
+        reward.stakingToken = this.token;
       }
     }
     async init() {
@@ -10814,6 +10861,7 @@
           this.noCampaignSection.visible = true;
           return;
         }
+        const currentAddress = import_eth_wallet6.Wallet.getInstance().address;
         let nodeItems = [];
         this.removeTimer();
         for (let idx = 0; idx < this.campaigns.length; idx++) {
@@ -10853,6 +10901,8 @@
           const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
           const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
           const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+          const lockedTokenDecimals = (lockedTokenObject == null ? void 0 : lockedTokenObject.decimals) || 18;
+          const defaultDecimalsOffset = 18 - lockedTokenDecimals;
           const isSimplified = campaign.isSimplified;
           const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
           const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
@@ -10904,9 +10954,9 @@
             let _totalTokens = 0;
             let _availableQty = 0;
             for (const o of options) {
-              const _totalLocked = await (0, import_staking_utils3.getStakingTotalLocked)(o.address, o.decimalsOffset);
+              const _totalLocked = await (0, import_staking_utils3.getStakingTotalLocked)(o.address);
               totalLocked[o.address] = _totalLocked;
-              const optionQty = new import_eth_wallet6.BigNumber(o.maxTotalLock).minus(_totalLocked);
+              const optionQty = new import_eth_wallet6.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
               const lbOptionQty = document.querySelector(`#lb-${o.address}`);
               if (lbOptionQty) {
                 lbOptionQty.caption = `${(0, import_global9.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
@@ -10928,8 +10978,8 @@
             ;
             totalTokens = _totalTokens;
             availableQty = _availableQty;
-            totalTokensLabel.caption = `${(0, import_global9.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-            availableQtyLabel.caption = `${(0, import_global9.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+            totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+            availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
             if (isClosed) {
               if (stickerLabel.caption !== "Closed") {
                 stickerSection.classList.add("closed");
@@ -10998,8 +11048,8 @@
           }))));
           totalTokensLabel.classList.add("bold");
           availableQtyLabel.classList.add("bold");
-          totalTokensLabel.caption = `${(0, import_global9.formatNumber)(totalTokens)} ${lockedTokenSymbol}`;
-          availableQtyLabel.caption = `${(0, import_global9.formatNumber)(availableQty)} ${lockedTokenSymbol}`;
+          totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+          availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
           totalTokensLabel.classList.add("text-right");
           availableQtyLabel.classList.add("text-right");
           const rowItems = [
@@ -11129,47 +11179,51 @@
               btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option: __spreadValues(__spreadValues({}, campaign), option), lockedTokenSymbol });
             }
             const isClaim = option.mode === "Claim";
-            const rewardOptions = !isClaim ? option.rewards : [];
+            const rewardOptions = !isClaim ? option.rewardsData : [];
             const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {};
             const lpRewardTokenIconPath = !isClaim && rewardToken.address ? (0, import_store10.getTokenIconPath)(rewardToken, chainId) : "";
             let aprInfo = {};
             const optionAvailableQtyLabel = await import_components14.Label.create();
             optionAvailableQtyLabel.classList.add("ml-auto");
             optionAvailableQtyLabel.id = `lb-${option.address}`;
-            optionAvailableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]))} ${lockedTokenSymbol}`;
+            optionAvailableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
             const claimStakedRow = await import_components14.HStack.create();
             claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
               class: "mr-025",
-              caption: "You Staked:"
+              caption: "You Staked"
             }));
             claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
               class: "ml-auto",
-              caption: `${(0, import_global9.formatNumber)(option.stakeQty)} ${lockedTokenSymbol}`
+              caption: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
             }));
-            const rowRewrads = await import_components14.Panel.create();
+            const rowRewards = await import_components14.Panel.create();
             if (isClaim) {
               claimStakedRow.classList.add("mb-1");
               for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
                 const reward = option.rewardsData[idx2];
                 const rewardToken2 = this.getRewardToken(reward.rewardTokenAddress);
-                const rewardSymbol = rewardToken2.symbol || "";
-                if (idx2) {
-                  rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-panel", {
-                    margin: { bottom: 16 },
-                    width: "100%",
-                    height: 2,
-                    background: { color: Theme11.divider }
-                  }));
+                const rewardTokenDecimals = rewardToken2.decimals || 18;
+                const decimalsOffset = 18 - rewardTokenDecimals;
+                let rewardLockedDecimalsOffset = decimalsOffset;
+                if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                  rewardLockedDecimalsOffset = decimalsOffset * 2;
                 }
-                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                const rewardSymbol = rewardToken2.symbol || "";
+                rowRewards.appendChild(/* @__PURE__ */ this.$render("i-panel", {
+                  margin: { bottom: 16 },
+                  width: "100%",
+                  height: 2,
+                  background: { color: campaign.customColorCampaign || Theme11.divider }
+                }));
+                rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Locked:`
                 }), /* @__PURE__ */ this.$render("i-label", {
                   class: "bold",
-                  caption: `${(0, import_global9.formatNumber)(reward.vestedReward)} ${rewardSymbol}`
+                  caption: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`
                 })));
-                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Vesting Start:`
@@ -11177,7 +11231,7 @@
                   class: "bold",
                   caption: reward.vestingStart ? reward.vestingStart.format("YYYY-MM-DD HH:mm:ss") : "TBC"
                 })));
-                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Vesting End:`
@@ -11188,14 +11242,14 @@
                 const passClaimStartTime = !(reward.claimStartTime && (0, import_moment4.default)().diff(import_moment4.default.unix(reward.claimStartTime)) < 0);
                 let rewardClaimable = `0 ${rewardSymbol}`;
                 if (passClaimStartTime) {
-                  rewardClaimable = `${(0, import_global9.formatNumber)(reward.claimable)} ${rewardSymbol}`;
+                  rewardClaimable = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                 }
                 let startClaimingText = "";
                 if (!(!reward.claimStartTime || passClaimStartTime)) {
                   const claimStart = import_moment4.default.unix(reward.claimStartTime).format("YYYY-MM-DD HH:mm:ss");
                   startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
                 }
-                rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   caption: `${rewardSymbol} Claimable:`
@@ -11206,7 +11260,7 @@
                   caption: startClaimingText
                 }) : []));
                 if (campaign.showContractLink) {
-                  rowRewrads.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                     gap: 4,
                     class: "pointer",
                     width: "fit-content",
@@ -11214,7 +11268,7 @@
                     onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, reward.address)
                   }, /* @__PURE__ */ this.$render("i-label", {
                     font: { bold: true },
-                    caption: "View Staking Contract"
+                    caption: "View Reward Contract"
                   }), /* @__PURE__ */ this.$render("i-icon", {
                     name: "external-link-alt",
                     width: "14",
@@ -11233,16 +11287,16 @@
                 btnClaim.id = `btnClaim-${idx2}-${option.address}`;
                 btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
                 btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-                rowRewrads.appendChild(btnClaim);
+                rowRewards.appendChild(btnClaim);
               }
               ;
             } else {
-              rowRewrads.visible = false;
+              rowRewards.visible = false;
             }
             const rowOptionItems = !isClaim ? [
               {
                 title: "Max. QTY",
-                value: `${(0, import_global9.formatNumber)(option.maxTotalLock)} ${lockedTokenSymbol}`,
+                value: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
                 isHidden: isSimplified
               },
               {
@@ -11253,7 +11307,7 @@
               },
               {
                 title: "Individual Cap",
-                value: `${(0, import_global9.formatNumber)(option.perAddressCap)} ${lockedTokenSymbol}`
+                value: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
               },
               {
                 title: "Campaign Start Date",
@@ -11292,6 +11346,7 @@
             })), /* @__PURE__ */ this.$render("i-label", {
               width: "100%",
               class: "staking-description",
+              minHeight: 20,
               caption: option.customDesc || ""
             })), /* @__PURE__ */ this.$render("i-panel", {
               class: "img-custom"
@@ -11315,10 +11370,42 @@
               url: import_assets5.default.fullPath(this.tokenIcon)
             })), /* @__PURE__ */ this.$render("i-panel", {
               class: "info-stake"
-            }, btnStake, await Promise.all(rewardOptions.map(async (rewardOption) => {
+            }, btnStake, btnUnstake, rowOptionItems.filter((f) => !f.isHidden).map((v) => {
+              return /* @__PURE__ */ this.$render("i-hstack", {
+                horizontalAlignment: "space-between"
+              }, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: v.title
+              }), v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
+                caption: v.value
+              }));
+            }), claimStakedRow, !isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
+              gap: 4,
+              class: "pointer",
+              width: "fit-content",
+              margin: { top: 8, left: "auto", right: "auto" },
+              onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, option.address)
+            }, /* @__PURE__ */ this.$render("i-label", {
+              font: { bold: true },
+              caption: "View Staking Contract"
+            }), /* @__PURE__ */ this.$render("i-icon", {
+              name: "external-link-alt",
+              width: "14",
+              height: "14",
+              fill: campaign.customColorText || "#fff",
+              class: "inline-block"
+            })) : [], isClaim ? [] : /* @__PURE__ */ this.$render("i-panel", {
+              width: "100%",
+              height: 2,
+              margin: { top: 10, bottom: 8 },
+              background: { color: campaign.customColorCampaign || Theme11.divider }
+            }), await Promise.all(rewardOptions.map(async (rewardOption, idx2) => {
               const labelApr = await import_components14.Label.create();
               labelApr.classList.add("ml-auto");
-              const rateDesc = `1 ${(0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet6.BigNumber(rewardOption.multiplier).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+              const rewardToken2 = this.getRewardToken(rewardOption.rewardTokenAddress);
+              const rewardTokenDecimals = rewardToken2.decimals || 18;
+              const decimalsOffset = 18 - rewardTokenDecimals;
+              const rateDesc = `1 ${(0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet6.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
               const updateApr = async () => {
                 if (option.lockTokenType === import_store10.LockTokenType.ERC20_Token) {
                   const apr = await (0, import_staking_utils3.getERC20RewardCurrentAPR)(rewardOption, lockedTokenObject, durationDays);
@@ -11342,39 +11429,74 @@
               updateApr();
               this.listAprTimer.push(setInterval(updateApr, 1e4));
               const aprValue = getAprValue(rewardOption);
+              let offset = decimalsOffset;
+              if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                offset = offset * 2;
+              }
+              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(new import_eth_wallet6.BigNumber(rewardOption.multiplier)).shiftedBy(offset));
+              const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
+              const rewardElm = await import_components14.VStack.create({ verticalAlignment: "center" });
+              rewardElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                horizontalAlignment: "space-between"
+              }, /* @__PURE__ */ this.$render("i-label", {
+                class: "mr-025",
+                caption: "You Earned:"
+              }), /* @__PURE__ */ this.$render("i-label", {
+                caption: `${earnedQty} ${earnedSymbol}`
+              })));
+              if (campaign.showContractLink) {
+                rewardElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+                  gap: 4,
+                  class: "pointer",
+                  width: "fit-content",
+                  margin: { top: 8, bottom: -4, left: "auto", right: "auto" },
+                  onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, rewardOption.address)
+                }, /* @__PURE__ */ this.$render("i-label", {
+                  font: { bold: true },
+                  caption: "View Reward Contract"
+                }), /* @__PURE__ */ this.$render("i-icon", {
+                  name: "external-link-alt",
+                  width: "14",
+                  height: "14",
+                  fill: campaign.customColorText || "#fff",
+                  class: "inline-block"
+                })));
+              }
               if (isSimplified) {
                 labelApr.caption = aprValue;
-                return /* @__PURE__ */ this.$render("i-vstack", null, /* @__PURE__ */ this.$render("i-hstack", {
+                return /* @__PURE__ */ this.$render("i-vstack", null, idx2 ? /* @__PURE__ */ this.$render("i-panel", {
+                  width: "100%",
+                  height: 2,
+                  margin: { top: 10, bottom: 8 },
+                  background: { color: campaign.customColorCampaign || Theme11.divider }
+                }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
                   class: "mr-025",
-                  caption: "Rate"
+                  caption: "Rate:"
                 }), /* @__PURE__ */ this.$render("i-label", {
                   class: "bold",
                   caption: rateDesc
                 })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
                   class: "mr-025",
-                  caption: "APR"
-                }), labelApr));
+                  caption: "APR:"
+                }), labelApr), rewardElm);
               }
               labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
-              return /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: "Rate"
-              }), labelApr);
-            })), rowOptionItems.filter((f) => !f.isHidden).map((v) => {
-              return /* @__PURE__ */ this.$render("i-hstack", {
+              return /* @__PURE__ */ this.$render("i-vstack", {
+                verticalAlignment: "center"
+              }, idx2 ? /* @__PURE__ */ this.$render("i-panel", {
+                width: "100%",
+                height: 2,
+                margin: { top: 10, bottom: 8 },
+                background: { color: campaign.customColorCampaign || Theme11.divider }
+              }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
               }, /* @__PURE__ */ this.$render("i-label", {
                 class: "mr-025",
-                caption: v.title
-              }), v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
-                caption: v.value
-              }));
-            }), /* @__PURE__ */ this.$render("i-panel", {
-              class: isClaim ? "hidden" : "custom-divider",
-              border: { top: { color: `${campaign.customColorCampaign || "#f15e61"} !important` } }
-            }), claimStakedRow, isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
+                caption: "Rate:"
+              }), labelApr), rewardElm);
+            })), isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
               gap: 4,
               class: "pointer",
               width: "fit-content",
@@ -11389,33 +11511,7 @@
               height: "14",
               fill: campaign.customColorText || "#fff",
               class: "inline-block"
-            })) : [], btnUnstake, rowRewrads, rewardOptions.map((rewardOption) => {
-              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(rewardOption.multiplier));
-              const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
-              return /* @__PURE__ */ this.$render("i-hstack", {
-                horizontalAlignment: "space-between"
-              }, /* @__PURE__ */ this.$render("i-label", {
-                class: "mr-025",
-                caption: "You Earned:"
-              }), /* @__PURE__ */ this.$render("i-label", {
-                caption: `${earnedQty} ${earnedSymbol}`
-              }));
-            })), !isClaim && !!campaign.showContractLink ? /* @__PURE__ */ this.$render("i-hstack", {
-              gap: 4,
-              class: "pointer",
-              width: "fit-content",
-              margin: { top: 16, left: "auto", right: "auto" },
-              onClick: () => (0, import_store10.viewOnExplorerByAddress)(chainId, option.address)
-            }, /* @__PURE__ */ this.$render("i-label", {
-              font: { bold: true },
-              caption: "View Staking Contract"
-            }), /* @__PURE__ */ this.$render("i-icon", {
-              name: "external-link-alt",
-              width: "14",
-              height: "14",
-              fill: campaign.customColorText || "#fff",
-              class: "inline-block"
-            })) : []));
+            })) : [], rowRewards)));
           }))));
         }
         ;

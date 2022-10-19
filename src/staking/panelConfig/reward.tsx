@@ -39,6 +39,7 @@ export class RewardConfig extends Module {
 	private _data?: Reward;
 	private _campaignEndLockTime: number = 0;
 	private _maxTotal: number = 0;
+	private _stakingToken: ITokenObject | undefined;
 	private inputAddress: Input;
 	private lbAddressErr: Label;
 	private isAddressValid: boolean;
@@ -47,6 +48,7 @@ export class RewardConfig extends Module {
 
 	private wrapperRewardNeededElm: HStack;
 	private lbMaxReward: Label;
+	private lbRate: Label;
 	private pnlTimeSelection: Panel;
 	private btnTime: Button;
 	private unit: number = 1;
@@ -117,6 +119,15 @@ export class RewardConfig extends Module {
 		return this._maxTotal || 0;
 	}
 
+	set stakingToken(token: ITokenObject | undefined) {
+		this._stakingToken = token;
+		this.updateRate();
+	}
+
+	get stakingToken() {
+		return this._stakingToken;
+	}
+
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
@@ -165,12 +176,25 @@ export class RewardConfig extends Module {
 		return new BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
 	}
 
+	get rate() {
+		return new BigNumber(this.inputMultiplier.value || 0).multipliedBy(this.maxTotal);
+	}
+
 	updateMaxReward = () => {
 		if (!this.lbMaxReward) return;
 		if (this.token) {
 			this.lbMaxReward.caption = `${formatNumber(this.maxReward)} ${this.token.symbol || ''}`;
 		} else {
 			this.lbMaxReward.caption = '-';
+		}
+	}
+
+	updateRate = () => {
+		if (!this.lbRate || !this.inputMultiplier) return;
+		if (this.stakingToken && this.token && this.inputMultiplier.value) {
+			this.lbRate.caption = `<span class="mr-0-5">1 ${this.stakingToken.symbol}</span> : <span class="ml-0-5">${this.inputMultiplier.value} ${this.token.symbol}</span>`;
+		} else {
+			this.lbRate.caption = '-';
 		}
 	}
 
@@ -269,6 +293,7 @@ export class RewardConfig extends Module {
 		if (adminDateElm) {
 			adminDateElm.min = moment().add(300, 'seconds').format('YYYY-MM-DD HH:mm:ss');
 		}
+		this.setAdminClaimDeadline(moment('31/12/9999 23:59:59', DefaultDateTimeFormat).unix());
 		this.checkStartDate();
   }
 
@@ -310,12 +335,14 @@ export class RewardConfig extends Module {
 	private onInputToken = (token: ITokenObject) => {
 		this.token = token;
 		this.updateMaxReward();
+		this.updateRate();
 		this.emitInput();
 	}
 
-	private onInputNumber = (input: Control) => {
+	private onInputMultiplier = (input: Control) => {
 		limitInputNumber(input, 18);
 		this.updateMaxReward();
+		this.updateRate();
 		this.emitInput();
 	}
 
@@ -422,7 +449,16 @@ export class RewardConfig extends Module {
 							<i-label class="lb-title" caption="Reward Factor" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
-						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputNumber(src)} />
+						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputMultiplier(src)} />
+					</i-hstack>
+					<i-hstack gap={10} margin={{ top: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Rate" />
+							<i-label font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} class="w-input" verticalAlignment="center">
+							<i-label id="lbRate" caption="-" class="lb-title w-100" font={{ color: Theme.text.third }} />
+						</i-vstack>
 					</i-hstack>
 					<i-hstack id="wrapperRewardNeededElm" visible={false} gap={10} margin={{ top: 8, bottom: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
@@ -430,7 +466,7 @@ export class RewardConfig extends Module {
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} class="w-input" verticalAlignment="center">
-							<i-label id="lbMaxReward" caption="-" class="lb-title w-100" />
+							<i-label id="lbMaxReward" caption="-" class="lb-title w-100" font={{ color: Theme.text.third }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">

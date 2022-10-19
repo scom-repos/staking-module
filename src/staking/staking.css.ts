@@ -389,14 +389,10 @@ Styles.cssRule('.staking-component', {
             },
           },
         },
-        '.custom-divider': {
-          borderTop: '2px solid',
-          marginBlock: '1rem',
-        },
         '.btn-stake': {
           width: '100%',
           padding: '0.625rem 0',
-          marginBottom: '25px',
+          marginBottom: '10px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

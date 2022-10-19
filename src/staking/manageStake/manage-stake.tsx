@@ -163,13 +163,15 @@ export class ManageStake extends Module {
       vaultToken: vaultTokenData
     }
     this.lockedTokenObject = getLockedTokenObject(info, tokenInfo, this.tokenMap);
+    const defaultDecimalsOffset = 18 - (this.lockedTokenObject?.decimals || 18);
     const symbol = getLockedTokenSymbol(info, this.lockedTokenObject);
     this.tokenSymbol = symbol;
     this.lbDuration.caption = info.duration;
-    this.perAddressCap = info.perAddressCap;
-    this.maxQty = info.maxTotalLock;
-    this.stakeQty = info.stakeQty;
-    this.availableQty = new BigNumber(info.maxTotalLock).minus(info.totalLocked).toFixed();
+    this.perAddressCap = new BigNumber(info.perAddressCap).shiftedBy(defaultDecimalsOffset).toFixed();
+    this.maxQty = new BigNumber(info.maxTotalLock).shiftedBy(defaultDecimalsOffset).toNumber();
+    this.stakeQty = new BigNumber(info.stakeQty).shiftedBy(defaultDecimalsOffset).toFixed();
+    const totalLocked = new BigNumber(info.totalLocked).shiftedBy(defaultDecimalsOffset);
+    this.availableQty = new BigNumber(this.maxQty).minus(totalLocked).toFixed();
     this.lbMaxQty.caption = `${formatNumber(this.maxQty)} ${symbol}`;
     this.lbAvailableQty.caption = `${formatNumber(this.availableQty)} ${symbol}`;
     this.btnApprove.visible = false;
@@ -216,22 +218,18 @@ export class ManageStake extends Module {
       this.colYourStakeQty.visible = false;
       this.sectionEarnedQty.visible = false;
       if (!!tokenAddress) {
-        const decimals = info.decimalsOffset || 0;
         if (lockTokenType == LockTokenType.ERC20_Token) {
+          await setTokenBalances();
           let balances = getTokenBalances();
-          if (!Object.keys(balances).length) {
-            await setTokenBalances();
-            balances = getTokenBalances();
-          }
           this.tokenBalances = Object.keys(balances).reduce((accumulator: any, key) => {
             accumulator[key.toLowerCase()] = balances[key];
             return accumulator;
           }, {});
           this.balance = this.tokenBalances[tokenAddress] || '0';
         } else if (lockTokenType == LockTokenType.LP_Token) {
-          this.balance = new BigNumber(lpTokenData.balance || 0).shiftedBy(decimals).toFixed();
+          this.balance = new BigNumber(lpTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
         } else if (lockTokenType == LockTokenType.VAULT_Token) {
-          this.balance = new BigNumber(vaultTokenData.balance || 0).shiftedBy(decimals).toFixed();
+          this.balance = new BigNumber(vaultTokenData.balance || 0).shiftedBy(defaultDecimalsOffset).toFixed();
         }
         this.btnMax.visible = true;
         this.btnMax.enabled = new BigNumber(this.balance).gt(0);
@@ -300,10 +298,7 @@ export class ManageStake extends Module {
         }
         this.showResultMessage(this.stakingResult, 'warning', `${this.currentMode === CurrentMode.STAKE ? 'Stake' : 'Unlock'} ${this.tokenSymbol}`);
         if (this.currentMode === CurrentMode.STAKE) {
-          const decimals = this.stakingInfo?.decimalsOffset || 0;
-          const amount = new BigNumber(this.inputAmount.value).shiftedBy(-decimals).toFixed();
-          lockToken(this.lockedTokenObject, amount, this.address);
-          // lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
+          lockToken(this.lockedTokenObject, this.inputAmount.value, this.address);
         } else {
           withdrawToken(this.address);
         }
@@ -353,6 +348,7 @@ export class ManageStake extends Module {
         }
       },
       onApproved: async (token: ITokenObject) => {
+        await setTokenBalances();
         this.btnApprove.rightIcon.visible = false;
         this.btnApprove.visible = false;
         this.btnMax.enabled = new BigNumber(this.balance).gt(0);
@@ -381,6 +377,7 @@ export class ManageStake extends Module {
       onPaid: async () => {
         const caption = this.currentMode === CurrentMode.STAKE ? 'Unstake' : 'Stake';
         if (this.onRefresh) {
+          await setTokenBalances();
           await this.onRefresh();
           setStakingStatus(actionKey, false, caption);
         }
