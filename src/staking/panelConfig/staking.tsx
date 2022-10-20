@@ -71,6 +71,7 @@ export class StakingConfig extends Module {
 		this.tokenSelection.targetChainId = chainId;
 		for (const elm of this.rewardConfig) {
 			elm.chainId = chainId;
+			elm.stakingToken = undefined;
 		}
 	}
 
@@ -123,6 +124,12 @@ export class StakingConfig extends Module {
 		const val = this.inputMaxTotalLock.value;
 		for (const reward of this.rewardConfig) {
 			reward.maxTotal = val;
+		}
+	}
+
+	private updateStakingToken() {
+		for (const reward of this.rewardConfig) {
+			reward.stakingToken = this.token;
 		}
 	}
 
@@ -316,6 +323,7 @@ export class StakingConfig extends Module {
 		this.rewardConfig[idx].data = reward;
 		this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
 		this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;
+		this.rewardConfig[idx].stakingToken = this.token;
 		this.currentReward = idx;
 		this.emitInput();
 	}
@@ -356,6 +364,7 @@ export class StakingConfig extends Module {
 
 	private onInputToken = (token: ITokenObject) => {
 		this.token = token;
+		this.updateStakingToken();
 		this.emitInput();
 	}
 

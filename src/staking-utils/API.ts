@@ -88,6 +88,7 @@ const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: 
     let reward = '0';
     let claimSoFar = '0';
     let claimable = '0';
+    let admin = '';
     if (!rewardAddress) {
       return {
         reward,
@@ -107,6 +108,7 @@ const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: 
     }
 
     try {
+      admin = await rewardsContract.admin();
       let rewardWei = await rewardsContract.reward();
       let unclaimedWei = await rewardsContract.unclaimed();
       let claimSoFarWei = await rewardsContract.claimSoFar(providerAddress);
@@ -139,7 +141,8 @@ const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: 
       reward,
       claimSoFar,
       claimable,
-      multiplier
+      multiplier,
+      admin
     }
   }
   catch (err) {
@@ -153,7 +156,6 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
     let wallet = Wallet.getInstance();
     let stakingAddress = option.address;
     let rewardOptions = option.rewards;
-    let decimalsOffset = option.decimalsOffset || 0;
     let currentAddress = wallet.address;
     let hasRewardAddress = rewardOptions.length > 0 && rewardOptions[0].address;
 
@@ -162,8 +164,8 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
     let totalCreditWei = await timeIsMoney.getCredit(currentAddress);
     let lockAmountWei = await timeIsMoney.lockAmount(currentAddress);
     let withdrawn = await timeIsMoney.withdrawn(currentAddress);
-    let totalCredit = Utils.fromDecimals(totalCreditWei).shiftedBy(decimalsOffset).toFixed();
-    let lockAmount = Utils.fromDecimals(lockAmountWei).shiftedBy(decimalsOffset).toFixed();
+    let totalCredit = Utils.fromDecimals(totalCreditWei).toFixed();
+    let lockAmount = Utils.fromDecimals(lockAmountWei).toFixed();
     let stakeQty = withdrawn ? '0' : lockAmount;
     let mode = '';
 
@@ -191,9 +193,9 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
     let perAddressCapWei = await timeIsMoney.perAddressCap();
     let lockedTime = releaseTime.minus(minimumLockTime);
 
-    let maxTotalLock = Utils.fromDecimals(maximumTotalLock).shiftedBy(decimalsOffset).toFixed();
-    let totalLocked = Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
-    let perAddressCap = Utils.fromDecimals(perAddressCapWei).shiftedBy(decimalsOffset).toFixed();
+    let maxTotalLock = Utils.fromDecimals(maximumTotalLock).toFixed();
+    let totalLocked = Utils.fromDecimals(totalLockedWei).toFixed();
+    let perAddressCap = Utils.fromDecimals(perAddressCapWei).toFixed();
     let tokenAddress = await timeIsMoney.token();
 
     let obj = {
@@ -211,21 +213,38 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
       endOfEntryPeriod: parseInt(endOfEntryPeriod) * 1000,
       perAddressCap: perAddressCap,
       tokenAddress: tokenAddress.toLowerCase(),
-      decimalsOffset,
     };
 
-    if (mode === 'Claim' && hasRewardAddress) {
+    if (hasRewardAddress) {
       let rewardsData: any[] = [];
       let promises = rewardOptions.map(async (option, index) => {
         return new Promise<void>(async (resolve, reject) => {
           try {
-            let stakingRewardInfo = await getStakingRewardInfoByAddresses(option, currentAddress, releaseTime.toNumber());
-            if (stakingRewardInfo) {
-              let vestedReward = new BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
+            if (mode === 'Claim') {
+              let stakingRewardInfo = await getStakingRewardInfoByAddresses(option, currentAddress, releaseTime.toNumber());
+              if (stakingRewardInfo) {
+                let vestedReward = new BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
+                rewardsData.push({
+                  ...option,
+                  ...stakingRewardInfo,
+                  vestedReward,
+                  index
+                });
+              }
+            } else {
+              let rewardsContract;
+              if (option.isCommonStartDate) {
+                rewardsContract = new TimeIsMoneyContracts.RewardsCommonStartDate(wallet, option.address);
+              } else {
+                rewardsContract = new TimeIsMoneyContracts.Rewards(wallet, option.address);
+              }
+              let admin = await rewardsContract.admin();
+              let multiplierWei = await rewardsContract.multiplier();
+              let multiplier = Utils.fromDecimals(multiplierWei).toFixed();
               rewardsData.push({
                 ...option,
-                ...stakingRewardInfo,
-                vestedReward,
+                multiplier,
+                admin,
                 index
               });
             }
@@ -310,11 +329,11 @@ const getAllCampaignsInfo = async (stakingInfo: { [key: number]: StakingCampaign
   return campaigns;
 }
 
-const getStakingTotalLocked = async (stakingAddress: string, decimalsOffset: number) => {
+const getStakingTotalLocked = async (stakingAddress: string) => {
   let wallet = Wallet.getInstance();
   let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet, stakingAddress);
   let totalLockedWei = await timeIsMoney.totalLocked();
-  let totalLocked = Utils.fromDecimals(totalLockedWei).shiftedBy(decimalsOffset).toFixed();
+  let totalLocked = Utils.fromDecimals(totalLockedWei).toFixed();
   return totalLocked;
 }
 
@@ -356,21 +375,24 @@ const getLPBalance = async (pairAddress: string) => {
 }
 
 const getVaultObject = async (vaultAddress: string) => {
-  let wallet = Wallet.getInstance();
-  let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultAddress);
-  let symbol = await vault.symbol();
-  let name = await vault.name();
-  let decimals = await vault.decimals();
-  let asset = await vault.asset();
-  let tokenMap = getTokenMap();
-  let assetToken = tokenMap[asset.toLowerCase()]
-  return {
-      address: vaultAddress.toLowerCase(),
-      decimals,
-      name,
-      symbol,
-      assetToken
-  }
+  try {
+    let wallet = Wallet.getInstance();
+    let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultAddress);
+    let symbol = await vault.symbol();
+    let name = await vault.name();
+    let decimals = await vault.decimals();
+    let tokenMap = getTokenMap();
+    let assetToken = tokenMap[vaultAddress.toLowerCase()]
+    return {
+        address: vaultAddress.toLowerCase(),
+        decimals,
+        name,
+        symbol,
+        assetToken
+    }
+  } catch {
+    return {}
+  } 
 }
 
 const getVaultBalance = async (vaultAddress: string) => {
@@ -485,16 +507,18 @@ const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDay
 
 const getVaultRewardCurrentAPR = async (rewardOption: any, vaultObject: any, lockedDays: number) => {
   let APR = '';
-  let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress)
-  let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
-  if (!assetTokenPrice || !rewardPrice) return '';
-  let wallet = Wallet.getInstance();
-  let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultObject.address);
-  let vaultTokenTotalSupply = await vault.totalSupply();
-  let lpAssetBalance =  await vault.lpAssetBalance();
-  let lpToAssetRatio = new BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
-  let VaultTokenPrice = new BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed()
-  APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+  try {
+    let rewardPrice = await getTokenPrice(rewardOption.rewardTokenAddress)
+    let assetTokenPrice = await getTokenPrice(vaultObject.assetToken.address);
+    if (!assetTokenPrice || !rewardPrice) return '';
+    let wallet = Wallet.getInstance();
+    let vault = new CrossChainContracts.OSWAP_BridgeVault(wallet, vaultObject.address);
+    let vaultTokenTotalSupply = await vault.totalSupply();
+    let lpAssetBalance = await vault.lpAssetBalance();
+    let lpToAssetRatio = new BigNumber(lpAssetBalance).div(vaultTokenTotalSupply).toFixed();
+    let VaultTokenPrice = new BigNumber(assetTokenPrice).times(lpToAssetRatio).toFixed()
+    APR = new BigNumber(rewardOption.multiplier).times(new BigNumber(rewardPrice).times(365)).div(new BigNumber(VaultTokenPrice).times(lockedDays)).toFixed();
+  } catch {}
   return APR; 
 }
 

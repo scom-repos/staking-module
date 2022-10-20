@@ -1,6 +1,6 @@
 import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign, Reward } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -400,6 +400,7 @@ export class StakingBlock extends Module implements PageBlock {
 			return;
 		}
 
+		const currentAddress = Wallet.getInstance().address;
 		let nodeItems: HTMLElement[] = [];
 		this.removeTimer();
 		for (let idx = 0; idx < this.campaigns.length; idx++) {
@@ -439,6 +440,8 @@ export class StakingBlock extends Module implements PageBlock {
 			const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
 			const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
 			const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
+			const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
+			const defaultDecimalsOffset = 18 - lockedTokenDecimals;
 			const isSimplified = campaign.isSimplified;
 			const activeStartTime = stakingInfo ? stakingInfo.startOfEntryPeriod : 0;
 			const activeEndTime = stakingInfo ? stakingInfo.endOfEntryPeriod : 0;
@@ -485,9 +488,9 @@ export class StakingBlock extends Module implements PageBlock {
 				let _totalTokens = 0;
 				let _availableQty = 0;
 				for (const o of options) {
-					const _totalLocked = await getStakingTotalLocked(o.address, o.decimalsOffset);
+					const _totalLocked = await getStakingTotalLocked(o.address);
 					totalLocked[o.address] = _totalLocked;
-					const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked);
+					const optionQty = new BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
 					const lbOptionQty = document.querySelector(`#lb-${o.address}`) as Label;
 					if (lbOptionQty) {
 						lbOptionQty.caption = `${formatNumber(optionQty)} ${lockedTokenSymbol}`;
@@ -508,8 +511,8 @@ export class StakingBlock extends Module implements PageBlock {
 				};
 				totalTokens = _totalTokens;
 				availableQty = _availableQty;
-				totalTokensLabel.caption = `${formatNumber(totalTokens)} ${lockedTokenSymbol}`;
-				availableQtyLabel.caption = `${formatNumber(availableQty)} ${lockedTokenSymbol}`;
+				totalTokensLabel.caption = `${formatNumber(new BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+				availableQtyLabel.caption = `${formatNumber(new BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
 				if (isClosed) {
 					if (stickerLabel.caption !== 'Closed') {
 						stickerSection.classList.add('closed');
@@ -585,8 +588,8 @@ export class StakingBlock extends Module implements PageBlock {
 
 			totalTokensLabel.classList.add('bold');
 			availableQtyLabel.classList.add('bold');
-			totalTokensLabel.caption = `${formatNumber(totalTokens)} ${lockedTokenSymbol}`;
-			availableQtyLabel.caption = `${formatNumber(availableQty)} ${lockedTokenSymbol}`;
+			totalTokensLabel.caption = `${formatNumber(new BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+			availableQtyLabel.caption = `${formatNumber(new BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
 			totalTokensLabel.classList.add('text-right');
 			availableQtyLabel.classList.add('text-right');
 			const rowItems = [
@@ -699,7 +702,7 @@ export class StakingBlock extends Module implements PageBlock {
 
 							const isClaim = option.mode === 'Claim';
 
-							const rewardOptions = !isClaim ? option.rewards : [];
+							const rewardOptions = !isClaim ? option.rewardsData : [];
 							const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {} as any;
 							const lpRewardTokenIconPath = !isClaim && rewardToken.address ? getTokenIconPath(rewardToken, chainId) : '';
 							let aprInfo: any = {};
@@ -707,36 +710,40 @@ export class StakingBlock extends Module implements PageBlock {
 							const optionAvailableQtyLabel = await Label.create();
 							optionAvailableQtyLabel.classList.add('ml-auto');
 							optionAvailableQtyLabel.id = `lb-${option.address}`;
-							optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.address]))} ${lockedTokenSymbol}`;
+							optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
 							const claimStakedRow = await HStack.create();
-							claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked:" />);
-							claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(option.stakeQty)} ${lockedTokenSymbol}`} />);
+							claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked" />);
+							claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} />);
 
-							const rowRewrads = await Panel.create();
+							const rowRewards = await Panel.create();
 							if (isClaim) {
 								claimStakedRow.classList.add('mb-1');
 								for (let idx = 0; idx < option.rewardsData.length; idx++) {
 									const reward = option.rewardsData[idx];
 									const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-									const rewardSymbol = rewardToken.symbol || '';
-									if (idx) {
-										rowRewrads.appendChild(
-											<i-panel margin={{ bottom: 16 }} width="100%" height={2} background={{ color: Theme.divider }} />
-										)
+									const rewardTokenDecimals = rewardToken.decimals || 18;
+									const decimalsOffset = 18 - rewardTokenDecimals;
+									let rewardLockedDecimalsOffset = decimalsOffset;
+									if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+										rewardLockedDecimalsOffset = decimalsOffset * 2;
 									}
-									rowRewrads.appendChild(
+									const rewardSymbol = rewardToken.symbol || '';
+									rowRewards.appendChild(
+										<i-panel margin={{ bottom: 16 }} width="100%" height={2} background={{ color: campaign.customColorCampaign || Theme.divider }} />
+									)
+									rowRewards.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Locked:`} />
-											<i-label class="bold" caption={`${formatNumber(reward.vestedReward)} ${rewardSymbol}`} />
+											<i-label class="bold" caption={`${formatNumber(new BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} />
 										</i-hstack>
 									);
-									rowRewrads.appendChild(
+									rowRewards.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Vesting Start:`} />
 											<i-label class="bold" caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
 										</i-hstack>
 									);
-									rowRewrads.appendChild(
+									rowRewards.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Vesting End:`} />
 											<i-label class="bold" caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
@@ -745,14 +752,14 @@ export class StakingBlock extends Module implements PageBlock {
 									const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
 									let rewardClaimable = `0 ${rewardSymbol}`;
 									if (passClaimStartTime) {
-										rewardClaimable = `${formatNumber(reward.claimable)} ${rewardSymbol}`;
+										rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
 									}
 									let startClaimingText = '';
 									if (!(!reward.claimStartTime || passClaimStartTime)) {
 										const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
 										startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
 									}
-									rowRewrads.appendChild(
+									rowRewards.appendChild(
 										<i-hstack horizontalAlignment="space-between">
 											<i-label caption={`${rewardSymbol} Claimable:`} />
 											<i-label class="bold" caption={rewardClaimable} />
@@ -760,9 +767,9 @@ export class StakingBlock extends Module implements PageBlock {
 										</i-hstack>
 									);
 									if (campaign.showContractLink) {
-										rowRewrads.appendChild(
+										rowRewards.appendChild(
 											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 12, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, reward.address)}>
-												<i-label font={{ bold: true }} caption="View Staking Contract" />
+												<i-label font={{ bold: true }} caption="View Reward Contract" />
 												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
 											</i-hstack>
 										)
@@ -777,16 +784,29 @@ export class StakingBlock extends Module implements PageBlock {
 									btnClaim.id = `btnClaim-${idx}-${option.address}`;
 									btnClaim.classList.add('btn-os', 'btn-stake', 'mt-1');
 									btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-									rowRewrads.appendChild(btnClaim);
+									rowRewards.appendChild(btnClaim);
+									// if (reward.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
+									// 	rowRewards.appendChild(
+									// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
+									// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+									// 				<i-label caption="Admin Claim:" />
+									// 				<i-label caption={`${formatNumber(1000)} ${rewardSymbol}`} />
+									// 			</i-hstack>
+									// 			<i-hstack horizontalAlignment="center">
+									// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol })} />
+									// 			</i-hstack>
+									// 		</i-vstack>
+									// 	)
+									// }
 								};
 							} else {
-								rowRewrads.visible = false;
+								rowRewards.visible = false;
 							}
 
 							const rowOptionItems = !isClaim ? [
 								{
 									title: 'Max. QTY',
-									value: `${formatNumber(option.maxTotalLock)} ${lockedTokenSymbol}`,
+									value: `${formatNumber(new BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
 									isHidden: isSimplified,
 								},
 								{
@@ -797,7 +817,7 @@ export class StakingBlock extends Module implements PageBlock {
 								},
 								{
 									title: 'Individual Cap',
-									value: `${formatNumber(option.perAddressCap)} ${lockedTokenSymbol}`,
+									value: `${formatNumber(new BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
 								},
 								{
 									title: 'Campaign Start Date',
@@ -828,7 +848,7 @@ export class StakingBlock extends Module implements PageBlock {
 											}
 											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
 										</i-hstack >
-										<i-label width="100%" class="staking-description" caption={option.customDesc || ''} />
+										<i-label width="100%" class="staking-description" minHeight={20} caption={option.customDesc || ''} />
 									</i-panel>
 									<i-panel class="img-custom">
 										{
@@ -845,11 +865,32 @@ export class StakingBlock extends Module implements PageBlock {
 									</i-panel>
 									<i-panel class="info-stake">
 										{btnStake}
+										{btnUnstake}
 										{
-											await Promise.all(rewardOptions.map(async (rewardOption: any) => {
+											rowOptionItems.filter(f => !f.isHidden).map((v: any) => {
+												return <i-hstack horizontalAlignment="space-between">
+													<i-label class="mr-025" caption={v.title} />
+													{v.elm ? v.elm : <i-label caption={v.value} />}
+												</i-hstack>
+											})
+										}
+										{claimStakedRow}
+										{
+											!isClaim && !!campaign.showContractLink ?
+											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+													<i-label font={{ bold: true }} caption="View Staking Contract" />
+													<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+											</i-hstack> : []
+										}
+										{ isClaim ? [] : <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> }
+										{
+											await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
 												const labelApr = await Label.create();
 												labelApr.classList.add('ml-auto');
-												const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+												const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+												const rewardTokenDecimals = rewardToken.decimals || 18;
+												const decimalsOffset = 18 - rewardTokenDecimals;
+												const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 												const updateApr = async () => {
 													if (option.lockTokenType === LockTokenType.ERC20_Token) {
 														const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
@@ -873,36 +914,66 @@ export class StakingBlock extends Module implements PageBlock {
 												updateApr();
 												this.listAprTimer.push(setInterval(updateApr, 10000));
 												const aprValue = getAprValue(rewardOption);
+												let offset = decimalsOffset;
+												if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+													offset = offset * 2;
+												}
+												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(new BigNumber(rewardOption.multiplier)).shiftedBy(offset));
+												const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
+												const rewardElm = await VStack.create({ verticalAlignment: 'center' });
+												rewardElm.appendChild(
+													<i-hstack horizontalAlignment="space-between">
+														<i-label class="mr-025" caption="You Earned:" />
+														<i-label caption={`${earnedQty} ${earnedSymbol}`} />
+													</i-hstack>
+												);
+												// if (rewardOption.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
+												// 	rowRewards.appendChild(
+												// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
+												// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+												// 				<i-label caption="Admin Claim:" />
+												// 				<i-label caption={`${formatNumber(1000)} ${earnedSymbol}`} />
+												// 			</i-hstack>
+												// 			<i-hstack horizontalAlignment="center">
+												// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol: earnedSymbol })} />
+												// 			</i-hstack>
+												// 		</i-vstack>
+												// 	)
+												// }
+												if (campaign.showContractLink) {
+													rewardElm.appendChild(
+														<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, rewardOption.address)}>
+															<i-label font={{ bold: true }} caption="View Reward Contract" />
+															<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+														</i-hstack>
+													)
+												}
 												if (isSimplified) {
 													labelApr.caption = aprValue;
 													return <i-vstack>
+														{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> : [] }
 														<i-hstack horizontalAlignment="space-between">
-															<i-label class="mr-025" caption="Rate" />
+															<i-label class="mr-025" caption="Rate:" />
 															<i-label class="bold" caption={rateDesc} />
 														</i-hstack>
 														<i-hstack>
-															<i-label class="mr-025" caption="APR" />
+															<i-label class="mr-025" caption="APR:" />
 															{labelApr}
 														</i-hstack>
+														{rewardElm}
 													</i-vstack>
 												}
 												labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
-												return <i-hstack>
-													<i-label class="mr-025" caption="Rate" />
-													{labelApr}
-												</i-hstack>
+												return <i-vstack verticalAlignment="center">
+													{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> : [] }
+													<i-hstack horizontalAlignment="space-between">
+														<i-label class="mr-025" caption="Rate:" />
+														{labelApr}
+													</i-hstack>
+													{rewardElm}
+												</i-vstack>
 											}))
 										}
-										{
-											rowOptionItems.filter(f => !f.isHidden).map((v: any) => {
-												return <i-hstack horizontalAlignment="space-between">
-													<i-label class="mr-025" caption={v.title} />
-													{v.elm ? v.elm : <i-label caption={v.value} />}
-												</i-hstack>
-											})
-										}
-										<i-panel class={isClaim ? 'hidden' : 'custom-divider'} border={{ top: { color: `${campaign.customColorCampaign || '#f15e61'} !important` } }} />
-										{claimStakedRow}
 										{
 											isClaim && !!campaign.showContractLink ?
 											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: -12, bottom: 12, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
@@ -910,26 +981,8 @@ export class StakingBlock extends Module implements PageBlock {
 												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
 											</i-hstack> : []
 										}
-										{btnUnstake}
-										{rowRewrads}
-										{
-											rewardOptions.map((rewardOption: any) => {
-												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(rewardOption.multiplier));
-												const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
-												return <i-hstack horizontalAlignment="space-between">
-													<i-label class="mr-025" caption="You Earned:" />
-													<i-label caption={`${earnedQty} ${earnedSymbol}`} />
-												</i-hstack>
-											})
-										}
+										{rowRewards}
 									</i-panel>
-									{
-										!isClaim && !!campaign.showContractLink ?
-										<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 16, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-												<i-label font={{ bold: true }} caption="View Staking Contract" />
-												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-										</i-hstack> : []
-									}
 								</i-panel>
 							</i-vstack>
 						}))
