@@ -2,7 +2,7 @@ import { Styles } from '@ijstech/components';
 const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.panel-config', {
-  background: Theme.background.main,
+  background: "#192046",
   padding: '1rem',
   margin: 'auto',
   $nest: {

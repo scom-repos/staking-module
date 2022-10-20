@@ -7222,7 +7222,7 @@
   var import_components6 = __toModule(__require("@ijstech/components"));
   var Theme4 = import_components6.Styles.Theme.ThemeVars;
   import_components6.Styles.cssRule(".panel-config", {
-    background: Theme4.background.main,
+    background: "#192046",
     padding: "1rem",
     margin: "auto",
     $nest: {
