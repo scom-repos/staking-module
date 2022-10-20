@@ -143,6 +143,31 @@ Styles.cssRule('.panel-config', {
     'i-checkbox.is-checked .checkmark': {
       backgroundColor: Theme.colors.secondary.light
     },
+    '.cs-upload': {
+      maxWidth: 300,
+      minHeight: '150px !important',
+      height: '150px !important',
+      borderRadius: 12,
+      padding: 4,
+      $nest: {
+        '.i-upload-wrapper': {
+          margin: 4,
+          height: '100%',
+        },
+        '.i-upload_preview': {
+          minHeight: 'auto',
+        },
+        'i-image': {
+          display: 'flex',
+        },
+        'i-image img': {
+          margin: 'auto',
+          objectFit: 'contain',
+          width: 300,
+          height: 150,
+        },
+      }
+    },
     '.cs-datepicker': {
       background: Theme.input.background,
       borderRadius: 12,

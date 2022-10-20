@@ -14,6 +14,7 @@ import {
   setUserTokens,
   setTokenMap,
   getTokenList,
+  fallBackUrl,
 } from '@staking/store';
 import { ITokenObject, formatNumber, EventId } from '@staking/global';
 import Assets from '@staking/assets';
@@ -67,7 +68,6 @@ export class TokenSelection extends Module {
   private $eventBus: IEventBus;
   private _disableSelect: boolean;
   private _disabledMaxBtn: boolean;
-  private fallbackUrl: string = Assets.fullPath('img/tokens/token-placeholder.svg');
   isInitialized = false;
 
   get token() {
@@ -327,7 +327,7 @@ export class TokenSelection extends Module {
             verticalAlignment="center"
             class="grid-item"
           >
-            <i-image width={24} height={24} url={logoAddress} fallbackUrl={this.fallbackUrl} />
+            <i-image width={24} height={24} url={logoAddress} fallbackUrl={fallBackUrl} />
             <i-label caption={token.symbol} onClick={() => this.onSelect(token)}></i-label>
           </i-hstack>
         )
@@ -349,7 +349,7 @@ export class TokenSelection extends Module {
         <i-vstack width="100%">
           <i-hstack>
             <i-hstack>
-              <i-image width={36} height={36} url={logoAddress} fallbackUrl={this.fallbackUrl} />
+              <i-image width={36} height={36} url={logoAddress} fallbackUrl={fallBackUrl} />
               <i-panel class="token-info">
                 <i-label caption={token.symbol}  onClick={() => this.onSelect(token)}/>
                 <i-hstack class="token-name" verticalAlignment="center">
@@ -489,7 +489,7 @@ export class TokenSelection extends Module {
           image = new Image(btnToken, {
             width: 20,
             height: 20,
-            fallbackUrl: this.fallbackUrl
+            fallbackUrl: fallBackUrl
           });
           btnToken.prepend(image);
         }

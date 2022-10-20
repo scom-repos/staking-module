@@ -5695,7 +5695,7 @@
   // src/staking/index.tsx
   var import_assets5 = __toModule(__require("@staking/assets"));
   var import_moment4 = __toModule(require_moment());
-  var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
+  var import_eth_wallet7 = __toModule(__require("@ijstech/eth-wallet"));
 
   // src/result/result.tsx
   var import_components2 = __toModule(__require("@ijstech/components"));
@@ -5958,7 +5958,6 @@
 
   // src/config.ts
   var baseUrl = "https://openswap.xyz/#";
-  var tokenIcon = "img/swap/openswap.png";
   var getTokenUrl = `${baseUrl}/swap`;
 
   // src/staking/staking.css.ts
@@ -6316,16 +6315,6 @@
             paddingTop: "1.5rem",
             marginBottom: "0.75rem"
           },
-          ".group-img": {
-            display: "flex",
-            justifyContent: "center",
-            $nest: {
-              "i-icon": {
-                margin: "auto 0.25rem",
-                fill: "var(--colors-primary-main)"
-              }
-            }
-          },
           ".info-stake": {
             width: "100%",
             padding: "0.5rem 0.75rem",
@@ -6371,6 +6360,27 @@
       },
       ".mr-025": {
         marginRight: "0.25rem"
+      },
+      "#importFileErrModal": {
+        $nest: {
+          ".modal": {
+            borderRadius: 12
+          },
+          ".i-modal_header": {
+            marginBottom: "1.5rem",
+            paddingBottom: "0.5rem",
+            borderBottom: `2px solid ${Theme.divider}`,
+            color: Theme.colors.primary.main,
+            fontSize: "1.25rem",
+            fontWeight: 700
+          },
+          ".i-modal_header > i-icon": {
+            fill: `${Theme.colors.primary.main} !important`
+          },
+          "#importFileErr span": {
+            fontSize: "16px !important"
+          }
+        }
       },
       "#loadingElm.i-loading--active": {
         marginTop: "2rem",
@@ -7363,6 +7373,31 @@
       "i-checkbox.is-checked .checkmark": {
         backgroundColor: Theme4.colors.secondary.light
       },
+      ".cs-upload": {
+        maxWidth: 300,
+        minHeight: "150px !important",
+        height: "150px !important",
+        borderRadius: 12,
+        padding: 4,
+        $nest: {
+          ".i-upload-wrapper": {
+            margin: 4,
+            height: "100%"
+          },
+          ".i-upload_preview": {
+            minHeight: "auto"
+          },
+          "i-image": {
+            display: "flex"
+          },
+          "i-image img": {
+            margin: "auto",
+            objectFit: "contain",
+            width: 300,
+            height: 150
+          }
+        }
+      },
       ".cs-datepicker": {
         background: Theme4.input.background,
         borderRadius: 12,
@@ -7787,7 +7822,6 @@
       super(parent, options);
       this._isSortBalanceShown = true;
       this._isBtnMaxShown = false;
-      this.fallbackUrl = import_assets4.default.fullPath("img/tokens/token-placeholder.svg");
       this.isInitialized = false;
       this.sortToken = (a, b, asc) => {
         if (a.balance != b.balance) {
@@ -8016,7 +8050,7 @@
             width: 24,
             height: 24,
             url: logoAddress,
-            fallbackUrl: this.fallbackUrl
+            fallbackUrl: import_store4.fallBackUrl
           }), /* @__PURE__ */ this.$render("i-label", {
             caption: token.symbol,
             onClick: () => this.onSelect(token)
@@ -8040,7 +8074,7 @@
         width: 36,
         height: 36,
         url: logoAddress,
-        fallbackUrl: this.fallbackUrl
+        fallbackUrl: import_store4.fallBackUrl
       }), /* @__PURE__ */ this.$render("i-panel", {
         class: "token-info"
       }, /* @__PURE__ */ this.$render("i-label", {
@@ -8179,7 +8213,7 @@
             image = new import_components8.Image(btnToken, {
               width: 20,
               height: 20,
-              fallbackUrl: this.fallbackUrl
+              fallbackUrl: import_store4.fallBackUrl
             });
             btnToken.prepend(image);
           }
@@ -8474,7 +8508,6 @@
   var RewardConfig = class extends import_components10.Module {
     constructor(parent, options) {
       super(parent, options);
-      this.isAdminValid = false;
       this._campaignEndLockTime = 0;
       this._maxTotal = 0;
       this.isInitialized = false;
@@ -8516,13 +8549,13 @@
               this.inputInitialReward.value = new import_eth_wallet3.BigNumber(initialReward).toFixed();
               this.inputRewardVesting.value = new import_eth_wallet3.BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
               this.setAdminClaimDeadline(claimDeadline);
-              this.inputAdmin.value = admin;
-              this.isAdminValid = true;
               this.checkboxStartDate.checked = !!isCommonStartDate;
               this.onCheckCommonStartDate();
               if (isCommonStartDate) {
                 this.setStartDate(vestingStartDate);
               }
+              this.updateMaxReward();
+              this.updateRate();
               this.emitInput();
             }
           }, 200);
@@ -8718,13 +8751,8 @@
         this.lbAddressErr.visible = !this.isAddressValid;
         this.emitInput();
       };
-      this.onInputAdmin = async () => {
-        this.isAdminValid = await (0, import_global5.isAddressValid)(this.inputAdmin.value);
-        this.lbErr.visible = !this.isAdminValid;
-        this.emitInput();
-      };
       this.checkValidation = () => {
-        return this.token && this.isAdminValid && this.checkInitialReward() && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (!this.isNew || this.adminClaimDeadline && this.adminClaimDeadline > (0, import_moment2.default)().unix()) && (!this.checkboxStartDate.checked || this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime)) && (this.isNew || this.isAddressValid);
+        return this.token && this.checkInitialReward() && (0, import_global5.isValidNumber)(this.inputMultiplier.value) && (0, import_global5.isValidNumber)(this.inputRewardVesting.value) && (!this.isNew || this.adminClaimDeadline && this.adminClaimDeadline > (0, import_moment2.default)().unix()) && (!this.checkboxStartDate.checked || this.checkboxStartDate.checked && (!this.campaignEndLockTime || this.vestingStartDate > this.campaignEndLockTime)) && (this.isNew || this.isAddressValid);
       };
       this.getData = () => {
         var _a;
@@ -8735,7 +8763,7 @@
           initialReward: new import_eth_wallet3.BigNumber(this.inputInitialReward.value),
           vestingPeriod: new import_eth_wallet3.BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
           claimDeadline: new import_eth_wallet3.BigNumber(this.adminClaimDeadline),
-          admin: `${this.inputAdmin.value}`,
+          admin: "",
           isCommonStartDate: this.checkboxStartDate.checked,
           vestingStartDate: new import_eth_wallet3.BigNumber(this.vestingStartDate || 0),
           rewardAmount: this.maxReward
@@ -9003,32 +9031,6 @@
         visible: false,
         font: { color: Theme7.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
-        gap: 10,
-        verticalAlignment: "center",
-        horizontalAlignment: "space-between"
-      }, /* @__PURE__ */ this.$render("i-hstack", {
-        gap: 4,
-        verticalAlignment: "center"
-      }, /* @__PURE__ */ this.$render("i-label", {
-        class: "lb-title",
-        caption: "Admin"
-      }), /* @__PURE__ */ this.$render("i-label", {
-        caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
-      })), /* @__PURE__ */ this.$render("i-vstack", {
-        gap: 4,
-        class: "w-input",
-        verticalAlignment: "center"
-      }, /* @__PURE__ */ this.$render("i-input", {
-        id: "inputAdmin",
-        class: "input-text w-input w-100",
-        onChanged: this.onInputAdmin
-      }), /* @__PURE__ */ this.$render("i-label", {
-        id: "lbErr",
-        visible: false,
-        caption: "The address is invalid!",
-        font: { color: Theme7.colors.primary.main, size: "12px" }
-      }))), /* @__PURE__ */ this.$render("i-hstack", {
         class: "row-mobile",
         gap: 10,
         verticalAlignment: "center",
@@ -9278,9 +9280,7 @@
         rewards[idx].visible = !(idx && reward);
         this.rewardConfig = [...rewards];
         this.pnlInfoElm.appendChild(this.rewardConfig[idx]);
-        if (!this.isNew) {
-          this.rewardConfig[idx].chainId = this.chainId;
-        }
+        this.rewardConfig[idx].chainId = this.chainId;
         this.rewardConfig[idx].data = reward;
         this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
         this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;
@@ -9629,6 +9629,8 @@
       super(parent, options);
       this.stakingConfig = [];
       this.currentStaking = 0;
+      this.logoUrl = "";
+      this.isAdminValid = false;
       this.isInitialized = false;
       this.setupInput = () => {
         if (this.wapperNetworkElm) {
@@ -9637,7 +9639,7 @@
       };
       this.setupData = async () => {
         if (this.data) {
-          const { chainId, customName, customDesc, getTokenURL, campaignStart, campaignEnd, showContractLink, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
+          const { chainId, customName, customDesc, customLogo, getTokenURL, campaignStart, campaignEnd, showContractLink, admin, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
           const interval = setInterval(async () => {
             if (this.isInitialized) {
               clearInterval(interval);
@@ -9645,6 +9647,9 @@
               this.inputName.value = customName;
               this.inputDesc.value = customDesc || "";
               this.inputURL.value = getTokenURL || "";
+              if (customLogo) {
+                this.uploadLogo.preview(customLogo);
+              }
               const start = new import_eth_wallet5.BigNumber(campaignStart).toNumber();
               const end = new import_eth_wallet5.BigNumber(campaignEnd).toNumber();
               this.campaignStart = start;
@@ -9654,6 +9659,9 @@
               startElm.value = import_moment3.default.unix(start).format(import_global7.DefaultDateTimeFormat);
               endElm.value = import_moment3.default.unix(end).format(import_global7.DefaultDateTimeFormat);
               this.checkboxContract.checked = !!showContractLink;
+              this.inputAdmin.value = admin;
+              this.isAdminValid = await (0, import_global7.isAddressValid)(admin);
+              this.lbErrAdmin.visible = !this.isAdminValid;
               this.inputMainColor.value = customColorCampaign || "";
               this.inputBg.value = customColorBackground || "";
               this.inputColorText.value = customColorText || "";
@@ -9819,9 +9827,7 @@
         stakings[idx].visible = !(idx && staking);
         this.stakingConfig = [...stakings];
         this.pnlInfoElm.appendChild(this.stakingConfig[idx]);
-        if (!this.isNew) {
-          this.stakingConfig[idx].chainId = this.network;
-        }
+        this.stakingConfig[idx].chainId = this.network;
         this.stakingConfig[idx].data = staking;
         this.currentStaking = idx;
         this.emitInput();
@@ -9853,6 +9859,11 @@
         import_components12.application.EventBus.dispatch(import_global7.EventId.EmitInput);
       };
       this.onInputText = () => {
+      };
+      this.onInputAdmin = async () => {
+        this.isAdminValid = await (0, import_global7.isAddressValid)(this.inputAdmin.value);
+        this.lbErrAdmin.visible = !this.isAdminValid;
+        this.emitInput();
       };
       this.isStakingValid = () => {
         if (!this.stakingConfig.length)
@@ -9899,7 +9910,7 @@
         return isValid;
       };
       this.checkValidation = () => {
-        return this.checkBalances() && !!this.inputName.value && this.campaignStart && this.campaignStart < this.campaignEnd && this.isStakingValid();
+        return this.checkBalances() && !!this.inputName.value && this.campaignStart && this.campaignStart < this.campaignEnd && this.isAdminValid && this.isStakingValid();
       };
       this.getStakingData = () => {
         const stakingData = [];
@@ -9914,10 +9925,12 @@
           chainId: this.network,
           customName: this.inputName.value,
           customDesc: this.inputDesc.value || void 0,
+          customLogo: this.logoUrl || void 0,
           getTokenURL: this.inputURL.value || void 0,
           campaignStart: new import_eth_wallet5.BigNumber(this.campaignStart),
           campaignEnd: new import_eth_wallet5.BigNumber(this.campaignEnd),
           showContractLink: this.checkboxContract.checked || void 0,
+          admin: `${this.inputAdmin.value}`,
           customColorCampaign: this.inputMainColor.value || void 0,
           customColorBackground: this.inputBg.value || void 0,
           customColorStakingBackground: this.inputStakingBg.value || void 0,
@@ -9947,6 +9960,24 @@
     }
     get data() {
       return this._data;
+    }
+    onBeforeUpload(target, file) {
+      return new Promise((resolve, reject) => {
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          reject("File size can not exceed 2MB!");
+        }
+        resolve(isLt2M);
+      });
+    }
+    async onChangeFile(source, files) {
+      if (!files.length)
+        return;
+      const data = await this.uploadLogo.toBase64(files[0]);
+      this.logoUrl = data || "";
+    }
+    onRemove(source, file) {
+      this.logoUrl = "";
     }
     async init() {
       this.network = (0, import_store8.getChainId)() || (0, import_store8.getDefaultChainId)();
@@ -10011,6 +10042,25 @@
         rows: 3,
         onChanged: this.onInputText
       })), /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 10,
+        verticalAlignment: "center",
+        horizontalAlignment: "space-between"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        class: "lb-title",
+        caption: "Campaign Logo"
+      }), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        verticalAlignment: "center",
+        class: "w-input",
+        position: "relative"
+      }, /* @__PURE__ */ this.$render("i-upload", {
+        id: "uploadLogo",
+        class: "input-text w-input cs-upload",
+        accept: "image/*",
+        onUploading: this.onBeforeUpload.bind(this),
+        onChanged: this.onChangeFile.bind(this),
+        onRemoved: this.onRemove.bind(this)
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -10094,6 +10144,32 @@
         id: "checkboxContract",
         height: "auto",
         checked: false
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 10,
+        verticalAlignment: "center",
+        horizontalAlignment: "space-between"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
+        gap: 4,
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        class: "lb-title",
+        caption: "Admin"
+      }), /* @__PURE__ */ this.$render("i-label", {
+        caption: "*",
+        font: { color: Theme9.colors.primary.main, size: "16px" }
+      })), /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 4,
+        class: "w-input",
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-input", {
+        id: "inputAdmin",
+        class: "input-text w-input w-100",
+        onChanged: this.onInputAdmin
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "lbErrAdmin",
+        visible: false,
+        caption: "The address is invalid!",
+        font: { color: Theme9.colors.primary.main, size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -10205,6 +10281,7 @@
   // src/staking/panelConfig/panel-config.tsx
   var import_store9 = __toModule(__require("@staking/store"));
   var import_staking_utils2 = __toModule(__require("@staking/staking-utils"));
+  var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
   var Theme10 = import_components13.Styles.Theme.ThemeVars;
   var PanelConfig = class extends import_components13.Module {
     constructor(parent, options) {
@@ -10332,13 +10409,21 @@
           this.btnAdd.enabled = true;
         }
       };
+      this.onAddCampaignByClick = () => {
+        if (this.isNew)
+          return;
+        this.onAddCampaign();
+      };
       this.updateButton = () => {
+        var _a;
         const valid = this.checkValidation();
         if (this.isNew) {
-          if (this.btnDeploy.rightIcon.visible || this.btnDeployDownload.rightIcon.visible)
+          if (this.btnDeployExport.rightIcon.visible)
             return;
-          this.btnDeploy.enabled = valid;
-          this.btnDeployDownload.enabled = valid;
+          const currentAddress = import_eth_wallet6.Wallet.getInstance().address || "";
+          const data = this.campaignConfig && this.campaignConfig[0].getData();
+          this.btnExport.enabled = valid;
+          this.btnDeployExport.enabled = valid && currentAddress.toLowerCase() === ((_a = data == null ? void 0 : data.admin) == null ? void 0 : _a.toLowerCase());
         } else {
           this.btnSave.enabled = valid;
           this.btnDownload.enabled = valid;
@@ -10389,26 +10474,25 @@
         }
       };
       this.onDownload = (data) => {
-        if (this.isNew) {
+        if (this.isNew && data) {
           (0, import_global8.downloadJsonFile)("campaign.json", __spreadValues({}, data));
           return;
         }
-        if (!this.isNew && this.checkValidation()) {
+        if (this.checkValidation()) {
           this.parseData();
           const campaigns = __spreadValues({}, this.campaigns);
           (0, import_global8.downloadJsonFile)("campaign.json", campaigns);
         }
       };
-      this.onDeployCampaign = async (isDownload) => {
+      this.onDeployCampaign = async () => {
         if (this.isNew && this.checkValidation()) {
           const campaign = this.campaignConfig[0].getData();
           const chainId = (0, import_store9.getChainId)();
           let result;
-          const btn = isDownload ? this.btnDeployDownload : this.btnDeploy;
           this.showResultMessage(this.stakingResult, "warning", `Deploying ${campaign.customName}`);
           const onUpdateBtn = () => {
-            btn.rightIcon.visible = false;
-            btn.caption = isDownload ? "Deploy and Download JSON" : "Deploy";
+            this.btnDeployExport.rightIcon.visible = false;
+            this.btnDeployExport.caption = "Deploy and Export JSON";
             this.updateButton();
             this.backElm.classList.add("cursor-pointer");
             this.backElm.onClick = () => this.onBack();
@@ -10422,10 +10506,10 @@
               this.backElm.classList.remove("cursor-pointer");
               this.backElm.onClick = () => {
               };
-              this.btnDeployDownload.enabled = false;
-              this.btnDeploy.enabled = false;
-              btn.caption = isDownload ? "Deploying And Downloading" : "Deploying";
-              btn.rightIcon.visible = true;
+              this.btnExport.enabled = false;
+              this.btnDeployExport.enabled = false;
+              this.btnDeployExport.caption = "Deploying & Exporting";
+              this.btnDeployExport.rightIcon.visible = true;
             }
           };
           const confirmationCallBack = async (receipt) => {
@@ -10440,11 +10524,10 @@
           result = await (0, import_staking_utils2.deployCampaign)(campaign, callBack);
           if (result) {
             this.stakingResult.closeModal();
-            this.onConfigSave({ [chainId]: [__spreadValues({}, result)] });
+            const obj = { [chainId]: [__spreadValues({}, result)] };
+            this.onConfigSave(obj);
             confirmationCallBack(true);
-            if (isDownload) {
-              this.onDownload({ [chainId]: [__spreadValues({}, result)] });
-            }
+            this.onDownload(obj);
           }
         }
       };
@@ -10511,7 +10594,7 @@
         class: "btn-os",
         margin: { left: "auto" },
         caption: "Add Campaign",
-        onClick: () => this.onAddCampaign()
+        onClick: () => this.onAddCampaignByClick()
       })), /* @__PURE__ */ this.$render("i-panel", {
         width: "100%",
         height: 2,
@@ -10551,7 +10634,7 @@
         onClick: this.onSave
       }), /* @__PURE__ */ this.$render("i-button", {
         id: "btnDownload",
-        caption: "Download JSON",
+        caption: "Export JSON",
         enabled: false,
         width: 200,
         maxWidth: "100%",
@@ -10570,26 +10653,28 @@
         verticalAlignment: "center",
         horizontalAlignment: "start"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Note: You need to confirm on your wallet for each staking/reward!",
+        caption: "Only the admin can deploy the campaign!",
+        font: { size: "12px", color: Theme10.colors.secondary.main }
+      }), /* @__PURE__ */ this.$render("i-label", {
+        caption: "You need to confirm on your wallet for each staking/reward!",
         font: { size: "12px", color: Theme10.colors.secondary.main }
       })), /* @__PURE__ */ this.$render("i-button", {
-        id: "btnDeploy",
-        caption: "Deploy",
+        id: "btnExport",
+        caption: "Export JSON",
         enabled: false,
         width: 200,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: Theme10.colors.primary.contrastText },
         class: "btn-os",
-        onClick: () => this.onDeployCampaign()
+        onClick: () => this.onDownload()
       }), /* @__PURE__ */ this.$render("i-button", {
-        id: "btnDeployDownload",
-        caption: "Deploy and Download JSON",
+        id: "btnDeployExport",
+        caption: "Deploy & Export JSON",
         enabled: false,
         width: 300,
         maxWidth: "100%",
         rightIcon: { spin: true, visible: false, fill: Theme10.colors.primary.contrastText },
         class: "btn-os",
-        onClick: () => this.onDeployCampaign(true)
+        onClick: this.onDeployCampaign
       })))))));
     }
   };
@@ -10606,8 +10691,52 @@
       this.campaigns = [];
       this.listAprTimer = [];
       this.listActiveTimer = [];
-      this.tokenIcon = tokenIcon || "img/swap/openswap.png";
       this.tokenMap = {};
+      this.initInputFile = (importFileElm) => {
+        var _a;
+        importFileElm.caption = '<input type="file" accept=".json" />';
+        const inputElm = (_a = importFileElm.firstChild) == null ? void 0 : _a.firstChild;
+        if (inputElm) {
+          inputElm.onchange = (event) => {
+            const reader = new FileReader();
+            const files = event.target.files;
+            if (!files.length) {
+              return;
+            }
+            const file = files[0];
+            reader.readAsBinaryString(file);
+            reader.onload = (event2) => {
+              const { loaded, total } = event2;
+              const isCompleted = loaded === total;
+              if (isCompleted) {
+                this.initInputFile(importFileElm);
+                this.convertJSONToObj(reader.result);
+              }
+            };
+          };
+        }
+      };
+      this.convertJSONToObj = (result) => {
+        if (!result)
+          this.showImportJsonError("Data is corrupted. No data were recovered.");
+        try {
+          const obj = JSON.parse(result);
+          const length = Object.keys(obj).length;
+          const chainId = (0, import_store10.getChainId)();
+          const campaignObj = obj[chainId];
+          if (!length) {
+            this.showImportJsonError("No data found in the imported file.");
+          } else if (!campaignObj) {
+            const network = (0, import_store10.getNetworkInfo)(chainId);
+            this.showImportJsonError(`No data found in ${network == null ? void 0 : network.name} network.`);
+          } else {
+            this.data = { [chainId]: [campaignObj[0]] };
+            this.onEditCampaign(true);
+          }
+        } catch (e) {
+          this.showImportJsonError("Data is corrupted. No data were recovered.");
+        }
+      };
       this.registerEvent = () => {
         this.$eventBus.register(this, import_global9.EventId.IsWalletConnected, this.onWalletConnect);
         this.$eventBus.register(this, import_global9.EventId.IsWalletDisconnected, this.onWalletConnect);
@@ -10627,7 +10756,7 @@
         var _a;
         if (this.data && isConnected) {
           try {
-            const wallet = import_eth_wallet6.Wallet.getInstance();
+            const wallet = import_eth_wallet7.Wallet.getInstance();
             const infoList = this.data[wallet.chainId];
             const stakingAddress = infoList && ((_a = infoList[0].stakings[0]) == null ? void 0 : _a.address);
             if (stakingAddress) {
@@ -10649,9 +10778,9 @@
           (0, import_store10.setTokenMap)();
         };
         const selectedProvider = localStorage.getItem("walletProvider");
-        const isValidProvider = Object.values(import_eth_wallet6.WalletPlugin).includes(selectedProvider);
-        if (!import_eth_wallet6.Wallet.getInstance().chainId) {
-          import_eth_wallet6.Wallet.getInstance().chainId = (0, import_store10.getDefaultChainId)();
+        const isValidProvider = Object.values(import_eth_wallet7.WalletPlugin).includes(selectedProvider);
+        if (!import_eth_wallet7.Wallet.getInstance().chainId) {
+          import_eth_wallet7.Wallet.getInstance().chainId = (0, import_store10.getDefaultChainId)();
         }
         if ((0, import_store10.hasWallet)() && isValidProvider) {
           await (0, import_store10.connectWallet)(selectedProvider, {
@@ -10807,6 +10936,21 @@
           this.noCampaignSection = await import_components14.Panel.create();
         }
         const isConnected = (0, import_store10.isWalletConnected)();
+        const isBtnShown = !this.data && isConnected;
+        let importFileElm;
+        let onImportCampaign;
+        let onClose;
+        if (isBtnShown) {
+          importFileElm = await import_components14.Label.create({ visible: false });
+          onImportCampaign = () => {
+            var _a, _b;
+            (_b = (_a = importFileElm.firstChild) == null ? void 0 : _a.firstChild) == null ? void 0 : _b.click();
+          };
+          onClose = () => {
+            this.importFileErrModal.visible = false;
+          };
+          this.initInputFile(importFileElm);
+        }
         this.noCampaignSection.clearInnerHTML();
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
           class: "no-campaign",
@@ -10818,7 +10962,7 @@
           url: import_assets5.default.fullPath("img/staking/TrollTrooper.svg")
         }), /* @__PURE__ */ this.$render("i-label", {
           caption: isConnected ? "No Campaigns" : "Please connect with your wallet!"
-        }), !this.data && isConnected ? /* @__PURE__ */ this.$render("i-hstack", {
+        }), isBtnShown ? /* @__PURE__ */ this.$render("i-hstack", {
           gap: 10,
           margin: { top: 10 },
           verticalAlignment: "center",
@@ -10833,7 +10977,31 @@
           caption: "Edit Existing Campaign",
           class: "btn-os btn-stake",
           onClick: () => this.onEditCampaign(false)
-        })) : [])));
+        }), /* @__PURE__ */ this.$render("i-button", {
+          maxWidth: 200,
+          caption: "Campaign Import",
+          class: "btn-os btn-stake",
+          onClick: () => onImportCampaign()
+        }), importFileElm, /* @__PURE__ */ this.$render("i-modal", {
+          id: "importFileErrModal",
+          maxWidth: "100%",
+          width: 420,
+          title: "Import Campaign Error",
+          closeIcon: { name: "times" }
+        }, /* @__PURE__ */ this.$render("i-vstack", {
+          gap: 20,
+          margin: { bottom: 10 },
+          verticalAlignment: "center",
+          horizontalAlignment: "center"
+        }, /* @__PURE__ */ this.$render("i-label", {
+          id: "importFileErr",
+          font: { size: "16px", color: Theme11.text.primary }
+        }), /* @__PURE__ */ this.$render("i-button", {
+          caption: "Close",
+          class: "btn-os btn-stake",
+          width: 120,
+          onClick: onClose
+        })))) : [])));
         this.noCampaignSection.visible = true;
       };
       this.renderEmpty = async () => {
@@ -10861,7 +11029,7 @@
           this.noCampaignSection.visible = true;
           return;
         }
-        const currentAddress = import_eth_wallet6.Wallet.getInstance().address;
+        const currentAddress = import_eth_wallet7.Wallet.getInstance().address;
         let nodeItems = [];
         this.removeTimer();
         for (let idx = 0; idx < this.campaigns.length; idx++) {
@@ -10879,26 +11047,32 @@
             containerSection.appendChild(style);
           }
           const options = campaign.options;
-          const stakingInfo = options ? options[0] : null;
-          let lpTokenData = {};
-          let vaultTokenData = {};
-          if (stakingInfo && stakingInfo.tokenAddress) {
-            if (stakingInfo.lockTokenType == import_store10.LockTokenType.LP_Token) {
-              lpTokenData = {
-                "object": await (0, import_staking_utils3.getLPObject)(stakingInfo.tokenAddress)
-              };
-            } else if (stakingInfo.lockTokenType == import_store10.LockTokenType.VAULT_Token) {
-              vaultTokenData = {
-                "object": await (0, import_staking_utils3.getVaultObject)(stakingInfo.tokenAddress)
-              };
+          for (let optIdx = 0; optIdx < options.length; optIdx++) {
+            const opt = options[optIdx];
+            let lpTokenData = {};
+            let vaultTokenData = {};
+            if (opt.tokenAddress) {
+              if (opt.lockTokenType == import_store10.LockTokenType.LP_Token) {
+                lpTokenData = {
+                  "object": await (0, import_staking_utils3.getLPObject)(opt.tokenAddress)
+                };
+              } else if (opt.lockTokenType == import_store10.LockTokenType.VAULT_Token) {
+                vaultTokenData = {
+                  "object": await (0, import_staking_utils3.getVaultObject)(opt.tokenAddress)
+                };
+              }
             }
+            const tokenInfo = {
+              tokenAddress: campaign.tokenAddress,
+              lpToken: lpTokenData,
+              vaultToken: vaultTokenData
+            };
+            options[optIdx] = __spreadProps(__spreadValues({}, options[optIdx]), {
+              tokenInfo
+            });
           }
-          const tokenInfo = {
-            tokenAddress: campaign.tokenAddress,
-            lpToken: lpTokenData,
-            vaultToken: vaultTokenData
-          };
-          const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
+          const stakingInfo = options ? options[0] : null;
+          const lockedTokenObject = getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
           const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
           const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
           const lockedTokenDecimals = (lockedTokenObject == null ? void 0 : lockedTokenObject.decimals) || 18;
@@ -10935,7 +11109,8 @@
             }), /* @__PURE__ */ this.$render("i-image", {
               width: 25,
               height: 25,
-              url: import_assets5.default.fullPath((network == null ? void 0 : network.img) || "")
+              url: import_assets5.default.fullPath((network == null ? void 0 : network.img) || ""),
+              fallbackUrl: import_store10.fallBackUrl
             })));
             simplifiedRow.appendChild(/* @__PURE__ */ this.$render("i-panel", {
               class: "simplified-link"
@@ -10956,7 +11131,7 @@
             for (const o of options) {
               const _totalLocked = await (0, import_staking_utils3.getStakingTotalLocked)(o.address);
               totalLocked[o.address] = _totalLocked;
-              const optionQty = new import_eth_wallet6.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
+              const optionQty = new import_eth_wallet7.BigNumber(o.maxTotalLock).minus(_totalLocked).shiftedBy(defaultDecimalsOffset);
               const lbOptionQty = document.querySelector(`#lb-${o.address}`);
               if (lbOptionQty) {
                 lbOptionQty.caption = `${(0, import_global9.formatNumber)(optionQty)} ${lockedTokenSymbol}`;
@@ -10978,8 +11153,8 @@
             ;
             totalTokens = _totalTokens;
             availableQty = _availableQty;
-            totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
-            availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+            totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+            availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
             if (isClosed) {
               if (stickerLabel.caption !== "Closed") {
                 stickerSection.classList.add("closed");
@@ -11048,8 +11223,8 @@
           }))));
           totalTokensLabel.classList.add("bold");
           availableQtyLabel.classList.add("bold");
-          totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
-          availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+          totalTokensLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(totalTokens).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+          availableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(availableQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
           totalTokensLabel.classList.add("text-right");
           availableQtyLabel.classList.add("text-right");
           const rowItems = [
@@ -11095,10 +11270,11 @@
           }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
             verticalAlignment: "center",
             class: "campaign-name"
-          }, /* @__PURE__ */ this.$render("i-image", {
+          }, !campaign.customLogo ? [] : /* @__PURE__ */ this.$render("i-image", {
             width: "25px",
             height: "25px",
-            url: import_assets5.default.fullPath(this.tokenIcon)
+            url: campaign.customLogo,
+            fallbackUrl: import_store10.fallBackUrl
           }), /* @__PURE__ */ this.$render("i-label", {
             caption: campaign.campaignName
           })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
@@ -11135,7 +11311,8 @@
             return /* @__PURE__ */ this.$render("i-image", {
               width: 25,
               height: 25,
-              url: import_assets5.default.fullPath(v)
+              url: import_assets5.default.fullPath(v),
+              fallbackUrl: import_store10.fallBackUrl
             });
           }), /* @__PURE__ */ this.$render("i-icon", {
             name: "external-link-alt",
@@ -11180,13 +11357,11 @@
             }
             const isClaim = option.mode === "Claim";
             const rewardOptions = !isClaim ? option.rewardsData : [];
-            const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {};
-            const lpRewardTokenIconPath = !isClaim && rewardToken.address ? (0, import_store10.getTokenIconPath)(rewardToken, chainId) : "";
             let aprInfo = {};
             const optionAvailableQtyLabel = await import_components14.Label.create();
             optionAvailableQtyLabel.classList.add("ml-auto");
             optionAvailableQtyLabel.id = `lb-${option.address}`;
-            optionAvailableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+            optionAvailableQtyLabel.caption = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
             const claimStakedRow = await import_components14.HStack.create();
             claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
               class: "mr-025",
@@ -11194,21 +11369,21 @@
             }));
             claimStakedRow.appendChild(/* @__PURE__ */ this.$render("i-label", {
               class: "ml-auto",
-              caption: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
+              caption: `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
             }));
             const rowRewards = await import_components14.Panel.create();
             if (isClaim) {
               claimStakedRow.classList.add("mb-1");
               for (let idx2 = 0; idx2 < option.rewardsData.length; idx2++) {
                 const reward = option.rewardsData[idx2];
-                const rewardToken2 = this.getRewardToken(reward.rewardTokenAddress);
-                const rewardTokenDecimals = rewardToken2.decimals || 18;
+                const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+                const rewardTokenDecimals = rewardToken.decimals || 18;
                 const decimalsOffset = 18 - rewardTokenDecimals;
                 let rewardLockedDecimalsOffset = decimalsOffset;
                 if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
                   rewardLockedDecimalsOffset = decimalsOffset * 2;
                 }
-                const rewardSymbol = rewardToken2.symbol || "";
+                const rewardSymbol = rewardToken.symbol || "";
                 rowRewards.appendChild(/* @__PURE__ */ this.$render("i-panel", {
                   margin: { bottom: 16 },
                   width: "100%",
@@ -11221,7 +11396,7 @@
                   caption: `${rewardSymbol} Locked:`
                 }), /* @__PURE__ */ this.$render("i-label", {
                   class: "bold",
-                  caption: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`
+                  caption: `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`
                 })));
                 rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
@@ -11242,7 +11417,7 @@
                 const passClaimStartTime = !(reward.claimStartTime && (0, import_moment4.default)().diff(import_moment4.default.unix(reward.claimStartTime)) < 0);
                 let rewardClaimable = `0 ${rewardSymbol}`;
                 if (passClaimStartTime) {
-                  rewardClaimable = `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+                  rewardClaimable = `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
                 }
                 let startClaimingText = "";
                 if (!(!reward.claimStartTime || passClaimStartTime)) {
@@ -11282,7 +11457,7 @@
                   caption: `Claim ${rewardSymbol}`,
                   background: { color: `${campaign.customColorButton} !important` },
                   font: { color: campaign.customColorText || "#fff" },
-                  enabled: !(!passClaimStartTime || new import_eth_wallet6.BigNumber(reward.claimable).isZero())
+                  enabled: !(!passClaimStartTime || new import_eth_wallet7.BigNumber(reward.claimable).isZero())
                 });
                 btnClaim.id = `btnClaim-${idx2}-${option.address}`;
                 btnClaim.classList.add("btn-os", "btn-stake", "mt-1");
@@ -11296,7 +11471,7 @@
             const rowOptionItems = !isClaim ? [
               {
                 title: "Max. QTY",
-                value: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
+                value: `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
                 isHidden: isSimplified
               },
               {
@@ -11307,7 +11482,7 @@
               },
               {
                 title: "Individual Cap",
-                value: `${(0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
+                value: `${(0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`
               },
               {
                 title: "Campaign Start Date",
@@ -11317,12 +11492,29 @@
             ] : [];
             const getAprValue = (rewardOption) => {
               if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-                const apr = new import_eth_wallet6.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, import_eth_wallet6.BigNumber.ROUND_DOWN);
+                const apr = new import_eth_wallet7.BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, import_eth_wallet7.BigNumber.ROUND_DOWN);
                 return `${apr}%`;
               }
               return "";
             };
             const durationDays = option.minLockTime / (60 * 60 * 24);
+            const imgTokensElm = await import_components14.HStack.create({ width: "100%", verticalAlignment: "center", horizontalAlignment: "center" });
+            const rewardLenght = option.rewardsData.length;
+            for (const reward of option.rewardsData) {
+              const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+              const imgUrl = (0, import_store10.getTokenIconPath)(rewardToken, chainId);
+              const size = 100 / rewardLenght;
+              imgTokensElm.appendChild(/* @__PURE__ */ this.$render("i-image", {
+                width: `${size}%`,
+                height: "100%",
+                maxWidth: 75,
+                maxHeight: 75,
+                url: import_assets5.default.fullPath(imgUrl),
+                fallbackUrl: import_store10.fallBackUrl
+              }));
+            }
+            const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
+            const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
             return /* @__PURE__ */ this.$render("i-vstack", {
               class: "column-custom"
             }, /* @__PURE__ */ this.$render("i-panel", {
@@ -11333,11 +11525,12 @@
             }, /* @__PURE__ */ this.$render("i-hstack", {
               verticalAlignment: "center",
               horizontalAlignment: "center"
-            }, lockedTokenIconPaths.map((v) => {
+            }, _lockedTokenIconPaths.map((v) => {
               return /* @__PURE__ */ this.$render("i-image", {
                 width: 25,
                 height: 25,
-                url: import_assets5.default.fullPath(v)
+                url: import_assets5.default.fullPath(v),
+                fallbackUrl: import_store10.fallBackUrl
               });
             }), /* @__PURE__ */ this.$render("i-label", {
               class: "bold duration",
@@ -11350,25 +11543,7 @@
               caption: option.customDesc || ""
             })), /* @__PURE__ */ this.$render("i-panel", {
               class: "img-custom"
-            }, option.lockTokenType === import_store10.LockTokenType.LP_Token && rewardOptions.length === 2 ? /* @__PURE__ */ this.$render("i-panel", {
-              class: "group-img"
-            }, /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets5.default.fullPath(lpRewardTokenIconPath)
-            }), /* @__PURE__ */ this.$render("i-icon", {
-              name: "plus",
-              width: 16,
-              height: 16
-            }), /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets5.default.fullPath(this.tokenIcon)
-            })) : /* @__PURE__ */ this.$render("i-image", {
-              width: 75,
-              height: 75,
-              url: import_assets5.default.fullPath(this.tokenIcon)
-            })), /* @__PURE__ */ this.$render("i-panel", {
+            }, imgTokensElm), /* @__PURE__ */ this.$render("i-panel", {
               class: "info-stake"
             }, btnStake, btnUnstake, rowOptionItems.filter((f) => !f.isHidden).map((v) => {
               return /* @__PURE__ */ this.$render("i-hstack", {
@@ -11402,11 +11577,12 @@
             }), await Promise.all(rewardOptions.map(async (rewardOption, idx2) => {
               const labelApr = await import_components14.Label.create();
               labelApr.classList.add("ml-auto");
-              const rewardToken2 = this.getRewardToken(rewardOption.rewardTokenAddress);
-              const rewardTokenDecimals = rewardToken2.decimals || 18;
+              const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+              const rewardTokenDecimals = rewardToken.decimals || 18;
               const decimalsOffset = 18 - rewardTokenDecimals;
-              const rateDesc = `1 ${(0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet6.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+              const rateDesc = `1 ${(0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet7.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
               const updateApr = async () => {
+                var _a, _b, _c, _d;
                 if (option.lockTokenType === import_store10.LockTokenType.ERC20_Token) {
                   const apr = await (0, import_staking_utils3.getERC20RewardCurrentAPR)(rewardOption, lockedTokenObject, durationDays);
                   if (!isNaN(parseFloat(apr))) {
@@ -11414,10 +11590,10 @@
                   }
                 } else if (option.lockTokenType === import_store10.LockTokenType.LP_Token) {
                   if (rewardOption.referencePair) {
-                    aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getLPRewardCurrentAPR)(rewardOption, lpTokenData.object, durationDays);
+                    aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getLPRewardCurrentAPR)(rewardOption, (_b = (_a = option.tokenInfo) == null ? void 0 : _a.lpTokenData) == null ? void 0 : _b.object, durationDays);
                   }
                 } else {
-                  aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getVaultRewardCurrentAPR)(rewardOption, vaultTokenData.object, durationDays);
+                  aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getVaultRewardCurrentAPR)(rewardOption, (_d = (_c = option.tokenInfo) == null ? void 0 : _c.vaultTokenData) == null ? void 0 : _d.object, durationDays);
                 }
                 const aprValue2 = getAprValue(rewardOption);
                 if (isSimplified) {
@@ -11433,7 +11609,7 @@
               if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
                 offset = offset * 2;
               }
-              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet6.BigNumber(option.totalCredit).times(new import_eth_wallet6.BigNumber(rewardOption.multiplier)).shiftedBy(offset));
+              const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.totalCredit).times(new import_eth_wallet7.BigNumber(rewardOption.multiplier)).shiftedBy(offset));
               const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
               const rewardElm = await import_components14.VStack.create({ verticalAlignment: "center" });
               rewardElm.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
@@ -11562,6 +11738,10 @@
       this.pnlConfig.showInputCampaign(isNew, this.getCampaign());
       this.stakingLayout.visible = false;
       this.pnlConfig.visible = true;
+    }
+    showImportJsonError(message) {
+      this.importFileErrModal.visible = true;
+      this.importFileErr.caption = message;
     }
     getCampaign() {
       if (this.data) {

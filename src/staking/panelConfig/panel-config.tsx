@@ -5,6 +5,7 @@ import './panel-config.css';
 import { CampaignConfig } from './campaign';
 import { getChainId, getNetworkInfo, isWalletConnected, StakingCampaign } from '@staking/store';
 import { deployCampaign } from '@staking/staking-utils';
+import { Wallet } from '@ijstech/eth-wallet';
 const Theme = Styles.Theme.ThemeVars;
 declare global {
   namespace JSX {
@@ -33,8 +34,8 @@ export class PanelConfig extends Module {
   private groupBtnDeployElm: HStack;
   private btnSave: Button;
   private btnDownload: Button;
-  private btnDeploy: Button;
-  private btnDeployDownload: Button;
+  private btnExport: Button;
+  private btnDeployExport: Button;
   private $eventBus: IEventBus;
   private isNew: boolean;
   private campaigns: {[chainId:number]: StakingCampaign[]};
@@ -177,12 +178,19 @@ export class PanelConfig extends Module {
     }
   }
 
+  private onAddCampaignByClick = () => {
+    if (this.isNew) return;
+    this.onAddCampaign();
+  }
+
   private updateButton = () => {
     const valid = this.checkValidation();
     if (this.isNew) {
-      if (this.btnDeploy.rightIcon.visible || this.btnDeployDownload.rightIcon.visible) return;
-      this.btnDeploy.enabled = valid;
-      this.btnDeployDownload.enabled = valid;
+      if (this.btnDeployExport.rightIcon.visible) return;
+      const currentAddress = Wallet.getInstance().address || '';
+      const data = this.campaignConfig && this.campaignConfig[0].getData();
+      this.btnExport.enabled = valid;
+      this.btnDeployExport.enabled = valid && currentAddress.toLowerCase() === data?.admin?.toLowerCase();
     } else {
       this.btnSave.enabled = valid;
       this.btnDownload.enabled = valid;
@@ -239,28 +247,27 @@ export class PanelConfig extends Module {
   }
 
   private onDownload = (data?: any) => {
-    if (this.isNew) {
+    if (this.isNew && data) {
       downloadJsonFile('campaign.json', { ...data });
       return;
     }
-    if (!this.isNew && this.checkValidation()) {
+    if (this.checkValidation()) {
       this.parseData();
       const campaigns = { ...this.campaigns };
       downloadJsonFile('campaign.json', campaigns);
     }
   }
 
-  private onDeployCampaign = async (isDownload?: boolean) => {
+  private onDeployCampaign = async () => {
     if (this.isNew && this.checkValidation()) {
       const campaign = this.campaignConfig[0].getData();
       const chainId = getChainId();
       let result: StakingCampaign | null;
-      const btn = isDownload ? this.btnDeployDownload : this.btnDeploy;
       this.showResultMessage(this.stakingResult, 'warning', `Deploying ${campaign.customName}`);
 
       const onUpdateBtn = () => {
-        btn.rightIcon.visible = false;
-        btn.caption = isDownload ? 'Deploy and Download JSON' : 'Deploy';
+        this.btnDeployExport.rightIcon.visible = false;
+        this.btnDeployExport.caption = 'Deploy and Export JSON';
         this.updateButton();
         this.backElm.classList.add('cursor-pointer');
         this.backElm.onClick = () => this.onBack();
@@ -274,10 +281,10 @@ export class PanelConfig extends Module {
           this.showResultMessage(this.stakingResult, 'success', reply);
           this.backElm.classList.remove('cursor-pointer');
           this.backElm.onClick = () => {};
-          this.btnDeployDownload.enabled = false;
-          this.btnDeploy.enabled = false;
-          btn.caption = isDownload ? 'Deploying And Downloading' : 'Deploying';
-          btn.rightIcon.visible = true;
+          this.btnExport.enabled = false;
+          this.btnDeployExport.enabled = false;
+          this.btnDeployExport.caption = 'Deploying & Exporting';
+          this.btnDeployExport.rightIcon.visible = true;
         }
       };
 
@@ -294,11 +301,10 @@ export class PanelConfig extends Module {
       result = await deployCampaign(campaign, callBack);
       if (result) {
         this.stakingResult.closeModal();
-        this.onConfigSave({[chainId]: [{ ...result }]});
-        confirmationCallBack(true)
-        if (isDownload) {
-          this.onDownload({[chainId]: [{ ...result }]});
-        }
+        const obj = {[chainId]: [{ ...result }]};
+        this.onConfigSave(obj);
+        confirmationCallBack(true);
+        this.onDownload(obj);
       }
     }
   }
@@ -324,7 +330,7 @@ export class PanelConfig extends Module {
             <i-vstack id="wapperCampaignsButton" visible={this.isMultiple} verticalAlignment="center">
               <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between" wrap="wrap-reverse">
                 <i-hstack id="listCampaignButton" verticalAlignment="center" />
-                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={() => this.onAddCampaign()} />
+                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={() => this.onAddCampaignByClick()} />
               </i-hstack>
               <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
             </i-vstack>
@@ -346,7 +352,7 @@ export class PanelConfig extends Module {
                   />
                   <i-button
                     id="btnDownload"
-                    caption="Download JSON"
+                    caption="Export JSON"
                     enabled={false}
                     width={200}
                     maxWidth="100%"
@@ -356,27 +362,27 @@ export class PanelConfig extends Module {
                 </i-hstack>
                 <i-hstack id="groupBtnDeployElm" gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center" wrap="wrap">
                   <i-vstack width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="start">
-                    <i-label caption="Note: You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
+                    <i-label caption="Only the admin can deploy the campaign!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
+                    <i-label caption="You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
                   </i-vstack>
                   <i-button
-                    id="btnDeploy"
-                    caption="Deploy"
+                    id="btnExport"
+                    caption="Export JSON"
                     enabled={false}
                     width={200}
                     maxWidth="100%"
-                    rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                     class="btn-os"
-                    onClick={() => this.onDeployCampaign()}
+                    onClick={() => this.onDownload()}
                   />
                   <i-button
-                    id="btnDeployDownload"
-                    caption="Deploy and Download JSON"
+                    id="btnDeployExport"
+                    caption="Deploy & Export JSON"
                     enabled={false}
                     width={300}
                     maxWidth="100%"
                     rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                     class="btn-os"
-                    onClick={() => this.onDeployCampaign(true)}
+                    onClick={this.onDeployCampaign}
                   />
                 </i-hstack>
               </i-hstack>

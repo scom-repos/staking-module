@@ -68,6 +68,8 @@ export {
 
 } from './data'
 
+export const fallBackUrl = Assets.fullPath('img/tokens/token-placeholder.svg');
+
 export const nullAddress = "0x0000000000000000000000000000000000000000";
 
 const TOKENS = "oswap_user_tokens_";

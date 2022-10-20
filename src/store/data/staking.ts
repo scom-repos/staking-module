@@ -19,10 +19,12 @@ interface StakingCampaign {
   chainId?: number,
   customName: string,
   customDesc?: string,
+  customLogo?: string,
   getTokenURL?: string,
   campaignStart: BigNumber, //unix
   campaignEnd: BigNumber, //unix
   showContractLink?: boolean,
+  admin: string, // can only withdraw remaining fund after claimDeadline.
   customColorCampaign?: string, // 1 campaign main color
   customColorBackground?: string, // 2 campign background
   customColorStakingBackground?: string, // 3 staking background

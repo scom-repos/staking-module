@@ -1,6 +1,6 @@
-import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker } from '@ijstech/components';
+import { Styles, Button, Image, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker, Upload } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { DefaultDateTimeFormat, EventId } from '@staking/global';
+import { DefaultDateTimeFormat, EventId, isAddressValid } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenBalance, getTokenMap, Networks, Staking, StakingCampaign } from '@staking/store';
 import moment from 'moment';
 import { StakingConfig } from './staking';
@@ -27,11 +27,16 @@ export class CampaignConfig extends Module {
 	private inputName: Input;
 	private inputDesc: Input;
 	private inputURL: Input;
+	private uploadLogo: Upload;
+	private logoUrl: string = '';
 	private inputCampaignStart: Datepicker;
 	private inputCampaignEnd: Datepicker;
 	private lbCampaignStartErr: Label;
 	private lbCampaignEndErr: Label;
 	private checkboxContract: Checkbox;
+	private inputAdmin: Input;
+	private lbErrAdmin: Label;
+	private isAdminValid = false;
 	private inputMainColor: Input;
 	private inputBg: Input;
 	private inputColorText: Input;
@@ -84,7 +89,7 @@ export class CampaignConfig extends Module {
 
 	private setupData = async () => {
 		if (this.data) {
-			const { chainId, customName, customDesc, getTokenURL, campaignStart, campaignEnd, showContractLink, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
+			const { chainId, customName, customDesc, customLogo, getTokenURL, campaignStart, campaignEnd, showContractLink, admin, customColorCampaign, customColorBackground, customColorStakingBackground, customColorButton, customColorText, customColorTimeBackground, stakings } = this.data;
 			const interval = setInterval(async () => {
 				if (this.isInitialized) {
 					clearInterval(interval);
@@ -92,6 +97,9 @@ export class CampaignConfig extends Module {
 					this.inputName.value = customName;
 					this.inputDesc.value = customDesc || '';
 					this.inputURL.value = getTokenURL || '';
+					if (customLogo) {
+						this.uploadLogo.preview(customLogo);
+					}
 					const start = new BigNumber(campaignStart).toNumber();
 					const end = new BigNumber(campaignEnd).toNumber();
 					this.campaignStart = start;
@@ -101,6 +109,9 @@ export class CampaignConfig extends Module {
 					startElm.value = moment.unix(start).format(DefaultDateTimeFormat);
 					endElm.value = moment.unix(end).format(DefaultDateTimeFormat);
 					this.checkboxContract.checked = !!showContractLink;
+					this.inputAdmin.value = admin;
+					this.isAdminValid = await isAddressValid(admin);
+					this.lbErrAdmin.visible = !this.isAdminValid;
 					this.inputMainColor.value = customColorCampaign || '';
 					this.inputBg.value = customColorBackground || '';
 					this.inputColorText.value = customColorText || '';
@@ -288,9 +299,7 @@ export class CampaignConfig extends Module {
 		stakings[idx].visible = !(idx && staking);
 		this.stakingConfig = [...stakings];
 		this.pnlInfoElm.appendChild(this.stakingConfig[idx]);
-		if (!this.isNew) {
-			this.stakingConfig[idx].chainId = this.network;
-		}
+		this.stakingConfig[idx].chainId = this.network;
 		this.stakingConfig[idx].data = staking;
 		this.currentStaking = idx;
 		this.emitInput();
@@ -327,6 +336,32 @@ export class CampaignConfig extends Module {
 	private onInputText = () => {
 
 	}
+
+	private onInputAdmin = async () => {
+		this.isAdminValid = await isAddressValid(this.inputAdmin.value);
+		this.lbErrAdmin.visible = !this.isAdminValid;
+		this.emitInput();
+	}
+
+	private onBeforeUpload(target: Upload, file: File): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        reject('File size can not exceed 2MB!')
+      }
+      resolve(isLt2M)
+    })
+  }
+
+  private async onChangeFile(source: Control, files: File[]) {
+    if (!files.length) return;
+    const data: any = await this.uploadLogo.toBase64(files[0]);
+    this.logoUrl = data || '';
+  }
+
+  private onRemove(source: Control, file: File) {
+    this.logoUrl = '';
+  }
 
 	private isStakingValid = () => {
 		if (!this.stakingConfig.length) return false;
@@ -378,6 +413,7 @@ export class CampaignConfig extends Module {
 			this.campaignStart &&
 			// this.campaignStart >= moment().unix() &&
 			this.campaignStart < this.campaignEnd &&
+			this.isAdminValid &&
 			this.isStakingValid();
 	}
 
@@ -395,10 +431,12 @@ export class CampaignConfig extends Module {
 			chainId: this.network,
 			customName: this.inputName.value,
 			customDesc: this.inputDesc.value || undefined,
+			customLogo: this.logoUrl || undefined,
 			getTokenURL: this.inputURL.value || undefined,
 			campaignStart: new BigNumber(this.campaignStart),
 			campaignEnd: new BigNumber(this.campaignEnd),
 			showContractLink: this.checkboxContract.checked || undefined,
+			admin: `${this.inputAdmin.value}`,
 			customColorCampaign: this.inputMainColor.value || undefined,
 			customColorBackground: this.inputBg.value || undefined,
 			customColorStakingBackground: this.inputStakingBg.value || undefined,
@@ -442,6 +480,19 @@ export class CampaignConfig extends Module {
 						<i-input id="inputDesc" class="input-area w-input" inputType="textarea" rows={3} onChanged={this.onInputText} />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-label class="lb-title" caption="Campaign Logo" />
+						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
+							<i-upload
+								id="uploadLogo"
+								class="input-text w-input cs-upload"
+								accept="image/*"
+								onUploading={this.onBeforeUpload.bind(this)}
+								onChanged={this.onChangeFile.bind(this)}
+								onRemoved={this.onRemove.bind(this)}
+							/>
+						</i-vstack>
+					</i-hstack>
+					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-label class="lb-title" caption="Token Trade URL" />
 						<i-input id="inputURL" class="input-text w-input" onChanged={this.onInputText} />
 					</i-hstack>
@@ -473,6 +524,16 @@ export class CampaignConfig extends Module {
 								height="auto"
 								checked={false}
 							/>
+						</i-vstack>
+					</i-hstack>
+					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+						<i-hstack gap={4} verticalAlignment="center">
+							<i-label class="lb-title" caption="Admin" />
+							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+						</i-hstack>
+						<i-vstack gap={4} class="w-input" verticalAlignment="center">
+							<i-input id="inputAdmin" class="input-text w-input w-100" onChanged={this.onInputAdmin} />
+							<i-label id="lbErrAdmin" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">

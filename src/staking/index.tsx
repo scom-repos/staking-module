@@ -1,6 +1,6 @@
-import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles, Modal } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
-import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign, Reward } from '@staking/store';
+import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign, Reward, fallBackUrl } from '@staking/store';
 import {
 	getStakingTotalLocked,
 	getLPObject,
@@ -21,7 +21,7 @@ import Assets from '@staking/assets';
 import moment from 'moment';
 import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import { Result } from '../result';
-import { getTokenUrl, tokenIcon } from '../config';
+import { getTokenUrl } from '../config';
 import './staking.css';
 import { ManageStake } from './manageStake';
 import { PanelConfig } from './panelConfig';
@@ -57,8 +57,9 @@ export class StakingBlock extends Module implements PageBlock {
 	private manageStakeElm: Panel;
 	private listAprTimer: any = [];
 	private listActiveTimer: any = [];
-	private tokenIcon = tokenIcon || 'img/swap/openswap.png';
 	private tokenMap: TokenMapType = {};
+	private importFileErrModal: Modal;
+  private importFileErr: Label;
 
 	validateConfig() {
 
@@ -114,6 +115,56 @@ export class StakingBlock extends Module implements PageBlock {
 		this.stakingLayout.visible = false;
 		this.pnlConfig.visible = true;
 	}
+
+	private initInputFile = (importFileElm: Label) => {
+    importFileElm.caption = '<input type="file" accept=".json" />';
+    const inputElm = importFileElm.firstChild?.firstChild as HTMLElement;
+    if (inputElm) {
+      inputElm.onchange = (event: any) => {
+        const reader = new FileReader();
+        const files = event.target.files;
+        if (!files.length) {
+          return;
+        }
+        const file = files[0];
+        reader.readAsBinaryString(file);
+        reader.onload = (event) => {
+          const { loaded, total } = event;
+          const isCompleted = loaded === total;
+          if (isCompleted) {
+            this.initInputFile(importFileElm);
+            this.convertJSONToObj(reader.result);
+          }
+        }
+      }
+    }
+  }
+
+	private convertJSONToObj = (result: any) => {
+    if (!result) this.showImportJsonError('Data is corrupted. No data were recovered.');
+		try {
+			const obj = JSON.parse(result);
+			const length = Object.keys(obj).length;
+			const chainId = getChainId();
+			const campaignObj = obj[chainId];
+			if (!length) {
+				this.showImportJsonError('No data found in the imported file.');
+			} else if (!campaignObj) {
+				const network = getNetworkInfo(chainId);
+				this.showImportJsonError(`No data found in ${network?.name} network.`);
+			} else {
+				this.data = { [chainId]: [campaignObj[0]] };
+				this.onEditCampaign(true);
+			}
+		} catch {
+			this.showImportJsonError('Data is corrupted. No data were recovered.');
+		}
+  }
+
+	private showImportJsonError(message: string) {
+    this.importFileErrModal.visible = true;
+    this.importFileErr.caption = message;
+  }
 
 	private getCampaign() {
 		if (this.data) {
@@ -353,6 +404,20 @@ export class StakingBlock extends Module implements PageBlock {
 			this.noCampaignSection = await Panel.create();
 		}
 		const isConnected = isWalletConnected();
+		const isBtnShown = !this.data && isConnected;
+		let importFileElm: any;
+		let onImportCampaign: any;
+		let onClose: any;
+		if (isBtnShown) {
+			importFileElm = await Label.create({ visible: false });
+			onImportCampaign = () => {
+				(importFileElm.firstChild?.firstChild as HTMLElement)?.click();
+			}
+			onClose = () => {
+				this.importFileErrModal.visible = false;
+			}
+			this.initInputFile(importFileElm);
+		}
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
 			<i-panel class="no-campaign" background={{ color: Theme.background.modal }}>
@@ -360,10 +425,18 @@ export class StakingBlock extends Module implements PageBlock {
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
 					<i-label caption={ isConnected ? 'No Campaigns' : 'Please connect with your wallet!' } />
 					{
-						!this.data && isConnected ? (
+						isBtnShown ? (
 							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">
 								<i-button maxWidth={200} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
 								<i-button maxWidth={200} caption="Edit Existing Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(false)} />
+								<i-button maxWidth={200} caption="Campaign Import" class="btn-os btn-stake" onClick={() => onImportCampaign()} />
+								{ importFileElm }
+								<i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
+									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
+										<i-label id="importFileErr" font={{ size: '16px', color: Theme.text.primary }} />
+										<i-button caption="Close" class="btn-os btn-stake" width={120} onClick={onClose} />
+									</i-vstack>
+								</i-modal>
 							</i-hstack>
 						) : []
 					}
@@ -418,26 +491,33 @@ export class StakingBlock extends Module implements PageBlock {
 				containerSection.appendChild(style);
 			}
 			const options = campaign.options;
-			const stakingInfo = options ? options[0] : null;
-			let lpTokenData: any = {};
-			let vaultTokenData: any = {};
-			if (stakingInfo && stakingInfo.tokenAddress) {
-				if (stakingInfo.lockTokenType == LockTokenType.LP_Token) {
-					lpTokenData = {
-						'object': await getLPObject(stakingInfo.tokenAddress)
-					}
-				} else if (stakingInfo.lockTokenType == LockTokenType.VAULT_Token) {
-					vaultTokenData = {
-						'object': await getVaultObject(stakingInfo.tokenAddress)
+			for (let optIdx = 0; optIdx < options.length; optIdx++) {
+				const opt = options[optIdx];
+				let lpTokenData: any = {};
+				let vaultTokenData: any = {};
+				if (opt.tokenAddress) {
+					if (opt.lockTokenType == LockTokenType.LP_Token) {
+						lpTokenData = {
+							'object': await getLPObject(opt.tokenAddress)
+						}
+					} else if (opt.lockTokenType == LockTokenType.VAULT_Token) {
+						vaultTokenData = {
+							'object': await getVaultObject(opt.tokenAddress)
+						}
 					}
 				}
+				const tokenInfo = {
+					tokenAddress: campaign.tokenAddress,
+					lpToken: lpTokenData,
+					vaultToken: vaultTokenData
+				}
+				options[optIdx] = {
+					...options[optIdx],
+					tokenInfo
+				}
 			}
-			const tokenInfo = {
-				tokenAddress: campaign.tokenAddress,
-				lpToken: lpTokenData,
-				vaultToken: vaultTokenData
-			}
-			const lockedTokenObject = getLockedTokenObject(stakingInfo, tokenInfo, this.tokenMap);
+			const stakingInfo = options ? options[0] : null;
+			const lockedTokenObject = getLockedTokenObject(stakingInfo, stakingInfo.tokenInfo, this.tokenMap);
 			const lockedTokenSymbol = getLockedTokenSymbol(stakingInfo, lockedTokenObject);
 			const lockedTokenIconPaths = getLockedTokenIconPaths(stakingInfo, lockedTokenObject, chainId, this.tokenMap);
 			const lockedTokenDecimals = lockedTokenObject?.decimals || 18;
@@ -471,7 +551,7 @@ export class StakingBlock extends Module implements PageBlock {
 				simplifiedRow.appendChild(
 					<i-panel class="simplified-description">
 						<i-label caption={`Don't have ${network?.name} ${lockedTokenSymbol}?`} />
-						<i-image width={25} height={25} url={Assets.fullPath(network?.img || '')} />
+						<i-image width={25} height={25} url={Assets.fullPath(network?.img || '')} fallbackUrl={fallBackUrl} />
 					</i-panel>
 				);
 				simplifiedRow.appendChild(
@@ -627,8 +707,8 @@ export class StakingBlock extends Module implements PageBlock {
 					<i-vstack class="column-custom">
 						<i-vstack class="banner" background={{ color: campaign.customColorCampaign || '#f15e61' }} verticalAlignment="space-between">
 							{stickerSection}
-							<i-hstack verticalAlignment='center' class="campaign-name">
-								<i-image width="25px" height="25px" url={Assets.fullPath(this.tokenIcon)} />
+							<i-hstack verticalAlignment="center" class="campaign-name">
+								{ !campaign.customLogo ? [] : <i-image width="25px" height="25px" url={campaign.customLogo} fallbackUrl={fallBackUrl} /> }
 								<i-label caption={campaign.campaignName} />
 							</i-hstack>
 							<i-hstack>
@@ -650,11 +730,11 @@ export class StakingBlock extends Module implements PageBlock {
 								}
 							</i-panel>
 							{simplifiedRow}
-							<i-hstack verticalAlignment='center' class="get-token" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
+							<i-hstack verticalAlignment="center" class="get-token" onClick={() => this.getLPToken(campaign, lockedTokenSymbol, chainId)}>
 								<i-label class="bold" caption={`Get ${lockedTokenSymbol}`} />
 								{
 									lockedTokenIconPaths.map((v: any) => {
-										return <i-image width={25} height={25} url={Assets.fullPath(v)} />
+										return <i-image width={25} height={25} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
 									})
 								}
 								<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} />
@@ -703,8 +783,6 @@ export class StakingBlock extends Module implements PageBlock {
 							const isClaim = option.mode === 'Claim';
 
 							const rewardOptions = !isClaim ? option.rewardsData : [];
-							const rewardToken = !isClaim ? this.getRewardToken(rewardOptions[0].tokenAddress) : {} as any;
-							const lpRewardTokenIconPath = !isClaim && rewardToken.address ? getTokenIconPath(rewardToken, chainId) : '';
 							let aprInfo: any = {};
 
 							const optionAvailableQtyLabel = await Label.create();
@@ -836,14 +914,28 @@ export class StakingBlock extends Module implements PageBlock {
 
 							const durationDays = option.minLockTime / (60 * 60 * 24);
 
+							const imgTokensElm = await HStack.create({ width: '100%', verticalAlignment: 'center', horizontalAlignment: 'center' })
+							const rewardLenght = option.rewardsData.length;
+							for (const reward of option.rewardsData) {
+								const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+								const imgUrl = getTokenIconPath(rewardToken, chainId);
+								const size = 100 / rewardLenght;
+								imgTokensElm.appendChild(
+									<i-image width={`${size}%`} height="100%" maxWidth={75} maxHeight={75} url={Assets.fullPath(imgUrl)} fallbackUrl={fallBackUrl} />
+								)
+							}
+
+							const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
+							const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
+
 							return <i-vstack class="column-custom">
 								<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || '#ffffff07' }}>
 									{stickerOptionSection}
 									<i-panel class="header-info">
-										<i-hstack verticalAlignment='center' horizontalAlignment="center">
+										<i-hstack verticalAlignment="center" horizontalAlignment="center">
 											{
-												lockedTokenIconPaths.map((v: any) => {
-													return <i-image width={25} height={25} url={Assets.fullPath(v)} />
+												_lockedTokenIconPaths.map((v: any) => {
+													return <i-image width={25} height={25} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
 												})
 											}
 											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
@@ -851,17 +943,7 @@ export class StakingBlock extends Module implements PageBlock {
 										<i-label width="100%" class="staking-description" minHeight={20} caption={option.customDesc || ''} />
 									</i-panel>
 									<i-panel class="img-custom">
-										{
-											(option.lockTokenType === LockTokenType.LP_Token && rewardOptions.length === 2)
-												?
-												<i-panel class="group-img">
-													<i-image width={75} height={75} url={Assets.fullPath(lpRewardTokenIconPath)} />
-													<i-icon name="plus" width={16} height={16} />
-													<i-image width={75} height={75} url={Assets.fullPath(this.tokenIcon)} />
-												</i-panel>
-												:
-												<i-image width={75} height={75} url={Assets.fullPath(this.tokenIcon)} />
-										}
+										{imgTokensElm}
 									</i-panel>
 									<i-panel class="info-stake">
 										{btnStake}
@@ -899,10 +981,10 @@ export class StakingBlock extends Module implements PageBlock {
 														}
 													} else if (option.lockTokenType === LockTokenType.LP_Token) {
 														if (rewardOption.referencePair) {
-															aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, lpTokenData.object, durationDays);
+															aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpTokenData?.object, durationDays);
 														}
 													} else {
-														aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, vaultTokenData.object, durationDays);
+														aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultTokenData?.object, durationDays);
 													}
 													const aprValue = getAprValue(rewardOption);
 													if (isSimplified) {

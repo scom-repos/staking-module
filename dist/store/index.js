@@ -6160,6 +6160,7 @@ __export(exports, {
   baseRoute: () => baseRoute,
   connectWallet: () => connectWallet,
   crossChainNativeTokenList: () => crossChainNativeTokenList,
+  fallBackUrl: () => fallBackUrl,
   getAddresses: () => getAddresses,
   getBridgeVaultVersion: () => getBridgeVaultVersion,
   getChainId: () => getChainId,
@@ -7269,6 +7270,7 @@ var Networks = [
 
 // src/store/index.ts
 var import_components2 = __toModule(require("@ijstech/components"));
+var fallBackUrl = import_assets.default.fullPath("img/tokens/token-placeholder.svg");
 var nullAddress = "0x0000000000000000000000000000000000000000";
 var TOKENS = "oswap_user_tokens_";
 var getUserTokens = (chainId) => {

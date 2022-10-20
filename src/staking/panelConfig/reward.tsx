@@ -26,9 +26,6 @@ export class RewardConfig extends Module {
 	private inputAdminClaimDeadline: Datepicker;
 	private adminClaimDeadline: number;
 	private lbErrAdminClaimDeadline: Label;
-	private inputAdmin: Input;
-	private lbErr: Label;
-	private isAdminValid = false;
 	private checkboxStartDate: Checkbox;
 	private wrapperStartDateElm: HStack;
 	private inputVestingStartDate: Datepicker;
@@ -136,7 +133,6 @@ export class RewardConfig extends Module {
 			// this.inputInitialReward.enabled = this.isNew;
 			// this.inputRewardVesting.enabled = this.isNew;
 			// this.inputAdminClaimDeadline.enabled = this.isNew;
-			// this.inputAdmin.enabled = this.isNew;
 			// if (this.tokenSelection) {
 			// 	this.tokenSelection.enabled = this.isNew;
 			// }
@@ -159,13 +155,13 @@ export class RewardConfig extends Module {
 					this.inputInitialReward.value = new BigNumber(initialReward).toFixed();
 					this.inputRewardVesting.value = new BigNumber(vestingPeriod).dividedBy(this.hourVal).toFixed();
 					this.setAdminClaimDeadline(claimDeadline);
-					this.inputAdmin.value = admin;
-					this.isAdminValid = true;
 					this.checkboxStartDate.checked = !!isCommonStartDate;
 					this.onCheckCommonStartDate();
 					if (isCommonStartDate) {
 						this.setStartDate(vestingStartDate);
 					}
+					this.updateMaxReward();
+					this.updateRate();
 					this.emitInput();
 				}
 			}, 200);
@@ -380,14 +376,8 @@ export class RewardConfig extends Module {
 		this.emitInput();
 	}
 
-	private onInputAdmin = async () => {
-		this.isAdminValid = await isAddressValid(this.inputAdmin.value);
-		this.lbErr.visible = !this.isAdminValid;
-		this.emitInput();
-	}
-
 	checkValidation = () => {
-		return this.token && this.isAdminValid &&
+		return this.token &&
 			this.checkInitialReward() &&
 			isValidNumber(this.inputMultiplier.value) &&
 			isValidNumber(this.inputRewardVesting.value) &&
@@ -404,7 +394,7 @@ export class RewardConfig extends Module {
 			initialReward: new BigNumber(this.inputInitialReward.value),
 			vestingPeriod: new BigNumber(this.inputRewardVesting.value).multipliedBy(this.unit).multipliedBy(this.hourVal),
 			claimDeadline: new BigNumber(this.adminClaimDeadline),
-			admin: `${this.inputAdmin.value}`,
+			admin: '',
 			isCommonStartDate: this.checkboxStartDate.checked,
 			vestingStartDate: new BigNumber(this.vestingStartDate || 0),
 			rewardAmount: this.maxReward
@@ -497,16 +487,6 @@ export class RewardConfig extends Module {
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 							<i-datepicker id="inputAdminClaimDeadline" width="100%" height={40} type="dateTime" class="cs-datepicker" />
 							<i-label id="lbErrAdminClaimDeadline" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
-						</i-vstack>
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-hstack gap={4} verticalAlignment="center">
-							<i-label class="lb-title" caption="Admin" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
-						</i-hstack>
-						<i-vstack gap={4} class="w-input" verticalAlignment="center">
-							<i-input id="inputAdmin" class="input-text w-input w-100" onChanged={this.onInputAdmin} />
-							<i-label id="lbErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack class="row-mobile" gap={10} verticalAlignment="center" horizontalAlignment="space-between">

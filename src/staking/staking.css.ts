@@ -363,16 +363,6 @@ Styles.cssRule('.staking-component', {
           paddingTop: '1.5rem',
           marginBottom: '0.75rem',
         },
-        '.group-img': {
-          display: 'flex',
-          justifyContent: 'center',
-          $nest: {
-            'i-icon': {
-              margin: 'auto 0.25rem',
-              fill: 'var(--colors-primary-main)',
-            },
-          },
-        },
         '.info-stake': {
           width: '100%',
           padding: '0.5rem 0.75rem',
@@ -418,6 +408,27 @@ Styles.cssRule('.staking-component', {
     },
     '.mr-025': {
       marginRight: '0.25rem',
+    },
+    '#importFileErrModal': {
+      $nest: {
+        '.modal': {
+          borderRadius: 12,
+        },
+        '.i-modal_header': {
+          marginBottom: '1.5rem',
+          paddingBottom: '0.5rem',
+          borderBottom: `2px solid ${Theme.divider}`,
+          color: Theme.colors.primary.main,
+          fontSize: '1.25rem',
+          fontWeight: 700,
+        },
+        '.i-modal_header > i-icon': {
+          fill: `${Theme.colors.primary.main} !important`
+        },
+        '#importFileErr span': {
+          fontSize: '16px !important'
+        }
+      }
     },
     '#loadingElm.i-loading--active': {
       marginTop: '2rem',

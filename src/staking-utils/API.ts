@@ -443,6 +443,7 @@ const getReservesByPair = async (pairAddress: string, tokenInAddress?: string, t
 }
 
 const getLPRewardCurrentAPR = async (rewardOption: any, lpObject: any, lockedDays: number) => {
+  if (!lpObject) return '';
   let wallet = Wallet.getInstance();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address!;
@@ -579,7 +580,7 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
     for (const staking of campaign.stakings) {
       let timeIsMoney = new TimeIsMoneyContracts.TimeIsMoney(wallet);
       let stakingResult: Staking;
-      const { campaignStart, campaignEnd } = campaign;
+      const { campaignStart, campaignEnd, admin } = campaign;
       const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
       let timeIsMoneyToken = new Erc20(wallet, lockTokenAddress);
       let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
@@ -593,7 +594,7 @@ const deployCampaign = async (campaign: StakingCampaign, callback?: any) => {
       });
       let rewardResult: Reward[] = [];
       for (const reward of staking.rewards) {
-        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline, admin } = reward;
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline } = reward;
         let rewardToken = new Erc20(wallet, rewardTokenAddress);
         let rewardTokenDecimals = await rewardToken.decimals;
         let params: any = {

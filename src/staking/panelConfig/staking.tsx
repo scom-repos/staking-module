@@ -317,9 +317,7 @@ export class StakingConfig extends Module {
 		rewards[idx].visible = !(idx && reward);
 		this.rewardConfig = [...rewards];
 		this.pnlInfoElm.appendChild(this.rewardConfig[idx]);
-		if (!this.isNew) {
-			this.rewardConfig[idx].chainId = this.chainId;
-		}
+		this.rewardConfig[idx].chainId = this.chainId;
 		this.rewardConfig[idx].data = reward;
 		this.rewardConfig[idx].campaignEndLockTime = this.minLockTime.plus(this._campaignEnd).toNumber();
 		this.rewardConfig[idx].maxTotal = this.inputMaxTotalLock.value || 0;

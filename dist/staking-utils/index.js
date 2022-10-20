@@ -19405,6 +19405,8 @@ var getReservesByPair = async (pairAddress, tokenInAddress, tokenOutAddress) => 
   return reserveObj;
 };
 var getLPRewardCurrentAPR = async (rewardOption, lpObject, lockedDays) => {
+  if (!lpObject)
+    return "";
   let wallet = import_eth_wallet4.Wallet.getInstance();
   const WETH = getWETH(wallet);
   const WETHAddress = WETH.address;
@@ -19537,7 +19539,7 @@ var deployCampaign = async (campaign, callback) => {
     for (const staking of campaign.stakings) {
       let timeIsMoney = new import_time_is_money_sdk.Contracts.TimeIsMoney(wallet);
       let stakingResult;
-      const { campaignStart, campaignEnd } = campaign;
+      const { campaignStart, campaignEnd, admin } = campaign;
       const { lockTokenAddress, maxTotalLock, minLockTime, perAddressCap } = staking;
       let timeIsMoneyToken = new import_eth_wallet4.Erc20(wallet, lockTokenAddress);
       let timeIsMoneyTokenDecimals = await timeIsMoneyToken.decimals;
@@ -19551,7 +19553,7 @@ var deployCampaign = async (campaign, callback) => {
       });
       let rewardResult = [];
       for (const reward of staking.rewards) {
-        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline, admin } = reward;
+        const { multiplier, rewardTokenAddress, initialReward, vestingPeriod, isCommonStartDate, vestingStartDate, claimDeadline } = reward;
         let rewardToken = new import_eth_wallet4.Erc20(wallet, rewardTokenAddress);
         let rewardTokenDecimals = await rewardToken.decimals;
         let params = {
