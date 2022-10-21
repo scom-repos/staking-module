@@ -434,9 +434,9 @@ export class StakingBlock extends Module implements PageBlock {
 					{
 						isBtnShown ? (
 							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">
-								<i-button maxWidth={200} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
-								<i-button maxWidth={200} caption="Import New Campaign" class="btn-os btn-stake" onClick={() => onImportCampaign(true)} />
-								<i-button maxWidth={200} caption="Import Existing Campaigns" class="btn-os btn-stake" onClick={() => onImportCampaign(false)} />
+								<i-button maxWidth={220} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
+								<i-button maxWidth={220} caption="Import New Campaign" class="btn-os btn-stake" onClick={() => onImportCampaign(true)} />
+								<i-button maxWidth={220} caption="Import Existing Campaigns" class="btn-os btn-stake" onClick={() => onImportCampaign(false)} />
 								{ importFileElm }
 								<i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
 									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">

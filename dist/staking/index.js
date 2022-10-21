@@ -11120,17 +11120,17 @@
           verticalAlignment: "center",
           horizontalAlignment: "center"
         }, /* @__PURE__ */ this.$render("i-button", {
-          maxWidth: 200,
+          maxWidth: 220,
           caption: "Add New Campaign",
           class: "btn-os btn-stake",
           onClick: () => this.onEditCampaign(true)
         }), /* @__PURE__ */ this.$render("i-button", {
-          maxWidth: 200,
+          maxWidth: 220,
           caption: "Import New Campaign",
           class: "btn-os btn-stake",
           onClick: () => onImportCampaign(true)
         }), /* @__PURE__ */ this.$render("i-button", {
-          maxWidth: 200,
+          maxWidth: 220,
           caption: "Import Existing Campaigns",
           class: "btn-os btn-stake",
           onClick: () => onImportCampaign(false)
