@@ -1,4 +1,4 @@
-import { Styles, Button, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label, VStack } from '@ijstech/components';
+import { Styles, Button, Container, HStack, Panel, customElements, ControlElement, Module, Icon, IEventBus, application, Label, VStack, Modal } from '@ijstech/components';
 import { downloadJsonFile, EventId, registerSendTxEvents } from '@staking/global';
 import { Result } from '../../result';
 import './panel-config.css';
@@ -40,6 +40,9 @@ export class PanelConfig extends Module {
   private isNew: boolean;
   private campaigns: {[chainId:number]: StakingCampaign[]};
   private isMultiple = true;
+  private importFileElm: Label;
+  private importFileErrModal: Modal;
+  private importFileErr: Label;
   onConfigSave: any;
   onReset: any;
 
@@ -66,8 +69,10 @@ export class PanelConfig extends Module {
   private onChangeChanged = () => {
     const chainId = getChainId();
     this.updateNetworkName(chainId);
-    for (const campaign of this.campaignConfig) {
-      campaign.chainId = chainId;
+    if (this.isNew) {
+      for (const campaign of this.campaignConfig) {
+        campaign.chainId = chainId;
+      }
     }
     this.updateButton();
   }
@@ -75,18 +80,20 @@ export class PanelConfig extends Module {
   showInputCampaign = async (isNew: boolean, campaigns?: StakingCampaign[]) => {
     this.wrapperNetworkElm.visible = isNew;
     this.wapperCampaignsButton.visible = this.isMultiple && !isNew;
+    this.btnAdd.enabled = !isNew;
     this.groupBtnSaveElm.visible = !isNew;
     this.groupBtnDeployElm.visible = isNew;
     this.isNew = isNew;
+    this.initInputFile();
     this.pnlInfoElm.clearInnerHTML();
     this.listCampaignButton.clearInnerHTML();
     this.campaignConfig = [];
     if (campaigns && campaigns.length) {
       for (const campaign of campaigns) {
-        await this.onAddCampaign(campaign);
+        await this.onAddCampaign(false, campaign);
       }
     } else {
-      this.onAddCampaign();
+      this.onAddCampaign(true);
     }
   }
 
@@ -133,8 +140,8 @@ export class PanelConfig extends Module {
     }
   }
 
-  private addCampaign = async (idx: number, campaign?: StakingCampaign) => {
-    if (idx && !campaign) {
+  private addCampaign = async (idx: number, showLast: boolean, campaign?: StakingCampaign) => {
+    if ((idx && !campaign) || showLast) {
       for (const elm of this.campaignConfig) {
         elm.visible = false;
       }
@@ -143,13 +150,13 @@ export class PanelConfig extends Module {
     campaigns[idx] = new CampaignConfig();
     campaigns[idx].isNew = this.isNew;
     campaigns[idx].data = campaign;
-    campaigns[idx].visible = !(idx && campaign);
+    campaigns[idx].visible = !(idx && campaign) || showLast;
     this.campaignConfig = [...campaigns];
     this.pnlInfoElm.appendChild(this.campaignConfig[idx]);
     this.currentCampaign = idx;
   }
 
-  private onAddCampaign = async (campaign?: StakingCampaign) => {
+  private onAddCampaign = async (showLast: boolean, campaign?: StakingCampaign) => {
     if (!this.isMultiple) return;
     const idx = Number(this.campaignConfig.length);
     if (!this.isNew) {
@@ -160,19 +167,19 @@ export class PanelConfig extends Module {
       icon.onClick = () => this.removeCampaign(idx);
       const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
       button.classList.add('btn-item');
-      if (!campaign || !idx) {
+      if (!campaign || !idx || showLast) {
         button.classList.add('btn-active');
       }
       button.onClick = () => this.onRenderCampaign(button, idx);
       const active = this.listCampaignButton.querySelector('.btn-active');
-      if (!campaign && active) {
+      if ((!campaign || showLast) && active) {
         active.classList.remove('btn-active');
       }
       pnl.appendChild(button);
       pnl.appendChild(icon);
       this.listCampaignButton.appendChild(pnl);
     }
-    await this.addCampaign(idx, campaign);
+    await this.addCampaign(idx, showLast, campaign);
     if (!this.isNew) {
       this.btnAdd.enabled = true;
     }
@@ -180,7 +187,67 @@ export class PanelConfig extends Module {
 
   private onAddCampaignByClick = () => {
     if (this.isNew) return;
-    this.onAddCampaign();
+    (this.importFileElm.firstChild?.firstChild as HTMLElement)?.click();
+    // this.onAddCampaign();
+  }
+
+  private onClose = () => {
+    this.importFileErrModal.visible = false;
+  }
+
+  private initInputFile = () => {
+    this.importFileElm.caption = '<input type="file" accept=".json" />';
+    const inputElm = this.importFileElm.firstChild?.firstChild as HTMLElement;
+    if (inputElm) {
+      inputElm.onchange = (event: any) => {
+        const reader = new FileReader();
+        const files = event.target.files;
+        if (!files.length) {
+          return;
+        }
+        const file = files[0];
+        reader.readAsBinaryString(file);
+        reader.onload = (event) => {
+          const { loaded, total } = event;
+          const isCompleted = loaded === total;
+          if (isCompleted) {
+            this.initInputFile();
+            this.convertJSONToObj(reader.result);
+          }
+        }
+      }
+    }
+  }
+
+	private convertJSONToObj = async (result: any) => {
+    if (!result) this.showImportJsonError('Data is corrupted. No data were recovered.');
+		try {
+			const obj = JSON.parse(result);
+			const length = Object.keys(obj).length;
+			if (!length) {
+				this.showImportJsonError('No data found in the imported file.');
+			} else {
+        const keys = Object.keys(obj);
+        let campaigns = [];
+        for (const key of keys) {
+          const arr = obj[key].map((item: StakingCampaign) => {
+            item.chainId = Number(key);
+            return item;
+          });
+          campaigns.push(...arr)
+        }
+        for (const campaign of campaigns) {
+          await this.onAddCampaign(true, campaign);
+        }
+			}
+		} catch {
+			this.showImportJsonError('Data is corrupted. No data were recovered.');
+		}
+  }
+
+	private showImportJsonError(message: string) {
+    this.importFileErrModal.visible = true;
+    this.importFileErr.caption = message;
   }
 
   private updateButton = () => {
@@ -330,7 +397,14 @@ export class PanelConfig extends Module {
             <i-vstack id="wapperCampaignsButton" visible={this.isMultiple} verticalAlignment="center">
               <i-hstack gap={10} margin={{ bottom: 10 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between" wrap="wrap-reverse">
                 <i-hstack id="listCampaignButton" verticalAlignment="center" />
-                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaign" onClick={() => this.onAddCampaignByClick()} />
+                <i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Campaigns" onClick={() => this.onAddCampaignByClick()} />
+                <i-label id="importFileElm" visible={false} />
+                <i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
+									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
+										<i-label id="importFileErr" font={{ size: '16px', color: Theme.text.primary }} />
+										<i-button caption="Close" class="btn-os btn-stake" width={120} onClick={this.onClose} />
+									</i-vstack>
+								</i-modal>
               </i-hstack>
               <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
             </i-vstack>

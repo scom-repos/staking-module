@@ -409,6 +409,15 @@ Styles.cssRule('.staking-component', {
     '.mr-025': {
       marginRight: '0.25rem',
     },
+    '.input-disabled': {
+      opacity: 0.4,
+      cursor: 'default',
+      $nest: {
+        '*': {
+          cursor: 'default',
+        }
+      }
+    },
     '#importFileErrModal': {
       $nest: {
         '.modal': {

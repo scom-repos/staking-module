@@ -153,6 +153,7 @@ Styles.cssRule('.panel-config', {
         '.i-upload-wrapper': {
           margin: 4,
           height: '100%',
+          cursor: 'pointer',
         },
         '.i-upload_preview': {
           minHeight: 'auto',

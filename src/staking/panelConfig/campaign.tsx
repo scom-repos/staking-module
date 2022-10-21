@@ -1,4 +1,4 @@
-import { Styles, Button, Image, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker, Upload } from '@ijstech/components';
+import { Styles, Button, Modal, Container, VStack, Panel, customElements, ControlElement, Module, HStack, Icon, Input, Checkbox, application, Label, Control, Datepicker, Upload } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import { DefaultDateTimeFormat, EventId, isAddressValid } from '@staking/global';
 import { getChainId, getDefaultChainId, getTokenBalance, getTokenMap, Networks, Staking, StakingCampaign } from '@staking/store';
@@ -82,8 +82,18 @@ export class CampaignConfig extends Module {
 	private setupInput = () => {
 		if (this.wapperNetworkElm) {
 			this.wapperNetworkElm.visible = !this.isNew;
-			// this.inputCampaignStart.enabled = this.isNew;
-			// this.inputCampaignEnd.enabled = this.isNew;
+			if (this.btnNetwork) {
+				this.btnNetwork.enabled = this.isNew;
+			}
+			this.inputCampaignStart.enabled = this.isNew;
+			this.inputCampaignEnd.enabled = this.isNew;
+			if (!this.isNew) {
+				this.inputCampaignStart.classList.add('input-disabled');
+				this.inputCampaignEnd.classList.add('input-disabled');
+			}
+			this.inputAdmin.enabled = this.isNew;
+			this.btnAdd.visible = this.isNew;
+			this.btnAdd.enabled = this.isNew;
 		}
 	}
 
@@ -110,8 +120,10 @@ export class CampaignConfig extends Module {
 					endElm.value = moment.unix(end).format(DefaultDateTimeFormat);
 					this.checkboxContract.checked = !!showContractLink;
 					this.inputAdmin.value = admin;
-					this.isAdminValid = await isAddressValid(admin);
-					this.lbErrAdmin.visible = !this.isAdminValid;
+					if (!admin) {
+						this.isAdminValid = await isAddressValid(admin);
+						this.lbErrAdmin.visible = !this.isAdminValid;
+					}
 					this.inputMainColor.value = customColorCampaign || '';
 					this.inputBg.value = customColorBackground || '';
 					this.inputColorText.value = customColorText || '';
@@ -230,6 +242,7 @@ export class CampaignConfig extends Module {
 			width: '100%',
 			height: 40,
 			maxWidth: 300,
+			enabled: this.isNew,
 		});
 		this.btnNetwork.classList.add('btn-select');
 		this.btnNetwork.onClick = () => { dropdownModal.visible = !dropdownModal.visible }

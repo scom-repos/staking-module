@@ -136,18 +136,21 @@ export class StakingConfig extends Module {
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
-			// this.inputLockingTime.enabled = this.isNew;
-			// this.inputPerAddressCap.enabled = this.isNew;
-			// this.inputMaxTotalLock.enabled = this.isNew;
-			// if (this.btnType) {
-			// 	this.btnType.enabled = this.isNew;
-			// }
-			// if (this.btnTime) {
-			// 	this.btnTime.enabled = this.isNew;
-			// }
-			// if (this.tokenSelection) {
-			// 	this.tokenSelection.enabled = this.isNew;
-			// }
+			this.inputAddress.enabled = this.isNew;
+			this.inputLockingTime.enabled = this.isNew;
+			this.inputPerAddressCap.enabled = this.isNew;
+			this.inputMaxTotalLock.enabled = this.isNew;
+			if (this.btnType) {
+				this.btnType.enabled = this.isNew;
+			}
+			if (this.btnTime) {
+				this.btnTime.enabled = this.isNew;
+			}
+			if (this.tokenSelection) {
+				this.tokenSelection.enabled = this.isNew;
+			}
+			this.btnAdd.visible = this.isNew;
+			this.btnAdd.enabled = this.isNew;
 		}
 	}
 

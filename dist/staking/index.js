@@ -6361,6 +6361,15 @@
       ".mr-025": {
         marginRight: "0.25rem"
       },
+      ".input-disabled": {
+        opacity: 0.4,
+        cursor: "default",
+        $nest: {
+          "*": {
+            cursor: "default"
+          }
+        }
+      },
       "#importFileErrModal": {
         $nest: {
           ".modal": {
@@ -7382,7 +7391,8 @@
         $nest: {
           ".i-upload-wrapper": {
             margin: 4,
-            height: "100%"
+            height: "100%",
+            cursor: "pointer"
           },
           ".i-upload_preview": {
             minHeight: "auto"
@@ -8530,7 +8540,25 @@
       this.setupInput = () => {
         if (this.wrapperAddressElm) {
           this.wrapperAddressElm.visible = !this.isNew;
+          this.inputAddress.enabled = this.isNew;
           this.wrapperRewardNeededElm.visible = this.isNew;
+          this.inputMultiplier.enabled = this.isNew;
+          this.inputInitialReward.enabled = this.isNew;
+          this.inputRewardVesting.enabled = this.isNew;
+          this.inputAdminClaimDeadline.enabled = this.isNew;
+          if (this.tokenSelection) {
+            this.tokenSelection.enabled = this.isNew;
+          }
+          if (this.btnTime) {
+            this.btnTime.enabled = this.isNew;
+          }
+          this.checkboxStartDate.enabled = this.isNew;
+          this.inputVestingStartDate.enabled = this.isNew;
+          if (!this.isNew) {
+            this.inputAdminClaimDeadline.classList.add("input-disabled");
+            this.checkboxStartDate.classList.add("input-disabled");
+            this.inputVestingStartDate.classList.add("input-disabled");
+          }
         }
       };
       this.setupData = async () => {
@@ -8704,7 +8732,11 @@
       this.emitInput = () => {
         import_components10.application.EventBus.dispatch(import_global5.EventId.EmitInput);
       };
-      this.onCheckCommonStartDate = () => {
+      this.onCheckCommonStartDate = (isClicked) => {
+        if (isClicked && !this.checkboxStartDate.enabled) {
+          this.checkboxStartDate.checked = !this.checkboxStartDate.checked;
+          return;
+        }
         this.wrapperStartDateElm.visible = this.checkboxStartDate.checked;
         this.emitInput();
       };
@@ -8901,7 +8933,7 @@
         onChanged: (src) => this.onInputMultiplier(src)
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
-        margin: { top: 8 },
+        margin: { bottom: 8, top: 8 },
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
       }, /* @__PURE__ */ this.$render("i-hstack", {
@@ -8925,7 +8957,7 @@
         id: "wrapperRewardNeededElm",
         visible: false,
         gap: 10,
-        margin: { top: 8, bottom: 8 },
+        margin: { bottom: 8 },
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
       }, /* @__PURE__ */ this.$render("i-hstack", {
@@ -9046,7 +9078,7 @@
         id: "checkboxStartDate",
         height: "auto",
         checked: false,
-        onChanged: this.onCheckCommonStartDate
+        onChanged: () => this.onCheckCommonStartDate(true)
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperStartDateElm",
         visible: false,
@@ -9111,6 +9143,21 @@
       this.setupInput = () => {
         if (this.wrapperAddressElm) {
           this.wrapperAddressElm.visible = !this.isNew;
+          this.inputAddress.enabled = this.isNew;
+          this.inputLockingTime.enabled = this.isNew;
+          this.inputPerAddressCap.enabled = this.isNew;
+          this.inputMaxTotalLock.enabled = this.isNew;
+          if (this.btnType) {
+            this.btnType.enabled = this.isNew;
+          }
+          if (this.btnTime) {
+            this.btnTime.enabled = this.isNew;
+          }
+          if (this.tokenSelection) {
+            this.tokenSelection.enabled = this.isNew;
+          }
+          this.btnAdd.visible = this.isNew;
+          this.btnAdd.enabled = this.isNew;
         }
       };
       this.setupData = async () => {
@@ -9635,6 +9682,18 @@
       this.setupInput = () => {
         if (this.wapperNetworkElm) {
           this.wapperNetworkElm.visible = !this.isNew;
+          if (this.btnNetwork) {
+            this.btnNetwork.enabled = this.isNew;
+          }
+          this.inputCampaignStart.enabled = this.isNew;
+          this.inputCampaignEnd.enabled = this.isNew;
+          if (!this.isNew) {
+            this.inputCampaignStart.classList.add("input-disabled");
+            this.inputCampaignEnd.classList.add("input-disabled");
+          }
+          this.inputAdmin.enabled = this.isNew;
+          this.btnAdd.visible = this.isNew;
+          this.btnAdd.enabled = this.isNew;
         }
       };
       this.setupData = async () => {
@@ -9660,8 +9719,10 @@
               endElm.value = import_moment3.default.unix(end).format(import_global7.DefaultDateTimeFormat);
               this.checkboxContract.checked = !!showContractLink;
               this.inputAdmin.value = admin;
-              this.isAdminValid = await (0, import_global7.isAddressValid)(admin);
-              this.lbErrAdmin.visible = !this.isAdminValid;
+              if (!admin) {
+                this.isAdminValid = await (0, import_global7.isAddressValid)(admin);
+                this.lbErrAdmin.visible = !this.isAdminValid;
+              }
               this.inputMainColor.value = customColorCampaign || "";
               this.inputBg.value = customColorBackground || "";
               this.inputColorText.value = customColorText || "";
@@ -9757,7 +9818,8 @@
           rightIcon: { name: "caret-down", fill: Theme9.colors.primary.main },
           width: "100%",
           height: 40,
-          maxWidth: 300
+          maxWidth: 300,
+          enabled: this.isNew
         });
         this.btnNetwork.classList.add("btn-select");
         this.btnNetwork.onClick = () => {
@@ -10304,26 +10366,30 @@
       this.onChangeChanged = () => {
         const chainId = (0, import_store9.getChainId)();
         this.updateNetworkName(chainId);
-        for (const campaign of this.campaignConfig) {
-          campaign.chainId = chainId;
+        if (this.isNew) {
+          for (const campaign of this.campaignConfig) {
+            campaign.chainId = chainId;
+          }
         }
         this.updateButton();
       };
       this.showInputCampaign = async (isNew, campaigns) => {
         this.wrapperNetworkElm.visible = isNew;
         this.wapperCampaignsButton.visible = this.isMultiple && !isNew;
+        this.btnAdd.enabled = !isNew;
         this.groupBtnSaveElm.visible = !isNew;
         this.groupBtnDeployElm.visible = isNew;
         this.isNew = isNew;
+        this.initInputFile();
         this.pnlInfoElm.clearInnerHTML();
         this.listCampaignButton.clearInnerHTML();
         this.campaignConfig = [];
         if (campaigns && campaigns.length) {
           for (const campaign of campaigns) {
-            await this.onAddCampaign(campaign);
+            await this.onAddCampaign(false, campaign);
           }
         } else {
-          this.onAddCampaign();
+          this.onAddCampaign(true);
         }
       };
       this.onBack = () => {
@@ -10365,8 +10431,8 @@
           }
         }
       };
-      this.addCampaign = async (idx, campaign) => {
-        if (idx && !campaign) {
+      this.addCampaign = async (idx, showLast, campaign) => {
+        if (idx && !campaign || showLast) {
           for (const elm of this.campaignConfig) {
             elm.visible = false;
           }
@@ -10375,12 +10441,12 @@
         campaigns[idx] = new CampaignConfig();
         campaigns[idx].isNew = this.isNew;
         campaigns[idx].data = campaign;
-        campaigns[idx].visible = !(idx && campaign);
+        campaigns[idx].visible = !(idx && campaign) || showLast;
         this.campaignConfig = [...campaigns];
         this.pnlInfoElm.appendChild(this.campaignConfig[idx]);
         this.currentCampaign = idx;
       };
-      this.onAddCampaign = async (campaign) => {
+      this.onAddCampaign = async (showLast, campaign) => {
         if (!this.isMultiple)
           return;
         const idx = Number(this.campaignConfig.length);
@@ -10392,27 +10458,81 @@
           icon.onClick = () => this.removeCampaign(idx);
           const button = await import_components13.Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
           button.classList.add("btn-item");
-          if (!campaign || !idx) {
+          if (!campaign || !idx || showLast) {
             button.classList.add("btn-active");
           }
           button.onClick = () => this.onRenderCampaign(button, idx);
           const active = this.listCampaignButton.querySelector(".btn-active");
-          if (!campaign && active) {
+          if ((!campaign || showLast) && active) {
             active.classList.remove("btn-active");
           }
           pnl.appendChild(button);
           pnl.appendChild(icon);
           this.listCampaignButton.appendChild(pnl);
         }
-        await this.addCampaign(idx, campaign);
+        await this.addCampaign(idx, showLast, campaign);
         if (!this.isNew) {
           this.btnAdd.enabled = true;
         }
       };
       this.onAddCampaignByClick = () => {
+        var _a, _b;
         if (this.isNew)
           return;
-        this.onAddCampaign();
+        (_b = (_a = this.importFileElm.firstChild) == null ? void 0 : _a.firstChild) == null ? void 0 : _b.click();
+      };
+      this.onClose = () => {
+        this.importFileErrModal.visible = false;
+      };
+      this.initInputFile = () => {
+        var _a;
+        this.importFileElm.caption = '<input type="file" accept=".json" />';
+        const inputElm = (_a = this.importFileElm.firstChild) == null ? void 0 : _a.firstChild;
+        if (inputElm) {
+          inputElm.onchange = (event) => {
+            const reader = new FileReader();
+            const files = event.target.files;
+            if (!files.length) {
+              return;
+            }
+            const file = files[0];
+            reader.readAsBinaryString(file);
+            reader.onload = (event2) => {
+              const { loaded, total } = event2;
+              const isCompleted = loaded === total;
+              if (isCompleted) {
+                this.initInputFile();
+                this.convertJSONToObj(reader.result);
+              }
+            };
+          };
+        }
+      };
+      this.convertJSONToObj = async (result) => {
+        if (!result)
+          this.showImportJsonError("Data is corrupted. No data were recovered.");
+        try {
+          const obj = JSON.parse(result);
+          const length = Object.keys(obj).length;
+          if (!length) {
+            this.showImportJsonError("No data found in the imported file.");
+          } else {
+            const keys = Object.keys(obj);
+            let campaigns = [];
+            for (const key of keys) {
+              const arr = obj[key].map((item) => {
+                item.chainId = Number(key);
+                return item;
+              });
+              campaigns.push(...arr);
+            }
+            for (const campaign of campaigns) {
+              await this.onAddCampaign(true, campaign);
+            }
+          }
+        } catch (e) {
+          this.showImportJsonError("Data is corrupted. No data were recovered.");
+        }
       };
       this.updateButton = () => {
         var _a;
@@ -10534,6 +10654,10 @@
       this.$eventBus = import_components13.application.EventBus;
       this.registerEvent();
     }
+    showImportJsonError(message) {
+      this.importFileErrModal.visible = true;
+      this.importFileErr.caption = message;
+    }
     init() {
       super.init();
       this.stakingResult = new Result();
@@ -10593,9 +10717,31 @@
         id: "btnAdd",
         class: "btn-os",
         margin: { left: "auto" },
-        caption: "Add Campaign",
+        caption: "Add Campaigns",
         onClick: () => this.onAddCampaignByClick()
-      })), /* @__PURE__ */ this.$render("i-panel", {
+      }), /* @__PURE__ */ this.$render("i-label", {
+        id: "importFileElm",
+        visible: false
+      }), /* @__PURE__ */ this.$render("i-modal", {
+        id: "importFileErrModal",
+        maxWidth: "100%",
+        width: 420,
+        title: "Import Campaign Error",
+        closeIcon: { name: "times" }
+      }, /* @__PURE__ */ this.$render("i-vstack", {
+        gap: 20,
+        margin: { bottom: 10 },
+        verticalAlignment: "center",
+        horizontalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-label", {
+        id: "importFileErr",
+        font: { size: "16px", color: Theme10.text.primary }
+      }), /* @__PURE__ */ this.$render("i-button", {
+        caption: "Close",
+        class: "btn-os btn-stake",
+        width: 120,
+        onClick: this.onClose
+      })))), /* @__PURE__ */ this.$render("i-panel", {
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
@@ -10692,6 +10838,7 @@
       this.listAprTimer = [];
       this.listActiveTimer = [];
       this.tokenMap = {};
+      this.isImportNewCampaign = false;
       this.initInputFile = (importFileElm) => {
         var _a;
         importFileElm.caption = '<input type="file" accept=".json" />';
@@ -10726,12 +10873,16 @@
           const campaignObj = obj[chainId];
           if (!length) {
             this.showImportJsonError("No data found in the imported file.");
-          } else if (!campaignObj) {
+          } else if (this.isImportNewCampaign && !campaignObj) {
             const network = (0, import_store10.getNetworkInfo)(chainId);
             this.showImportJsonError(`No data found in ${network == null ? void 0 : network.name} network.`);
           } else {
-            this.data = { [chainId]: [campaignObj[0]] };
-            this.onEditCampaign(true);
+            if (this.isImportNewCampaign) {
+              const data = { [chainId]: [campaignObj[0]] };
+              this.onEditCampaign(true, data);
+            } else {
+              this.onEditCampaign(false, obj);
+            }
           }
         } catch (e) {
           this.showImportJsonError("Data is corrupted. No data were recovered.");
@@ -10942,8 +11093,9 @@
         let onClose;
         if (isBtnShown) {
           importFileElm = await import_components14.Label.create({ visible: false });
-          onImportCampaign = () => {
+          onImportCampaign = (isNew) => {
             var _a, _b;
+            this.isImportNewCampaign = isNew;
             (_b = (_a = importFileElm.firstChild) == null ? void 0 : _a.firstChild) == null ? void 0 : _b.click();
           };
           onClose = () => {
@@ -10974,14 +11126,14 @@
           onClick: () => this.onEditCampaign(true)
         }), /* @__PURE__ */ this.$render("i-button", {
           maxWidth: 200,
-          caption: "Edit Existing Campaign",
+          caption: "Import New Campaign",
           class: "btn-os btn-stake",
-          onClick: () => this.onEditCampaign(false)
+          onClick: () => onImportCampaign(true)
         }), /* @__PURE__ */ this.$render("i-button", {
           maxWidth: 200,
-          caption: "Campaign Import",
+          caption: "Import Existing Campaigns",
           class: "btn-os btn-stake",
-          onClick: () => onImportCampaign()
+          onClick: () => onImportCampaign(false)
         }), importFileElm, /* @__PURE__ */ this.$render("i-modal", {
           id: "importFileErrModal",
           maxWidth: "100%",
@@ -11734,8 +11886,8 @@
       this.stakingLayout.visible = true;
       this.onSetupPage((0, import_store10.isWalletConnected)());
     }
-    async onEditCampaign(isNew) {
-      this.pnlConfig.showInputCampaign(isNew, this.getCampaign());
+    async onEditCampaign(isNew, data) {
+      this.pnlConfig.showInputCampaign(isNew, this.getCampaign(data));
       this.stakingLayout.visible = false;
       this.pnlConfig.visible = true;
     }
@@ -11743,12 +11895,13 @@
       this.importFileErrModal.visible = true;
       this.importFileErr.caption = message;
     }
-    getCampaign() {
-      if (this.data) {
-        const keys = Object.keys(this.data);
+    getCampaign(data) {
+      const _data = data ? data : this.data;
+      if (_data) {
+        const keys = Object.keys(_data);
         let campaigns = [];
         for (const key of keys) {
-          const arr = this.data[key].map((item) => {
+          const arr = _data[key].map((item) => {
             item.chainId = Number(key);
             return item;
           });
@@ -11756,7 +11909,7 @@
         }
         return campaigns;
       }
-      return this.data;
+      return _data;
     }
     render() {
       return /* @__PURE__ */ this.$render("i-panel", {

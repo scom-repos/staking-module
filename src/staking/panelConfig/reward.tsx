@@ -128,14 +128,25 @@ export class RewardConfig extends Module {
 	private setupInput = () => {
 		if (this.wrapperAddressElm) {
 			this.wrapperAddressElm.visible = !this.isNew;
+			this.inputAddress.enabled = this.isNew;
 			this.wrapperRewardNeededElm.visible = this.isNew;
-			// this.inputMultiplier.enabled = this.isNew;
-			// this.inputInitialReward.enabled = this.isNew;
-			// this.inputRewardVesting.enabled = this.isNew;
-			// this.inputAdminClaimDeadline.enabled = this.isNew;
-			// if (this.tokenSelection) {
-			// 	this.tokenSelection.enabled = this.isNew;
-			// }
+			this.inputMultiplier.enabled = this.isNew;
+			this.inputInitialReward.enabled = this.isNew;
+			this.inputRewardVesting.enabled = this.isNew;
+			this.inputAdminClaimDeadline.enabled = this.isNew;
+			if (this.tokenSelection) {
+				this.tokenSelection.enabled = this.isNew;
+			}
+			if (this.btnTime) {
+				this.btnTime.enabled = this.isNew;
+			}
+			this.checkboxStartDate.enabled = this.isNew;
+			this.inputVestingStartDate.enabled = this.isNew;
+			if (!this.isNew) {
+				this.inputAdminClaimDeadline.classList.add('input-disabled');
+				this.checkboxStartDate.classList.add('input-disabled');
+				this.inputVestingStartDate.classList.add('input-disabled');
+			}
 		}
 	}
 
@@ -323,7 +334,11 @@ export class RewardConfig extends Module {
 		application.EventBus.dispatch(EventId.EmitInput);
 	}
 
-	private onCheckCommonStartDate = () => {
+	private onCheckCommonStartDate = (isClicked?: boolean) => {
+		if (isClicked && !this.checkboxStartDate.enabled) {
+			this.checkboxStartDate.checked = !this.checkboxStartDate.checked;
+			return;
+		}
 		this.wrapperStartDateElm.visible = this.checkboxStartDate.checked;
 		this.emitInput();
 	}
@@ -441,7 +456,7 @@ export class RewardConfig extends Module {
 						</i-hstack>
 						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputMultiplier(src)} />
 					</i-hstack>
-					<i-hstack gap={10} margin={{ top: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack gap={10} margin={{ bottom: 8, top: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Rate" />
 							<i-label font={{ color: Theme.colors.primary.main, size: '16px' }} />
@@ -450,7 +465,7 @@ export class RewardConfig extends Module {
 							<i-label id="lbRate" caption="-" class="lb-title w-100" font={{ color: Theme.text.third }} />
 						</i-vstack>
 					</i-hstack>
-					<i-hstack id="wrapperRewardNeededElm" visible={false} gap={10} margin={{ top: 8, bottom: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
+					<i-hstack id="wrapperRewardNeededElm" visible={false} gap={10} margin={{ bottom: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Needed" />
 							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
@@ -496,7 +511,7 @@ export class RewardConfig extends Module {
 								id="checkboxStartDate"
 								height="auto"
 								checked={false}
-								onChanged={this.onCheckCommonStartDate}
+								onChanged={() => this.onCheckCommonStartDate(true)}
 							/>
 						</i-vstack>
 					</i-hstack>

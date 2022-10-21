@@ -60,6 +60,7 @@ export class StakingBlock extends Module implements PageBlock {
 	private tokenMap: TokenMapType = {};
 	private importFileErrModal: Modal;
   private importFileErr: Label;
+	private isImportNewCampaign = false;
 
 	validateConfig() {
 
@@ -110,8 +111,8 @@ export class StakingBlock extends Module implements PageBlock {
 		this.onSetupPage(isWalletConnected());
 	}
 
-	async onEditCampaign(isNew: boolean) {
-		this.pnlConfig.showInputCampaign(isNew, this.getCampaign());
+	async onEditCampaign(isNew: boolean, data?: { [key: string]: StakingCampaign[] }) {
+		this.pnlConfig.showInputCampaign(isNew, this.getCampaign(data));
 		this.stakingLayout.visible = false;
 		this.pnlConfig.visible = true;
 	}
@@ -149,12 +150,16 @@ export class StakingBlock extends Module implements PageBlock {
 			const campaignObj = obj[chainId];
 			if (!length) {
 				this.showImportJsonError('No data found in the imported file.');
-			} else if (!campaignObj) {
+			} else if (this.isImportNewCampaign && !campaignObj) {
 				const network = getNetworkInfo(chainId);
 				this.showImportJsonError(`No data found in ${network?.name} network.`);
 			} else {
-				this.data = { [chainId]: [campaignObj[0]] };
-				this.onEditCampaign(true);
+				if (this.isImportNewCampaign) {
+					const data = { [chainId]: [campaignObj[0]] };
+					this.onEditCampaign(true, data);
+				} else {
+					this.onEditCampaign(false, obj);
+				}
 			}
 		} catch {
 			this.showImportJsonError('Data is corrupted. No data were recovered.');
@@ -166,12 +171,13 @@ export class StakingBlock extends Module implements PageBlock {
     this.importFileErr.caption = message;
   }
 
-	private getCampaign() {
-		if (this.data) {
-			const keys = Object.keys(this.data);
+	private getCampaign(data?: { [key: string]: StakingCampaign[] }) {
+		const _data = data ? data : this.data;
+		if (_data) {
+			const keys = Object.keys(_data);
 			let campaigns = [];
 			for (const key of keys) {
-				const arr = this.data[key].map((item: StakingCampaign) => {
+				const arr = _data[key].map((item: StakingCampaign) => {
 					item.chainId = Number(key)
 					return item;
 				});
@@ -179,7 +185,7 @@ export class StakingBlock extends Module implements PageBlock {
 			}
 			return campaigns;
 		}
-		return this.data;
+		return _data;
 	}
 
 	constructor(parent?: Container, options?: ControlElement) {
@@ -410,7 +416,8 @@ export class StakingBlock extends Module implements PageBlock {
 		let onClose: any;
 		if (isBtnShown) {
 			importFileElm = await Label.create({ visible: false });
-			onImportCampaign = () => {
+			onImportCampaign = (isNew: boolean) => {
+				this.isImportNewCampaign = isNew;
 				(importFileElm.firstChild?.firstChild as HTMLElement)?.click();
 			}
 			onClose = () => {
@@ -428,8 +435,8 @@ export class StakingBlock extends Module implements PageBlock {
 						isBtnShown ? (
 							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">
 								<i-button maxWidth={200} caption="Add New Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(true)} />
-								<i-button maxWidth={200} caption="Edit Existing Campaign" class="btn-os btn-stake" onClick={() => this.onEditCampaign(false)} />
-								<i-button maxWidth={200} caption="Campaign Import" class="btn-os btn-stake" onClick={() => onImportCampaign()} />
+								<i-button maxWidth={200} caption="Import New Campaign" class="btn-os btn-stake" onClick={() => onImportCampaign(true)} />
+								<i-button maxWidth={200} caption="Import Existing Campaigns" class="btn-os btn-stake" onClick={() => onImportCampaign(false)} />
 								{ importFileElm }
 								<i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
 									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
