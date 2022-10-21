@@ -120,7 +120,7 @@ export class CampaignConfig extends Module {
 					endElm.value = moment.unix(end).format(DefaultDateTimeFormat);
 					this.checkboxContract.checked = !!showContractLink;
 					this.inputAdmin.value = admin;
-					if (!admin) {
+					if (admin) {
 						this.isAdminValid = await isAddressValid(admin);
 						this.lbErrAdmin.visible = !this.isAdminValid;
 					}

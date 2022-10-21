@@ -9719,7 +9719,7 @@
               endElm.value = import_moment3.default.unix(end).format(import_global7.DefaultDateTimeFormat);
               this.checkboxContract.checked = !!showContractLink;
               this.inputAdmin.value = admin;
-              if (!admin) {
+              if (admin) {
                 this.isAdminValid = await (0, import_global7.isAddressValid)(admin);
                 this.lbErrAdmin.visible = !this.isAdminValid;
               }
