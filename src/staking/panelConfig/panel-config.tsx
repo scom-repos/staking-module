@@ -387,11 +387,11 @@ export class PanelConfig extends Module {
       <i-panel class="panel-config custom-scroll">
         <i-panel id="configCampaignsElm" margin={{ left: 'auto', right: 'auto' }} width="100%" maxWidth={800}>
           <i-hstack id="backElm" gap={4} width="fit-content" margin={{ top: 5, bottom: 15, left: 'auto' }} verticalAlignment="center" class="cursor-pointer" onClick={this.onBack}>
-            <i-icon name="arrow-left" fill={Theme.text.primary} width={20} height={20} />
-            <i-label caption="Back" font={{ size: '20px', bold: true }} />
+            <i-icon name="arrow-left" fill='#FFFFFF' width={20} height={20} />
+            <i-label caption="Back" font={{ size: '20px', bold: true, color: '#FFFFFF' }} />
           </i-hstack>
           <i-hstack id="networkElm" width="100%" height={150} verticalAlignment="center" horizontalAlignment="center">
-            <i-label caption="Please connect with your network!" />
+            <i-label caption="Please connect with your network!" font={{ color: '#FFFFFF' }} />
           </i-hstack>
           <i-panel visible={false} id="campaignElm" width="100%">
             <i-vstack id="wapperCampaignsButton" visible={this.isMultiple} verticalAlignment="center">
@@ -409,7 +409,7 @@ export class PanelConfig extends Module {
               <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
             </i-vstack>
             <i-hstack id="wrapperNetworkElm" width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
-              <i-label id="lbNetworkName" font={{ color: Theme.colors.primary.main, size: '20px', bold: true }} />
+              <i-label id="lbNetworkName" font={{ color: '#F15E61', size: '20px', bold: true }} />
             </i-hstack>
             <i-vstack gap={10} verticalAlignment="center" class="main-content">
               <i-panel id="pnlInfoElm" />
@@ -454,7 +454,7 @@ export class PanelConfig extends Module {
                     enabled={false}
                     width={300}
                     maxWidth="100%"
-                    rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                    rightIcon={{ spin: true, visible: false, fill: '#FFFFFF' }}
                     class="btn-os"
                     onClick={this.onDeployCampaign}
                   />

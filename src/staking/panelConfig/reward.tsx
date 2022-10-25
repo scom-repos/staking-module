@@ -215,10 +215,11 @@ export class RewardConfig extends Module {
 		});
 		this.btnTime = await Button.create({
 			caption: 'Hour(s)',
-			background: { color: Theme.input.background },
+			background: { color: '#0C1234' },
+			font: { color: '#FFFFFF' },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
-			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
+			rightIcon: { name: 'caret-down', fill: '#F15E61' },
 			width: '100%',
 			height: 40,
 			maxWidth: 80,
@@ -435,59 +436,59 @@ export class RewardConfig extends Module {
 					<i-hstack id="wrapperAddressElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Address" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} class="w-input" verticalAlignment="center">
 							<i-input id="inputAddress" class="input-text w-input w-100" onChanged={this.onInputAddress} />
-							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbAddressErr" visible={false} caption="The address is invalid!" font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Token Address" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-panel id="pnlTokenSelection" class="w-input" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Factor" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputMultiplier" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputMultiplier(src)} />
 					</i-hstack>
 					<i-hstack gap={10} margin={{ bottom: 8, top: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Rate" />
-							<i-label font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} class="w-input" verticalAlignment="center">
-							<i-label id="lbRate" caption="-" class="lb-title w-100" font={{ color: Theme.text.third }} />
+							<i-label id="lbRate" caption="-" class="lb-title w-100" font={{ color: '#f6c958' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack id="wrapperRewardNeededElm" visible={false} gap={10} margin={{ bottom: 8 }} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Needed" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} class="w-input" verticalAlignment="center">
-							<i-label id="lbMaxReward" caption="-" class="lb-title w-100" font={{ color: Theme.text.third }} />
+							<i-label id="lbMaxReward" caption="-" class="lb-title w-100" font={{ color: '#f6c958' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Upfront Reward Ratio" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 						<i-input id="inputInitialReward" placeholder="0 <= Reward Ratio <= 1" inputType="number" class="input-text w-input" onChanged={(src: Control) => this.onInputInitalReward(src)} />
-							<i-label id="lbErrInitialReward" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbErrInitialReward" visible={false} font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Reward Vesting" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-hstack gap={4} class="w-input" verticalAlignment="center" wrap="nowrap">
 							<i-input id="inputRewardVesting" inputType="number" width={216} class="input-text" onChanged={(src: Control) => this.onInputUnix(src)} />
@@ -497,11 +498,11 @@ export class RewardConfig extends Module {
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Admin Claim Deadline" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 							<i-datepicker id="inputAdminClaimDeadline" width="100%" height={40} type="dateTime" class="cs-datepicker" />
-							<i-label id="lbErrAdminClaimDeadline" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbErrAdminClaimDeadline" visible={false} font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack class="row-mobile" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
@@ -518,11 +519,11 @@ export class RewardConfig extends Module {
 					<i-hstack id="wrapperStartDateElm" visible={false} gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Vesting Start Date" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 							<i-datepicker id="inputVestingStartDate" width="100%" height={40} type="dateTime" class="cs-datepicker" />
-							<i-label id="lbStartDateErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbStartDateErr" visible={false} font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 				</i-vstack>

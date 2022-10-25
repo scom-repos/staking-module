@@ -427,10 +427,10 @@ export class StakingBlock extends Module implements PageBlock {
 		}
 		this.noCampaignSection.clearInnerHTML();
 		this.noCampaignSection.appendChild(
-			<i-panel class="no-campaign" background={{ color: Theme.background.modal }}>
+			<i-panel class="no-campaign" background={{ color: '#192046' }}>
 				<i-vstack gap={10} verticalAlignment="center">
 					<i-image url={Assets.fullPath('img/staking/TrollTrooper.svg')} />
-					<i-label caption={ isConnected ? 'No Campaigns' : 'Please connect with your wallet!' } />
+					<i-label font={{ color: '#FFFFFF' }} caption={ isConnected ? 'No Campaigns' : 'Please connect with your wallet!' } />
 					{
 						isBtnShown ? (
 							<i-hstack gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center">

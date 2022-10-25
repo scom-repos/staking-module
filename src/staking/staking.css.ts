@@ -72,10 +72,10 @@ Styles.cssRule('.staking-component', {
       fontFamily: 'Proxima Nova',
     },
     '#stakingElm': {
-      background: Theme.background.default,
+      background: '#0c1234',
     },
     '.i-loading-overlay': {
-      background: Theme.background.default,
+      background: '#0c1234',
     },
     '.overflow-inherit': {
       overflow: 'inherit',
@@ -166,6 +166,7 @@ Styles.cssRule('.staking-component', {
       $nest: {
         'i-label:not(.duration) > *': {
           fontSize: '0.875rem',
+          color: '#FFFFFF'
         },
         '.sticker': {
           position: 'absolute',
@@ -179,7 +180,7 @@ Styles.cssRule('.staking-component', {
               borderBottomColor: '#ccc',
             },
             '&.closed': {
-              borderBottomColor: Theme.background.default,
+              borderBottomColor: '#0c1234',
               $nest: {
                 'i-label > *': {
                   color: '#f7d064 !important',
@@ -426,13 +427,13 @@ Styles.cssRule('.staking-component', {
         '.i-modal_header': {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
-          borderBottom: `2px solid ${Theme.divider}`,
-          color: Theme.colors.primary.main,
+          borderBottom: `2px solid #F15E61`,
+          color: '#F15E61',
           fontSize: '1.25rem',
           fontWeight: 700,
         },
         '.i-modal_header > i-icon': {
-          fill: `${Theme.colors.primary.main} !important`
+          fill: `#F15E61 !important`
         },
         '#importFileErr span': {
           fontSize: '16px !important'

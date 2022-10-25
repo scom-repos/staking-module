@@ -191,7 +191,7 @@ export class ManageStake extends Module {
       this.sectionEarnedQty.visible = true;
       this.sectionTokenInput.visible = false;
       this.colYourStakeQty.innerHTML = '';
-      this.colYourStakeQty.appendChild(<i-label caption="Your Stake QTY" />);
+      this.colYourStakeQty.appendChild(<i-label caption="Your Stake QTY" font={{ color: '#FFFFFF' }} />);
       this.colYourStakeQty.appendChild(<i-label class="text-yellow" caption={`${formatNumber(this.stakeQty)} ${symbol}`} />);
       const maturity = moment(info.releaseTime).format('YYYY-MM-DD HH:mm:ss');
       this.lbMaturity.caption = maturity;
@@ -202,7 +202,7 @@ export class ManageStake extends Module {
         const rewardSymbol = this.tokenMap[rewardOption.tokenAddress?.toLowerCase()]?.symbol || '';
         this.sectionEarnedQty.appendChild(
           <i-vstack class="w-50">
-            <i-label caption="Your Earned QTY" />
+            <i-label caption="Your Earned QTY" font={{ color: '#FFFFFF' }} />
             <i-label class="text-yellow" caption={`${earnedQty} ${rewardSymbol}`} />
           </i-vstack>
         )
@@ -251,7 +251,7 @@ export class ManageStake extends Module {
         this.sectionTokenInput.visible = false;
       }
       this.colIndividualCap.innerHTML = '';
-      this.colIndividualCap.appendChild(<i-label caption="Individual Cap" />);
+      this.colIndividualCap.appendChild(<i-label caption="Individual Cap" font={{ color: '#FFFFFF' }} />);
       this.colIndividualCap.appendChild(<i-label class="text-yellow" caption={`${formatNumber(info.perAddressCap)} ${symbol}`} />);
       const setMaturityText = () => {
         const val = moment().add(info.minLockTime, 'seconds').format('YYYY-MM-DD HH:mm:ss');
@@ -422,7 +422,7 @@ export class ManageStake extends Module {
             <i-hstack horizontalAlignment="center">
               <i-vstack class="manage-wrapper">
                 <i-panel class="main-content">
-                  <i-vstack id="loadingElm" class="i-loading-overlay" background={{ color: Theme.background.modal }}>
+                  <i-vstack id="loadingElm" class="i-loading-overlay" background={{ color: '#192046' }}>
                     <i-vstack class="i-loading-spinner" horizontalAlignment="center" verticalAlignment="center">
                       <i-icon
                         class="i-loading-spinner_icon"
@@ -435,7 +435,7 @@ export class ManageStake extends Module {
                     </i-vstack>
                   </i-vstack>
                   <i-panel class="manage-header">
-                    <i-icon width={20} height={20} fill={Theme.text.primary} class="cursor-pointer pointer" name="arrow-left" onClick={this.closeStakeModal} />
+                    <i-icon width={20} height={20} fill="#fff" class="cursor-pointer pointer" name="arrow-left" onClick={this.closeStakeModal} />
                     <i-label
                       id="lbTitle"
                       caption="Create Locked Staking"
@@ -444,7 +444,7 @@ export class ManageStake extends Module {
                     <i-icon
                       width={20}
                       height={20}
-                      fill={Theme.text.primary}
+                      fill="#fff"
                       class="question-icon"
                       name="question"
                       tooltip={{
@@ -454,18 +454,18 @@ export class ManageStake extends Module {
                     />
                   </i-panel>
                   <i-panel id="sectionUnlockMessage" visible={true} class="description">
-                    <i-label caption="Note that you will forfeit your rewards if you unstake before the maturity date." />
-                    <i-label caption="By unlocking, you will lose your progress, are you sure?" />
+                    <i-label caption="Note that you will forfeit your rewards if you unstake before the maturity date." font={{ color: '#FFFFFF' }} />
+                    <i-label caption="By unlocking, you will lose your progress, are you sure?" font={{ color: '#FFFFFF' }} />
                   </i-panel>
                   <i-panel class="section-info">
                     <i-panel visible={false}>
                       <i-vstack class="w-100">
                         <i-hstack verticalAlignment="center">
-                          <i-label class="mr-025" caption="Duration (days)" />
+                          <i-label class="mr-025" caption="Duration (days)" font={{ color: '#FFFFFF' }} />
                           <i-icon
                             width={18}
                             height={18}
-                            fill={Theme.text.primary}
+                            fill="#fff"
                             class="question-icon"
                             name="question"
                             tooltip={{
@@ -477,11 +477,11 @@ export class ManageStake extends Module {
                         <i-label id="lbDuration" class="text-yellow" caption="-" />
                       </i-vstack>
                       <i-vstack class="w-50">
-                        <i-label caption="Max QTY." />
+                        <i-label caption="Max QTY." font={{ color: '#FFFFFF' }} />
                         <i-label id="lbMaxQty" class="text-yellow" caption="-" />
                       </i-vstack>
                       <i-vstack class="w-50">
-                        <i-label caption="Available QTY." />
+                        <i-label caption="Available QTY." font={{ color: '#FFFFFF' }} />
                         <i-label id="lbAvailableQty" class="text-yellow" caption="-" />
                       </i-vstack>
                       <i-vstack id="colYourStakeQty" class="w-50" />
@@ -489,13 +489,13 @@ export class ManageStake extends Module {
                       <i-vstack id="colIndividualCap" class="w-50" />
                     </i-panel>
                     <i-vstack class="w-100">
-                      <i-label caption="Maturity" />
+                      <i-label caption="Maturity" font={{ color: '#FFFFFF' }} />
                       <i-label id="lbMaturity" class="text-yellow" caption="-" />
                     </i-vstack>
                   </i-panel>
                   <i-panel id="sectionTokenInput" class="input--token-box mb-1">
                     <i-hstack class="mb-075">
-                      <i-label caption="Input" />
+                      <i-label caption="Input" font={{ color: '#FFFFFF' }} />
                       <i-label id="lbBalance" class="text-yellow text-normal w-100 text-right" caption="-" />
                     </i-hstack>
                     <i-hstack>

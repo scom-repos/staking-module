@@ -359,7 +359,7 @@ export class TokenSelection extends Module {
                       name="copy"
                       width="14px"
                       height="14px"
-                      fill={Theme.text.primary}
+                      fill='#FFFFFF'
                       margin={{ right: 8 }}
                       tooltip={{ content: `${token.symbol} has been copied`, trigger: 'click' }}
                       onClick={() => application.copyToClipboard(token.address || '')}
@@ -409,7 +409,7 @@ export class TokenSelection extends Module {
       this.tokenList.append(...tokenItems);
     } else if (this.targetChainId && this.targetChainId !== getChainId()) {
       this.tokenList.innerHTML = '';
-      this.tokenList.append(<i-label class="text-center mt-1 mb-1" caption="No tokens found" />)
+      this.tokenList.append(<i-label font={{ color: '#FFFFFF' }} class="text-center mt-1 mb-1" caption="No tokens found" />)
     } else  {
       try {
         const tokenObj = await getTokenObject(this.filterValue, true);
@@ -419,7 +419,7 @@ export class TokenSelection extends Module {
       } catch (err) {
         this.tokenList.innerHTML = '';
         this.tokenList.append(
-          <i-label class="text-center mt-1 mb-1" caption="No tokens found" />
+          <i-label font={{ color: '#FFFFFF' }} class="text-center mt-1 mb-1" caption="No tokens found" />
         )
       }
     }
@@ -548,7 +548,7 @@ export class TokenSelection extends Module {
       <i-panel class="token-selection">
         <i-panel class="flex">
           <i-button id="btnMax" visible={false} enabled={false} class="custom-btn" caption="Max" onClick={() => this.onSetMaxBalance()} />
-          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: Theme.colors.primary.main }} caption="Select a token" onClick={() => this.showModal()} />
+          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: '#F15E61' }} caption="Select a token" onClick={() => this.showModal()} />
         </i-panel>
         <i-modal id="tokenSelectionModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }} onClose={() => this.onCloseModal()}>
           <i-panel class="search">

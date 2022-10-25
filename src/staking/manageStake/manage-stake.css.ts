@@ -25,7 +25,7 @@ Styles.cssRule('.manage-stake', {
       width: '480px',
     },
     '.question-icon': {
-      border: `2px solid ${Theme.divider}`,
+      border: `2px solid #fff`,
       borderRadius: '50%',
       padding: '3px',
       opacity: '0.8'
@@ -37,7 +37,7 @@ Styles.cssRule('.manage-stake', {
       alignItems: 'center',
       paddingBottom: '1rem',
       marginBottom: '1rem',
-      borderBottom: `2px solid ${Theme.divider}`,
+      borderBottom: `2px solid #fff`,
     },
     '.main-content': {
       fontSize: '.875rem',
@@ -70,7 +70,7 @@ Styles.cssRule('.manage-stake', {
           }
         },
         '.input--token-box': {
-          border: `1px solid ${Theme.divider}`,
+          border: `1px solid #fff`,
           borderRadius: '5px',
           padding: '0.75rem',
         },
@@ -105,13 +105,14 @@ Styles.cssRule('.manage-stake', {
           border: 'none',
           width: '100% !important',
           backgroundColor: 'transparent',
+          color: '#fff',
           fontSize: '1.25rem',
           textAlign: 'left'
         },
       }
     },
     '.text-yellow': {
-      color: Theme.text.third,
+      color: '#f6c958',
       fontSize: '1.25rem',
       fontWeight: 'bold',
     },
@@ -139,6 +140,7 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
+          background: '#192046',
           width: 480,
           maxWidth: '100%',
           borderRadius: '1rem',
@@ -153,6 +155,7 @@ Styles.cssRule('.manage-stake', {
           display: 'none',
         },
         '.modal': {
+          background: '#192046',
           width: 480,
           maxWidth: '100%',
           padding: '0.75rem 1rem',

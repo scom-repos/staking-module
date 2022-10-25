@@ -6024,10 +6024,10 @@
         fontFamily: "Proxima Nova"
       },
       "#stakingElm": {
-        background: Theme.background.default
+        background: "#0c1234"
       },
       ".i-loading-overlay": {
-        background: Theme.background.default
+        background: "#0c1234"
       },
       ".overflow-inherit": {
         overflow: "inherit"
@@ -6117,7 +6117,8 @@
       ".wrapper": {
         $nest: {
           "i-label:not(.duration) > *": {
-            fontSize: "0.875rem"
+            fontSize: "0.875rem",
+            color: "#FFFFFF"
           },
           ".sticker": {
             position: "absolute",
@@ -6131,7 +6132,7 @@
                 borderBottomColor: "#ccc"
               },
               "&.closed": {
-                borderBottomColor: Theme.background.default,
+                borderBottomColor: "#0c1234",
                 $nest: {
                   "i-label > *": {
                     color: "#f7d064 !important"
@@ -6378,13 +6379,13 @@
           ".i-modal_header": {
             marginBottom: "1.5rem",
             paddingBottom: "0.5rem",
-            borderBottom: `2px solid ${Theme.divider}`,
-            color: Theme.colors.primary.main,
+            borderBottom: `2px solid #F15E61`,
+            color: "#F15E61",
             fontSize: "1.25rem",
             fontWeight: 700
           },
           ".i-modal_header > i-icon": {
-            fill: `${Theme.colors.primary.main} !important`
+            fill: `#F15E61 !important`
           },
           "#importFileErr span": {
             fontSize: "16px !important"
@@ -6470,7 +6471,7 @@
         width: "480px"
       },
       ".question-icon": {
-        border: `2px solid ${Theme2.divider}`,
+        border: `2px solid #fff`,
         borderRadius: "50%",
         padding: "3px",
         opacity: "0.8"
@@ -6482,7 +6483,7 @@
         alignItems: "center",
         paddingBottom: "1rem",
         marginBottom: "1rem",
-        borderBottom: `2px solid ${Theme2.divider}`
+        borderBottom: `2px solid #fff`
       },
       ".main-content": {
         fontSize: ".875rem",
@@ -6515,7 +6516,7 @@
             }
           },
           ".input--token-box": {
-            border: `1px solid ${Theme2.divider}`,
+            border: `1px solid #fff`,
             borderRadius: "5px",
             padding: "0.75rem"
           },
@@ -6550,13 +6551,14 @@
             border: "none",
             width: "100% !important",
             backgroundColor: "transparent",
+            color: "#fff",
             fontSize: "1.25rem",
             textAlign: "left"
           }
         }
       },
       ".text-yellow": {
-        color: Theme2.text.third,
+        color: "#f6c958",
         fontSize: "1.25rem",
         fontWeight: "bold"
       },
@@ -6584,6 +6586,7 @@
             display: "none"
           },
           ".modal": {
+            background: "#192046",
             width: 480,
             maxWidth: "100%",
             borderRadius: "1rem",
@@ -6598,6 +6601,7 @@
             display: "none"
           },
           ".modal": {
+            background: "#192046",
             width: 480,
             maxWidth: "100%",
             padding: "0.75rem 1rem",
@@ -6797,7 +6801,8 @@
           this.sectionTokenInput.visible = false;
           this.colYourStakeQty.innerHTML = "";
           this.colYourStakeQty.appendChild(/* @__PURE__ */ this.$render("i-label", {
-            caption: "Your Stake QTY"
+            caption: "Your Stake QTY",
+            font: { color: "#FFFFFF" }
           }));
           this.colYourStakeQty.appendChild(/* @__PURE__ */ this.$render("i-label", {
             class: "text-yellow",
@@ -6814,7 +6819,8 @@
             this.sectionEarnedQty.appendChild(/* @__PURE__ */ this.$render("i-vstack", {
               class: "w-50"
             }, /* @__PURE__ */ this.$render("i-label", {
-              caption: "Your Earned QTY"
+              caption: "Your Earned QTY",
+              font: { color: "#FFFFFF" }
             }), /* @__PURE__ */ this.$render("i-label", {
               class: "text-yellow",
               caption: `${earnedQty} ${rewardSymbol}`
@@ -6866,7 +6872,8 @@
           }
           this.colIndividualCap.innerHTML = "";
           this.colIndividualCap.appendChild(/* @__PURE__ */ this.$render("i-label", {
-            caption: "Individual Cap"
+            caption: "Individual Cap",
+            font: { color: "#FFFFFF" }
           }));
           this.colIndividualCap.appendChild(/* @__PURE__ */ this.$render("i-label", {
             class: "text-yellow",
@@ -7041,7 +7048,7 @@
       }, /* @__PURE__ */ this.$render("i-vstack", {
         id: "loadingElm",
         class: "i-loading-overlay",
-        background: { color: Theme3.background.modal }
+        background: { color: "#192046" }
       }, /* @__PURE__ */ this.$render("i-vstack", {
         class: "i-loading-spinner",
         horizontalAlignment: "center",
@@ -7058,7 +7065,7 @@
       }, /* @__PURE__ */ this.$render("i-icon", {
         width: 20,
         height: 20,
-        fill: Theme3.text.primary,
+        fill: "#fff",
         class: "cursor-pointer pointer",
         name: "arrow-left",
         onClick: this.closeStakeModal
@@ -7069,7 +7076,7 @@
       }), /* @__PURE__ */ this.$render("i-icon", {
         width: 20,
         height: 20,
-        fill: Theme3.text.primary,
+        fill: "#fff",
         class: "question-icon",
         name: "question",
         tooltip: {
@@ -7081,9 +7088,11 @@
         visible: true,
         class: "description"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Note that you will forfeit your rewards if you unstake before the maturity date."
+        caption: "Note that you will forfeit your rewards if you unstake before the maturity date.",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-label", {
-        caption: "By unlocking, you will lose your progress, are you sure?"
+        caption: "By unlocking, you will lose your progress, are you sure?",
+        font: { color: "#FFFFFF" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         class: "section-info"
       }, /* @__PURE__ */ this.$render("i-panel", {
@@ -7094,11 +7103,12 @@
         verticalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         class: "mr-025",
-        caption: "Duration (days)"
+        caption: "Duration (days)",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-icon", {
         width: 18,
         height: 18,
-        fill: Theme3.text.primary,
+        fill: "#fff",
         class: "question-icon",
         name: "question",
         tooltip: {
@@ -7112,7 +7122,8 @@
       })), /* @__PURE__ */ this.$render("i-vstack", {
         class: "w-50"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Max QTY."
+        caption: "Max QTY.",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbMaxQty",
         class: "text-yellow",
@@ -7120,7 +7131,8 @@
       })), /* @__PURE__ */ this.$render("i-vstack", {
         class: "w-50"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Available QTY."
+        caption: "Available QTY.",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbAvailableQty",
         class: "text-yellow",
@@ -7137,7 +7149,8 @@
       })), /* @__PURE__ */ this.$render("i-vstack", {
         class: "w-100"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Maturity"
+        caption: "Maturity",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbMaturity",
         class: "text-yellow",
@@ -7148,7 +7161,8 @@
       }, /* @__PURE__ */ this.$render("i-hstack", {
         class: "mb-075"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Input"
+        caption: "Input",
+        font: { color: "#FFFFFF" }
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbBalance",
         class: "text-yellow text-normal w-100 text-right",
@@ -7269,10 +7283,10 @@
       ".btn-item": {
         background: `${Theme4.colors.secondary.main} !important`,
         borderRadius: 0,
-        color: Theme4.colors.primary.contrastText,
+        color: "#FFFFFF",
         $nest: {
           "&.btn-active": {
-            background: `${Theme4.colors.primary.main} !important`,
+            background: `#F15E61 !important`,
             cursor: "default"
           }
         }
@@ -7299,7 +7313,7 @@
         height: "80px !important",
         borderRadius: 12,
         padding: 8,
-        background: Theme4.input.background,
+        background: "#0C1234",
         $nest: {
           "textarea": {
             width: "100% !important",
@@ -7308,6 +7322,7 @@
             boxShadow: "none",
             outline: "none",
             border: "none",
+            color: "#FFFFFF",
             fontSize: "1rem"
           }
         }
@@ -7316,7 +7331,7 @@
         height: "40px !important",
         borderRadius: 12,
         paddingInline: 8,
-        background: Theme4.input.background,
+        background: "#0C1234",
         $nest: {
           "&.w-100": {
             width: "100% !important"
@@ -7326,8 +7341,16 @@
             width: "100% !important",
             height: "100% !important",
             backgroundColor: "transparent",
+            color: "#FFFFFF",
             fontSize: "1rem",
             textAlign: "left"
+          }
+        }
+      },
+      ".main-content": {
+        $nest: {
+          ".lb-title ": {
+            color: "#fff"
           }
         }
       },
@@ -7348,7 +7371,7 @@
           },
           ".modal": {
             padding: "0.75rem 0",
-            background: Theme4.background.paper,
+            background: "#0C1234",
             borderRadius: 6,
             border: `1px solid ${Theme4.colors.primary.dark}`,
             $nest: {
@@ -7357,7 +7380,8 @@
                 overflow: "auto"
               },
               "i-button": {
-                boxShadow: "none"
+                boxShadow: "none",
+                color: "#FFFFFF"
               },
               "i-button:hover": {
                 background: `${Theme4.action.hover} !important`
@@ -7367,7 +7391,7 @@
         }
       },
       "i-checkbox .checkmark": {
-        backgroundColor: Theme4.input.background,
+        backgroundColor: "#0C1234",
         border: `1px solid ${Theme4.colors.primary.light}`,
         borderRadius: 6,
         width: 20,
@@ -7392,7 +7416,12 @@
           ".i-upload-wrapper": {
             margin: 4,
             height: "100%",
-            cursor: "pointer"
+            cursor: "pointer",
+            borderColor: "#F15E61"
+          },
+          ".i-upload-wrapper i-button": {
+            background: "#F15E61",
+            color: "#FFFFFF"
           },
           ".i-upload_preview": {
             minHeight: "auto"
@@ -7409,7 +7438,7 @@
         }
       },
       ".cs-datepicker": {
-        background: Theme4.input.background,
+        background: "#0C1234",
         borderRadius: 12,
         maxWidth: 300,
         $nest: {
@@ -7421,7 +7450,7 @@
             padding: "1rem",
             fontSize: "1rem",
             textAlign: "center",
-            color: Theme4.text.primary
+            color: "#FFFFFF"
           },
           "input::placeholder": {
             color: Theme4.docs.text
@@ -7457,7 +7486,7 @@
             width: "5px"
           },
           "&::-webkit-scrollbar-thumb": {
-            background: Theme4.colors.primary.main,
+            background: "#F15E61",
             borderRadius: "5px"
           }
         }
@@ -7496,6 +7525,7 @@
                     maxWidth: "inherit !important",
                     $nest: {
                       ".modal": {
+                        background: "#192046",
                         maxWidth: "inherit !important"
                       }
                     }
@@ -7543,7 +7573,7 @@
         $nest: {
           ".i-checkbox_label": {
             fontSize: "1.5rem",
-            color: Theme5.text.third,
+            color: "#f6c958",
             width: "150px !important"
           },
           ".checkmark": {
@@ -7589,7 +7619,7 @@
         padding: "1.25rem 1rem 1rem"
       },
       ".i-modal_header > i-icon": {
-        fill: `${Theme5.colors.primary.main} !important`
+        fill: `#F15E61 !important`
       },
       "i-icon": {
         display: "inline-block"
@@ -7605,7 +7635,7 @@
         width: "3px"
       },
       "::-webkit-scrollbar-thumb": {
-        background: Theme5.colors.primary.main,
+        background: "#F15E61",
         borderRadius: "5px"
       },
       ".ml-auto": {
@@ -7638,12 +7668,12 @@
           "&.has-token": {
             background: "transparent",
             fontWeight: "bold",
-            color: Theme5.text.third,
+            color: "#f6c958",
             paddingRight: "0",
             $nest: {
               "> i-icon": {
                 marginRight: "-7px",
-                fill: Theme5.colors.primary.main
+                fill: "#F15E61"
               }
             }
           }
@@ -7653,7 +7683,8 @@
         marginRight: "0.25rem"
       },
       "#btnToken": {
-        background: Theme5.input.background,
+        background: "#0C1234",
+        color: "#FFFFFF",
         height: "40px",
         width: "100%",
         padding: "0.5rem 0.75rem",
@@ -7668,7 +7699,7 @@
       ".bg-modal": {
         $nest: {
           ".modal": {
-            background: Theme5.background.modal,
+            background: "#192046",
             width: 500,
             maxWidth: "100%",
             padding: "0.75rem 1rem",
@@ -7686,13 +7717,16 @@
           ".i-modal_header": {
             marginBottom: "1.5rem",
             paddingBottom: "0.5rem",
-            borderBottom: `2px solid ${Theme5.divider}`,
-            color: Theme5.colors.primary.main,
+            borderBottom: `2px solid #F15E61`,
+            color: "#F15E61",
             fontSize: "1.25rem",
             fontWeight: 700
           },
+          ".i-modal_header > span": {
+            color: "#F15E61"
+          },
           ".i-modal_header > i-icon": {
-            fill: `${Theme5.colors.primary.main} !important`
+            fill: `#F15E61 !important`
           },
           ".search": {
             position: "relative",
@@ -7715,7 +7749,7 @@
                 borderRadius: "0.5rem",
                 border: "2px solid #2a3675",
                 background: "transparent",
-                color: "inherit",
+                color: "#FFFFFF",
                 fontSize: "inherit"
               }
             }
@@ -7727,7 +7761,7 @@
             marginBlock: "0.5rem",
             $nest: {
               "i-label *": {
-                color: Theme5.colors.primary.main,
+                color: "#F15E61",
                 fontSize: "1rem"
               },
               ".token-section": {
@@ -7738,7 +7772,7 @@
                 width: "10px",
                 height: "14px",
                 display: "flex",
-                fill: Theme5.text.primary,
+                fill: "#FFFFFF",
                 position: "absolute",
                 right: "0"
               },
@@ -7749,7 +7783,7 @@
                 bottom: "2px"
               },
               ".icon-sorted": {
-                fill: Theme5.colors.primary.main
+                fill: "#F15E61"
               }
             }
           },
@@ -7767,7 +7801,7 @@
                 cursor: "pointer",
                 $nest: {
                   "&:hover": {
-                    borderColor: Theme5.colors.primary.main
+                    borderColor: "#F15E61"
                   },
                   "i-image": {
                     marginRight: "0.5rem"
@@ -7803,6 +7837,9 @@
                   },
                   "&:not(:first-child)": {
                     marginTop: 0
+                  },
+                  "i-label": {
+                    color: "#FFFFFF"
                   }
                 }
               },
@@ -8100,7 +8137,7 @@
         name: "copy",
         width: "14px",
         height: "14px",
-        fill: Theme6.text.primary,
+        fill: "#FFFFFF",
         margin: { right: 8 },
         tooltip: { content: `${token.symbol} has been copied`, trigger: "click" },
         onClick: () => import_components8.application.copyToClipboard(token.address || ""),
@@ -8137,6 +8174,7 @@
       } else if (this.targetChainId && this.targetChainId !== (0, import_store4.getChainId)()) {
         this.tokenList.innerHTML = "";
         this.tokenList.append(/* @__PURE__ */ this.$render("i-label", {
+          font: { color: "#FFFFFF" },
           class: "text-center mt-1 mb-1",
           caption: "No tokens found"
         }));
@@ -8150,6 +8188,7 @@
         } catch (err) {
           this.tokenList.innerHTML = "";
           this.tokenList.append(/* @__PURE__ */ this.$render("i-label", {
+            font: { color: "#FFFFFF" },
             class: "text-center mt-1 mb-1",
             caption: "No tokens found"
           }));
@@ -8283,7 +8322,7 @@
         id: "btnToken",
         enabled: false,
         class: "custom-btn",
-        rightIcon: { name: "caret-down", fill: Theme6.colors.primary.main },
+        rightIcon: { name: "caret-down", fill: "#F15E61" },
         caption: "Select a token",
         onClick: () => this.showModal()
       })), /* @__PURE__ */ this.$render("i-modal", {
@@ -8617,10 +8656,11 @@
         });
         this.btnTime = await import_components10.Button.create({
           caption: "Hour(s)",
-          background: { color: Theme7.input.background },
+          background: { color: "#0C1234" },
+          font: { color: "#FFFFFF" },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme7.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: "#F15E61" },
           width: "100%",
           height: 40,
           maxWidth: 80
@@ -8883,7 +8923,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -8896,7 +8936,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme7.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -8909,7 +8949,7 @@
         caption: "Reward Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         class: "w-input"
@@ -8925,7 +8965,7 @@
         caption: "Reward Factor"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMultiplier",
         inputType: "number",
@@ -8943,7 +8983,7 @@
         class: "lb-title",
         caption: "Rate"
       }), /* @__PURE__ */ this.$render("i-label", {
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -8952,7 +8992,7 @@
         id: "lbRate",
         caption: "-",
         class: "lb-title w-100",
-        font: { color: Theme7.text.third }
+        font: { color: "#f6c958" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperRewardNeededElm",
         visible: false,
@@ -8968,7 +9008,7 @@
         caption: "Reward Needed"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -8977,7 +9017,7 @@
         id: "lbMaxReward",
         caption: "-",
         class: "lb-title w-100",
-        font: { color: Theme7.text.third }
+        font: { color: "#f6c958" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -8990,7 +9030,7 @@
         caption: "Upfront Reward Ratio"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -9005,7 +9045,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbErrInitialReward",
         visible: false,
-        font: { color: Theme7.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9018,7 +9058,7 @@
         caption: "Reward Vesting"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 4,
         class: "w-input",
@@ -9046,7 +9086,7 @@
         caption: "Admin Claim Deadline"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -9061,7 +9101,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbErrAdminClaimDeadline",
         visible: false,
-        font: { color: Theme7.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         class: "row-mobile",
         gap: 10,
@@ -9093,7 +9133,7 @@
         caption: "Vesting Start Date"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme7.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -9108,7 +9148,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbStartDateErr",
         visible: false,
-        font: { color: Theme7.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       })))));
     }
   };
@@ -9207,10 +9247,11 @@
         });
         this.btnTime = await import_components11.Button.create({
           caption: "Hour(s)",
-          background: { color: Theme8.input.background },
+          font: { color: "#FFFFFF" },
+          background: { color: "#0C1234" },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: "#F15E61" },
           width: "100%",
           height: 40,
           maxWidth: 80
@@ -9255,10 +9296,11 @@
         const type = import_store7.LockTokenTypeList.find((f) => f.value === this.lockType);
         this.btnType = await import_components11.Button.create({
           caption: (type == null ? void 0 : type.name) || "Select Type",
-          background: { color: Theme8.input.background },
+          background: { color: "#0C1234" },
+          font: { color: "#FFFFFF" },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme8.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: "#F15E61" },
           width: "100%",
           height: 40,
           maxWidth: 300
@@ -9517,7 +9559,7 @@
         caption: "Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -9530,7 +9572,7 @@
         id: "lbAddressErr",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme8.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -9543,7 +9585,7 @@
         caption: "Lock Token Address"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlTokenSelection",
         class: "w-input"
@@ -9559,7 +9601,7 @@
         caption: "Locking Time"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 4,
         class: "w-input",
@@ -9587,7 +9629,7 @@
         caption: "Max Total Lock"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputMaxTotalLock",
         inputType: "number",
@@ -9605,7 +9647,7 @@
         caption: "Per Address Cap"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputPerAddressCap",
         inputType: "number",
@@ -9635,7 +9677,7 @@
         caption: "Lock Token Type"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme8.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "typeSelection",
         class: "network-selection w-input"
@@ -9812,10 +9854,11 @@
         const networkObj = listNetwork.find((f) => f.chainId === this.network);
         this.btnNetwork = await import_components12.Button.create({
           caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : "Select Network",
-          background: { color: Theme9.input.background },
+          background: { color: "#0C1234" },
+          font: { color: "#FFFFFF" },
           border: { style: "none", radius: 12 },
           padding: { top: "0.5rem", bottom: "0.5rem", left: "0.75rem", right: "0.75rem" },
-          rightIcon: { name: "caret-down", fill: Theme9.colors.primary.main },
+          rightIcon: { name: "caret-down", fill: "#F15E61" },
           width: "100%",
           height: 40,
           maxWidth: 300,
@@ -10069,7 +10112,7 @@
         caption: "Network"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme9.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         id: "networkSelection",
         class: "network-selection w-input"
@@ -10085,7 +10128,7 @@
         caption: "Campaign Name"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme9.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-input", {
         id: "inputName",
         class: "input-text w-input",
@@ -10145,7 +10188,7 @@
         caption: "Campaign Start"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme9.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -10160,7 +10203,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbCampaignStartErr",
         visible: false,
-        font: { color: Theme9.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -10173,7 +10216,7 @@
         caption: "Campaign End"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme9.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         verticalAlignment: "center",
@@ -10188,7 +10231,7 @@
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbCampaignEndErr",
         visible: false,
-        font: { color: Theme9.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         class: "row-mobile",
@@ -10218,7 +10261,7 @@
         caption: "Admin"
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "*",
-        font: { color: Theme9.colors.primary.main, size: "16px" }
+        font: { color: "#F15E61", size: "16px" }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 4,
         class: "w-input",
@@ -10231,7 +10274,7 @@
         id: "lbErrAdmin",
         visible: false,
         caption: "The address is invalid!",
-        font: { color: Theme9.colors.primary.main, size: "12px" }
+        font: { color: "#F15E61", size: "12px" }
       }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -10681,12 +10724,12 @@
         onClick: this.onBack
       }, /* @__PURE__ */ this.$render("i-icon", {
         name: "arrow-left",
-        fill: Theme10.text.primary,
+        fill: "#FFFFFF",
         width: 20,
         height: 20
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "Back",
-        font: { size: "20px", bold: true }
+        font: { size: "20px", bold: true, color: "#FFFFFF" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "networkElm",
         width: "100%",
@@ -10694,7 +10737,8 @@
         verticalAlignment: "center",
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
-        caption: "Please connect with your network!"
+        caption: "Please connect with your network!",
+        font: { color: "#FFFFFF" }
       })), /* @__PURE__ */ this.$render("i-panel", {
         visible: false,
         id: "campaignElm",
@@ -10754,7 +10798,7 @@
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         id: "lbNetworkName",
-        font: { color: Theme10.colors.primary.main, size: "20px", bold: true }
+        font: { color: "#F15E61", size: "20px", bold: true }
       })), /* @__PURE__ */ this.$render("i-vstack", {
         gap: 10,
         verticalAlignment: "center",
@@ -10818,7 +10862,7 @@
         enabled: false,
         width: 300,
         maxWidth: "100%",
-        rightIcon: { spin: true, visible: false, fill: Theme10.colors.primary.contrastText },
+        rightIcon: { spin: true, visible: false, fill: "#FFFFFF" },
         class: "btn-os",
         onClick: this.onDeployCampaign
       })))))));
@@ -11106,13 +11150,14 @@
         this.noCampaignSection.clearInnerHTML();
         this.noCampaignSection.appendChild(/* @__PURE__ */ this.$render("i-panel", {
           class: "no-campaign",
-          background: { color: Theme11.background.modal }
+          background: { color: "#192046" }
         }, /* @__PURE__ */ this.$render("i-vstack", {
           gap: 10,
           verticalAlignment: "center"
         }, /* @__PURE__ */ this.$render("i-image", {
           url: import_assets5.default.fullPath("img/staking/TrollTrooper.svg")
         }), /* @__PURE__ */ this.$render("i-label", {
+          font: { color: "#FFFFFF" },
           caption: isConnected ? "No Campaigns" : "Please connect with your wallet!"
         }), isBtnShown ? /* @__PURE__ */ this.$render("i-hstack", {
           gap: 10,

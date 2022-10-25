@@ -235,10 +235,11 @@ export class CampaignConfig extends Module {
 		const networkObj = listNetwork.find(f => f.chainId === this.network);
 		this.btnNetwork = await Button.create({
 			caption: networkObj ? `${networkObj.name} (${networkObj.chainId})` : 'Select Network',
-			background: { color: Theme.input.background },
+			background: { color: '#0C1234' },
+			font: { color: '#FFFFFF' },
 			border: { style: 'none', radius: 12 },
 			padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' },
-			rightIcon: { name: 'caret-down', fill: Theme.colors.primary.main },
+			rightIcon: { name: 'caret-down', fill: '#F15E61' },
 			width: '100%',
 			height: 40,
 			maxWidth: 300,
@@ -477,14 +478,14 @@ export class CampaignConfig extends Module {
 					<i-hstack id="wapperNetworkElm" gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Network" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-panel id="networkSelection" class="network-selection w-input" />
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign Name" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-input id="inputName" class="input-text w-input" onChanged={this.emitInput} />
 					</i-hstack>
@@ -512,21 +513,21 @@ export class CampaignConfig extends Module {
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign Start" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 							<i-datepicker id="inputCampaignStart" width="100%" height={40} type="dateTime" class="cs-datepicker" />
-							<i-label id="lbCampaignStartErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbCampaignStartErr" visible={false} font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Campaign End" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} verticalAlignment="center" class="w-input" position="relative">
 							<i-datepicker id="inputCampaignEnd" width="100%" height={40} type="dateTime" class="cs-datepicker" />
-							<i-label id="lbCampaignEndErr" visible={false} font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbCampaignEndErr" visible={false} font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} class="row-mobile" margin={{ top: 5, bottom: 5 }} verticalAlignment="center" horizontalAlignment="space-between">
@@ -542,11 +543,11 @@ export class CampaignConfig extends Module {
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
 						<i-hstack gap={4} verticalAlignment="center">
 							<i-label class="lb-title" caption="Admin" />
-							<i-label caption="*" font={{ color: Theme.colors.primary.main, size: '16px' }} />
+							<i-label caption="*" font={{ color: '#F15E61', size: '16px' }} />
 						</i-hstack>
 						<i-vstack gap={4} class="w-input" verticalAlignment="center">
 							<i-input id="inputAdmin" class="input-text w-input w-100" onChanged={this.onInputAdmin} />
-							<i-label id="lbErrAdmin" visible={false} caption="The address is invalid!" font={{ color: Theme.colors.primary.main, size: '12px' }} />
+							<i-label id="lbErrAdmin" visible={false} caption="The address is invalid!" font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
 					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">

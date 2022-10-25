@@ -10,7 +10,7 @@ Styles.cssRule('.token-selection', {
       $nest: {
         '.i-checkbox_label': {
           fontSize: '1.5rem',
-          color: Theme.text.third,
+          color: '#f6c958',
           width: '150px !important'
         },
         '.checkmark': {
@@ -56,7 +56,7 @@ Styles.cssRule('.token-selection', {
       padding: '1.25rem 1rem 1rem'
     },
     '.i-modal_header > i-icon': {
-      fill: `${Theme.colors.primary.main} !important`
+      fill: `#F15E61 !important`
     },
     'i-icon': {
       display: 'inline-block'
@@ -72,7 +72,7 @@ Styles.cssRule('.token-selection', {
       width: '3px',
     },
     '::-webkit-scrollbar-thumb': {
-      background: Theme.colors.primary.main,
+      background: '#F15E61',
       borderRadius: '5px',
     },
     '.ml-auto': {
@@ -105,12 +105,12 @@ Styles.cssRule('.token-selection', {
         '&.has-token': {
           background: 'transparent',
           fontWeight: 'bold',
-          color: Theme.text.third,
+          color: '#f6c958',
           paddingRight: '0',
           $nest: {
             '> i-icon': {
               marginRight: '-7px',
-              fill: Theme.colors.primary.main,
+              fill: '#F15E61',
             }
           }
         },
@@ -120,7 +120,8 @@ Styles.cssRule('.token-selection', {
       marginRight: '0.25rem',
     },
     '#btnToken': {
-      background: Theme.input.background,
+      background: '#0C1234',
+      color: '#FFFFFF',
       height: '40px',
       width: '100%',
       padding: '0.5rem 0.75rem',
@@ -135,7 +136,7 @@ Styles.cssRule('.token-selection', {
     '.bg-modal': {
       $nest: {
         '.modal': {
-          background: Theme.background.modal,
+          background: '#192046',
           width: 500,
           maxWidth: '100%',
           padding: '0.75rem 1rem',
@@ -153,13 +154,16 @@ Styles.cssRule('.token-selection', {
         '.i-modal_header': {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
-          borderBottom: `2px solid ${Theme.divider}`,
-          color: Theme.colors.primary.main,
+          borderBottom: `2px solid #F15E61`,
+          color: '#F15E61',
           fontSize: '1.25rem',
           fontWeight: 700,
         },
+        '.i-modal_header > span': {
+          color: '#F15E61',
+        },
         '.i-modal_header > i-icon': {
-          fill: `${Theme.colors.primary.main} !important`
+          fill: `#F15E61 !important`
         },
         '.search': {
           position: 'relative',
@@ -182,7 +186,7 @@ Styles.cssRule('.token-selection', {
               borderRadius: '0.5rem',
               border: '2px solid #2a3675',
               background: 'transparent',
-              color: 'inherit',
+              color: '#FFFFFF',
               fontSize: 'inherit',
             }
           }
@@ -194,7 +198,7 @@ Styles.cssRule('.token-selection', {
           marginBlock: '0.5rem',
           $nest: {
             'i-label *': {
-              color: Theme.colors.primary.main,
+              color: '#F15E61',
               fontSize: '1rem',
             },
             '.token-section': {
@@ -205,7 +209,7 @@ Styles.cssRule('.token-selection', {
               width: '10px',
               height: '14px',
               display: 'flex',
-              fill: Theme.text.primary,
+              fill: '#FFFFFF',
               position: 'absolute',
               right: '0',
             },
@@ -216,7 +220,7 @@ Styles.cssRule('.token-selection', {
               bottom: '2px',
             },
             '.icon-sorted': {
-              fill: Theme.colors.primary.main,
+              fill: '#F15E61',
             }
           }
         },
@@ -234,7 +238,7 @@ Styles.cssRule('.token-selection', {
               cursor: 'pointer',
               $nest: {
                 '&:hover': {
-                  borderColor: Theme.colors.primary.main
+                  borderColor: '#F15E61'
                 },
                 'i-image': {
                   marginRight: '0.5rem'
@@ -270,6 +274,9 @@ Styles.cssRule('.token-selection', {
                 },
                 '&:not(:first-child)': {
                   marginTop: 0
+                },
+                'i-label': {
+                  color: '#FFFFFF'
                 }
               }
             },

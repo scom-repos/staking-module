@@ -30,10 +30,10 @@ Styles.cssRule('.panel-config', {
     '.btn-item': {
       background: `${Theme.colors.secondary.main} !important`,
       borderRadius: 0,
-      color: Theme.colors.primary.contrastText,
+      color: '#FFFFFF',
       $nest: {
         '&.btn-active': {
-          background: `${Theme.colors.primary.main} !important`,
+          background: `#F15E61 !important`,
           cursor: 'default',
         }
       }
@@ -60,7 +60,7 @@ Styles.cssRule('.panel-config', {
       height: '80px !important',
       borderRadius: 12,
       padding: 8,
-      background: Theme.input.background,
+      background: "#0C1234",
       $nest: {
         'textarea': {
           width: '100% !important',
@@ -69,6 +69,7 @@ Styles.cssRule('.panel-config', {
           boxShadow: 'none',
           outline: 'none',
           border: 'none',
+          color: '#FFFFFF',
           fontSize: '1rem',
         }
       }
@@ -77,7 +78,7 @@ Styles.cssRule('.panel-config', {
       height: '40px !important',
       borderRadius: 12,
       paddingInline: 8,
-      background: Theme.input.background,
+      background: "#0C1234",
       $nest: {
         '&.w-100': {
           width: '100% !important',
@@ -87,8 +88,16 @@ Styles.cssRule('.panel-config', {
           width: '100% !important',
           height: '100% !important',
           backgroundColor: 'transparent',
+          color: '#FFFFFF',
           fontSize: '1rem',
           textAlign: 'left'
+        },
+      }
+    },
+    '.main-content': {
+      $nest: {
+        '.lb-title ': {
+          color: '#fff'
         },
       }
     },
@@ -109,7 +118,7 @@ Styles.cssRule('.panel-config', {
         },
         '.modal': {
           padding: '0.75rem 0',
-          background: Theme.background.paper,
+          background: '#0C1234',
           borderRadius: 6,
           border: `1px solid ${Theme.colors.primary.dark}`,
           $nest: {
@@ -119,6 +128,7 @@ Styles.cssRule('.panel-config', {
             },
             'i-button': {
               boxShadow: 'none',
+              color: '#FFFFFF'
             },
             'i-button:hover': {
               background: `${Theme.action.hover} !important`,
@@ -128,7 +138,7 @@ Styles.cssRule('.panel-config', {
       },
     },
     'i-checkbox .checkmark': {
-      backgroundColor: Theme.input.background,
+      backgroundColor: "#0C1234",
       border: `1px solid ${Theme.colors.primary.light}`,
       borderRadius: 6,
       width: 20,
@@ -154,6 +164,11 @@ Styles.cssRule('.panel-config', {
           margin: 4,
           height: '100%',
           cursor: 'pointer',
+          borderColor: '#F15E61'
+        },
+        '.i-upload-wrapper i-button': {
+          background: '#F15E61',
+          color: '#FFFFFF'
         },
         '.i-upload_preview': {
           minHeight: 'auto',
@@ -170,7 +185,7 @@ Styles.cssRule('.panel-config', {
       }
     },
     '.cs-datepicker': {
-      background: Theme.input.background,
+      background: '#0C1234',
       borderRadius: 12,
       maxWidth: 300,
       $nest: {
@@ -182,7 +197,7 @@ Styles.cssRule('.panel-config', {
           padding: '1rem',
           fontSize: '1rem',
           textAlign: 'center',
-          color: Theme.text.primary,
+          color: '#FFFFFF',
         },
         'input::placeholder': {
           //@ts-ignore
@@ -219,7 +234,7 @@ Styles.cssRule('.panel-config', {
           width: '5px',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: Theme.colors.primary.main,
+          background: '#F15E61',
           borderRadius: '5px',
         }
       }
@@ -258,6 +273,7 @@ Styles.cssRule('.panel-config', {
                   maxWidth: 'inherit !important',
                   $nest: {
                     '.modal': {
+                      background: '#192046',
                       maxWidth: 'inherit !important',
                     }
                   }
