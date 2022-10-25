@@ -21,8 +21,6 @@ import { BigNumber } from '@ijstech/eth-wallet';
 import './manage-stake.css';
 import moment from 'moment';
 
-const Theme = Styles.Theme.ThemeVars;
-
 enum CurrentMode {
   STAKE,
   UNLOCK

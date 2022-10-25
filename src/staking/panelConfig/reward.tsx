@@ -4,7 +4,6 @@ import { DefaultDateTimeFormat, EventId, formatNumber, isAddressValid, isInvalid
 import { getChainId, getDefaultChainId, getTokenMapData, Reward } from '@staking/store';
 import moment from 'moment';
 import { TokenSelection } from '../../token-selection';
-const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -233,8 +232,8 @@ export class RewardConfig extends Module {
 				height: 36,
 			});
 			dropdownItem.onClick = () => {
-				if (this.unit === unit.value) return;
 				dropdownModal.visible = false;
+				if (this.unit === unit.value) return;
 				this.btnTime.caption = unit.name;
 				this.unit = unit.value;
 			};

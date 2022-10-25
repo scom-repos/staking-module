@@ -4,7 +4,6 @@ import { EventId, isAddressValid, isValidNumber, ITokenObject, limitInputNumber 
 import { getChainId, getDefaultChainId, getTokenMapData, LockTokenType, LockTokenTypeList, Reward, RewardNeeded, Staking } from '@staking/store';
 import { TokenSelection } from '../../token-selection';
 import { RewardConfig } from './reward';
-const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -220,8 +219,8 @@ export class StakingConfig extends Module {
 				height: 36,
 			});
 			dropdownItem.onClick = () => {
-				if (this.unit === unit.value) return;
 				dropdownModal.visible = false;
+				if (this.unit === unit.value) return;
 				this.btnTime.caption = unit.name;
 				this.unit = unit.value;
 				this.updateCampaignEndLockTime();
@@ -267,8 +266,8 @@ export class StakingConfig extends Module {
 				height: 36,
 			});
 			dropdownItem.onClick = () => {
-				if (this.lockType === type.value) return;
 				dropdownModal.visible = false;
+				if (this.lockType === type.value) return;
 				this.btnType.caption = `${type.name} (${type.value})`;
 				this.lockType = type.value;
 			};
@@ -336,7 +335,7 @@ export class StakingConfig extends Module {
 		const idx = Number(this.rewardConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
 		pnl.classList.add('pnl-label');
-		const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+		const icon = await Icon.create({ name: 'times', fill: '#181e3e', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
 		icon.onClick = () => this.removeReward(idx);
 		const button = await Button.create({ caption: `Reward ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
 		button.classList.add('btn-item');
@@ -508,7 +507,7 @@ export class StakingConfig extends Module {
 						<i-hstack id="listRewardButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Reward" onClick={() => this.onAddReward()} />
 					</i-hstack>
-					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
+					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6573c3' }} />
 					<i-panel id="pnlInfoElm" />
 				</i-vstack>
 			</i-panel>

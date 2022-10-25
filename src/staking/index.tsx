@@ -1,4 +1,4 @@
-import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles, Modal } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, HStack, Container, customElements, ControlElement, IEventBus, application, customModule, Styles, Modal, CarouselSlider } from '@ijstech/components';
 import { formatNumber, formatDate, registerSendTxEvents, TokenMapType, PageBlock, EventId } from '@staking/global';
 import { InfuraId, Networks, getChainId, getTokenMap, getTokenIconPath, viewOnExplorerByAddress, isWalletConnected, getNetworkInfo, setTokenMap, getDefaultChainId, hasWallet, connectWallet, setDataFromSCConfig, setCurrentChainId, tokenSymbol, LockTokenType, getStakingStatus, StakingCampaign, Reward, fallBackUrl } from '@staking/store';
 import {
@@ -26,8 +26,6 @@ import './staking.css';
 import { ManageStake } from './manageStake';
 import { PanelConfig } from './panelConfig';
 import { Contracts } from '@validapp/time-is-money-sdk';
-
-const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -384,6 +382,18 @@ export class StakingBlock extends Module implements PageBlock {
 		if (!this.data) {
 			await this.renderEmpty();
 		}
+
+		window.addEventListener('resize', () => {
+			const isDesktop = innerWidth >= 1240;
+			if (this.stakingElm) {
+				const carousels = this.stakingElm.querySelectorAll('i-carousel-slider');
+				for (const _carousel of carousels) {
+					const carousel = _carousel as CarouselSlider;
+					carousel.width = isDesktop ? '75%' : '100%';
+					carousel.slidesToShow = isDesktop ? 3 : 1;
+				}
+			}
+		});
 	}
 
 	private updateButtonStatus = async (data: any) => {
@@ -440,7 +450,7 @@ export class StakingBlock extends Module implements PageBlock {
 								{ importFileElm }
 								<i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
 									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
-										<i-label id="importFileErr" font={{ size: '16px', color: Theme.text.primary }} />
+										<i-label id="importFileErr" font={{ size: '16px', color: '#fff' }} />
 										<i-button caption="Close" class="btn-os btn-stake" width={120} onClick={onClose} />
 									</i-vstack>
 								</i-modal>
@@ -485,6 +495,16 @@ export class StakingBlock extends Module implements PageBlock {
 		this.removeTimer();
 		for (let idx = 0; idx < this.campaigns.length; idx++) {
 			const campaign = this.campaigns[idx];
+			const isDesktop = innerWidth >= 1240;
+			let items: any[] = [];
+			let carousel = await CarouselSlider.create({
+				width: isDesktop ? '75%' : '100%',
+				minHeight: 200,
+				slidesToShow: isDesktop ? 3 : 1,
+				transitionSpeed: 600,
+				items: items,
+				type: 'arrow'
+			})
 			const containerSection = await Panel.create();
 			containerSection.id = `campaign-${idx}`;
 			containerSection.classList.add('container-custom');
@@ -708,6 +728,341 @@ export class StakingBlock extends Module implements PageBlock {
 				},
 			];
 
+			const _items = await Promise.all(options.map(async (option: any) => {
+					const stickerOptionSection = await Panel.create();
+					stickerOptionSection.classList.add('sticker', 'sold-out', 'hidden', 'sticker-text');
+					stickerOptionSection.id = `sticker-${option.address}`;
+					stickerOptionSection.appendChild(
+						<i-panel class="sticker-text">
+							<i-icon name="star" />
+							<i-label caption="Sold Out" />
+						</i-panel>
+					)
+
+					const key = `btn-${option.address}`;
+					const btnStake = await Button.create({
+						caption: this.getBtnText(key, 'Stake'),
+						background: { color: `${campaign.customColorButton} !important` },
+						font: { color: campaign.customColorText || '#fff' },
+						rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
+					});
+					const btnUnstake = await Button.create({
+						caption: this.getBtnText(key, 'Unstake'),
+						background: { color: `${campaign.customColorButton} !important` },
+						font: { color: campaign.customColorText || '#fff' },
+						rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
+					});
+					if (option.mode === 'Stake') {
+						btnUnstake.visible = false;
+						btnStake.id = key;
+						btnStake.enabled = !isClosed;
+						btnStake.classList.add('btn-os', 'btn-stake');
+						btnStake.onClick = () => this.onStake({ ...campaign, ...option });
+					} else {
+						btnStake.visible = false;
+						btnUnstake.id = key;
+						btnUnstake.classList.add('btn-os', 'btn-stake');
+						btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option: { ...campaign, ...option }, lockedTokenSymbol });
+					}
+
+					const isClaim = option.mode === 'Claim';
+
+					const rewardOptions = !isClaim ? option.rewardsData : [];
+					let aprInfo: any = {};
+
+					const optionAvailableQtyLabel = await Label.create();
+					optionAvailableQtyLabel.classList.add('ml-auto');
+					optionAvailableQtyLabel.id = `lb-${option.address}`;
+					optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
+					const claimStakedRow = await HStack.create();
+					claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked" />);
+					claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} />);
+
+					const rowRewards = await Panel.create();
+					if (isClaim) {
+						claimStakedRow.classList.add('mb-1');
+						for (let idx = 0; idx < option.rewardsData.length; idx++) {
+							const reward = option.rewardsData[idx];
+							const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+							const rewardTokenDecimals = rewardToken.decimals || 18;
+							const decimalsOffset = 18 - rewardTokenDecimals;
+							let rewardLockedDecimalsOffset = decimalsOffset;
+							if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+								rewardLockedDecimalsOffset = decimalsOffset * 2;
+							}
+							const rewardSymbol = rewardToken.symbol || '';
+							rowRewards.appendChild(
+								<i-panel margin={{ bottom: 16 }} width="100%" height={2} background={{ color: campaign.customColorCampaign || '#0000001f' }} />
+							)
+							rowRewards.appendChild(
+								<i-hstack horizontalAlignment="space-between">
+									<i-label caption={`${rewardSymbol} Locked:`} />
+									<i-label class="bold" caption={`${formatNumber(new BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} />
+								</i-hstack>
+							);
+							rowRewards.appendChild(
+								<i-hstack horizontalAlignment="space-between">
+									<i-label caption={`${rewardSymbol} Vesting Start:`} />
+									<i-label class="bold" caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
+								</i-hstack>
+							);
+							rowRewards.appendChild(
+								<i-hstack horizontalAlignment="space-between">
+									<i-label caption={`${rewardSymbol} Vesting End:`} />
+									<i-label class="bold" caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
+								</i-hstack>
+							);
+							const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
+							let rewardClaimable = `0 ${rewardSymbol}`;
+							if (passClaimStartTime) {
+								rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
+							}
+							let startClaimingText = '';
+							if (!(!reward.claimStartTime || passClaimStartTime)) {
+								const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
+								startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
+							}
+							rowRewards.appendChild(
+								<i-hstack horizontalAlignment="space-between">
+									<i-label caption={`${rewardSymbol} Claimable:`} />
+									<i-label class="bold" caption={rewardClaimable} />
+									{startClaimingText ? <i-label caption={startClaimingText} /> : []}
+								</i-hstack>
+							);
+							if (campaign.showContractLink) {
+								rowRewards.appendChild(
+									<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 12, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, reward.address)}>
+										<i-label font={{ bold: true }} caption="View Reward Contract" />
+										<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+									</i-hstack>
+								)
+							}
+							const btnClaim = await Button.create({
+								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: false },
+								caption: `Claim ${rewardSymbol}`,
+								background: { color: `${campaign.customColorButton} !important` },
+								font: { color: campaign.customColorText || '#fff' },
+								enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero())
+							})
+							btnClaim.id = `btnClaim-${idx}-${option.address}`;
+							btnClaim.classList.add('btn-os', 'btn-stake', 'mt-1');
+							btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
+							rowRewards.appendChild(btnClaim);
+							// if (reward.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
+							// 	rowRewards.appendChild(
+							// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
+							// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							// 				<i-label caption="Admin Claim:" />
+							// 				<i-label caption={`${formatNumber(1000)} ${rewardSymbol}`} />
+							// 			</i-hstack>
+							// 			<i-hstack horizontalAlignment="center">
+							// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol })} />
+							// 			</i-hstack>
+							// 		</i-vstack>
+							// 	)
+							// }
+						};
+					} else {
+						rowRewards.visible = false;
+					}
+
+					const rowOptionItems = !isClaim ? [
+						{
+							title: 'Max. QTY',
+							value: `${formatNumber(new BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
+							isHidden: isSimplified,
+						},
+						{
+							title: 'Available QTY',
+							value: optionAvailableQtyLabel.caption,
+							isHidden: isSimplified,
+							elm: optionAvailableQtyLabel,
+						},
+						{
+							title: 'Individual Cap',
+							value: `${formatNumber(new BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
+						},
+						{
+							title: 'Campaign Start Date',
+							value: formatDate(option.startOfEntryPeriod, 'DD MMM YYYY'),
+							isHidden: !isSimplified,
+						},
+					] : [];
+
+					const getAprValue = (rewardOption: any) => {
+						if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
+							const apr = new BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
+							return `${apr}%`;
+						}
+						return '';
+					}
+
+					const durationDays = option.minLockTime / (60 * 60 * 24);
+
+					const imgTokensElm = await HStack.create({ width: '100%', verticalAlignment: 'center', horizontalAlignment: 'center' })
+					const rewardLenght = option.rewardsData.length;
+					for (const reward of option.rewardsData) {
+						const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
+						const imgUrl = getTokenIconPath(rewardToken, chainId);
+						const size = 100 / rewardLenght;
+						imgTokensElm.appendChild(
+							<i-image width={`${size}%`} height="100%" maxWidth={75} maxHeight={75} url={Assets.fullPath(imgUrl)} fallbackUrl={fallBackUrl} />
+						)
+					}
+
+					const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
+					const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
+
+					return <i-vstack class="column-custom" width="100%" padding={{ left: 5, right: 5 }}>
+						<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || '#ffffff07' }}>
+							{stickerOptionSection}
+							<i-panel class="header-info">
+								<i-hstack verticalAlignment="center" horizontalAlignment="center">
+									{
+										_lockedTokenIconPaths.map((v: any) => {
+											return <i-image width={25} height={25} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
+										})
+									}
+									<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
+								</i-hstack >
+								<i-label width="100%" class="staking-description" minHeight={20} caption={option.customDesc || ''} />
+							</i-panel>
+							<i-panel class="img-custom">
+								{imgTokensElm}
+							</i-panel>
+							<i-panel class="info-stake">
+								{btnStake}
+								{btnUnstake}
+								{
+									rowOptionItems.filter(f => !f.isHidden).map((v: any) => {
+										return <i-hstack horizontalAlignment="space-between">
+											<i-label class="mr-025" caption={v.title} />
+											{v.elm ? v.elm : <i-label caption={v.value} />}
+										</i-hstack>
+									})
+								}
+								{claimStakedRow}
+								{
+									!isClaim && !!campaign.showContractLink ?
+									<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+											<i-label font={{ bold: true }} caption="View Staking Contract" />
+											<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+									</i-hstack> : []
+								}
+								{ isClaim ? [] : <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || '#0000001f' }} /> }
+								{
+									await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
+										const labelApr = await Label.create();
+										labelApr.classList.add('ml-auto');
+										const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
+										const rewardTokenDecimals = rewardToken.decimals || 18;
+										const decimalsOffset = 18 - rewardTokenDecimals;
+										const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+										const updateApr = async () => {
+											if (option.lockTokenType === LockTokenType.ERC20_Token) {
+												const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
+												if (!isNaN(parseFloat(apr))) {
+													aprInfo[rewardOption.rewardTokenAddress] = apr;
+												}
+											} else if (option.lockTokenType === LockTokenType.LP_Token) {
+												if (rewardOption.referencePair) {
+													aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpTokenData?.object, durationDays);
+												}
+											} else {
+												aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultTokenData?.object, durationDays);
+											}
+											const aprValue = getAprValue(rewardOption);
+											if (isSimplified) {
+												labelApr.caption = aprValue;
+											} else {
+												labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
+											}
+										}
+										updateApr();
+										this.listAprTimer.push(setInterval(updateApr, 10000));
+										const aprValue = getAprValue(rewardOption);
+										let offset = decimalsOffset;
+										if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+											offset = offset * 2;
+										}
+										const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(new BigNumber(rewardOption.multiplier)).shiftedBy(offset));
+										const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
+										const rewardElm = await VStack.create({ verticalAlignment: 'center' });
+										rewardElm.appendChild(
+											<i-hstack horizontalAlignment="space-between">
+												<i-label class="mr-025" caption="You Earned:" />
+												<i-label caption={`${earnedQty} ${earnedSymbol}`} />
+											</i-hstack>
+										);
+										// if (rewardOption.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
+										// 	rowRewards.appendChild(
+										// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
+										// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+										// 				<i-label caption="Admin Claim:" />
+										// 				<i-label caption={`${formatNumber(1000)} ${earnedSymbol}`} />
+										// 			</i-hstack>
+										// 			<i-hstack horizontalAlignment="center">
+										// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol: earnedSymbol })} />
+										// 			</i-hstack>
+										// 		</i-vstack>
+										// 	)
+										// }
+										if (campaign.showContractLink) {
+											rewardElm.appendChild(
+												<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, rewardOption.address)}>
+													<i-label font={{ bold: true }} caption="View Reward Contract" />
+													<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+												</i-hstack>
+											)
+										}
+										if (isSimplified) {
+											labelApr.caption = aprValue;
+											return <i-vstack>
+												{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || '#0000001f' }} /> : [] }
+												<i-hstack horizontalAlignment="space-between">
+													<i-label class="mr-025" caption="Rate:" />
+													<i-label class="bold" caption={rateDesc} />
+												</i-hstack>
+												<i-hstack>
+													<i-label class="mr-025" caption="APR:" />
+													{labelApr}
+												</i-hstack>
+												{rewardElm}
+											</i-vstack>
+										}
+										labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
+										return <i-vstack verticalAlignment="center">
+											{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || '#0000001f' }} /> : [] }
+											<i-hstack horizontalAlignment="space-between">
+												<i-label class="mr-025" caption="Rate:" />
+												{labelApr}
+											</i-hstack>
+											{rewardElm}
+										</i-vstack>
+									}))
+								}
+								{
+									isClaim && !!campaign.showContractLink ?
+									<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: -12, bottom: 12, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
+										<i-label font={{ bold: true }} caption="View Staking Contract" />
+										<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
+									</i-hstack> : []
+								}
+								{rowRewards}
+							</i-panel>
+						</i-panel>
+					</i-vstack>
+				})
+			);
+
+			items = _items.map((item, idx) => {
+				return {
+					name: `Staking ${idx}`,
+					controls: [item]
+				}
+			})
+			carousel.items = items;
+
 			nodeItems.push(containerSection);
 			containerSection.appendChild(
 				<i-hstack class="row-custom" background={{ color: campaign.customColorBackground || '#ffffff26' }} width="100%" wrap="wrap">
@@ -749,333 +1104,7 @@ export class StakingBlock extends Module implements PageBlock {
 							{activeTimerRow}
 						</i-vstack>
 					</i-vstack>
-					{
-						await Promise.all(options.map(async (option: any) => {
-							const stickerOptionSection = await Panel.create();
-							stickerOptionSection.classList.add('sticker', 'sold-out', 'hidden', 'sticker-text');
-							stickerOptionSection.id = `sticker-${option.address}`;
-							stickerOptionSection.appendChild(
-								<i-panel class="sticker-text">
-									<i-icon name="star" />
-									<i-label caption="Sold Out" />
-								</i-panel>
-							)
-
-							const key = `btn-${option.address}`;
-							const btnStake = await Button.create({
-								caption: this.getBtnText(key, 'Stake'),
-								background: { color: `${campaign.customColorButton} !important` },
-								font: { color: campaign.customColorText || '#fff' },
-								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
-							});
-							const btnUnstake = await Button.create({
-								caption: this.getBtnText(key, 'Unstake'),
-								background: { color: `${campaign.customColorButton} !important` },
-								font: { color: campaign.customColorText || '#fff' },
-								rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: getStakingStatus(key).value }
-							});
-							if (option.mode === 'Stake') {
-								btnUnstake.visible = false;
-								btnStake.id = key;
-								btnStake.enabled = !isClosed;
-								btnStake.classList.add('btn-os', 'btn-stake');
-								btnStake.onClick = () => this.onStake({ ...campaign, ...option });
-							} else {
-								btnStake.visible = false;
-								btnUnstake.id = key;
-								btnUnstake.classList.add('btn-os', 'btn-stake');
-								btnUnstake.onClick = () => this.onUnstake(btnUnstake, { option: { ...campaign, ...option }, lockedTokenSymbol });
-							}
-
-							const isClaim = option.mode === 'Claim';
-
-							const rewardOptions = !isClaim ? option.rewardsData : [];
-							let aprInfo: any = {};
-
-							const optionAvailableQtyLabel = await Label.create();
-							optionAvailableQtyLabel.classList.add('ml-auto');
-							optionAvailableQtyLabel.id = `lb-${option.address}`;
-							optionAvailableQtyLabel.caption = `${formatNumber(new BigNumber(option.maxTotalLock).minus(totalLocked[option.address]).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`;
-							const claimStakedRow = await HStack.create();
-							claimStakedRow.appendChild(<i-label class="mr-025" caption="You Staked" />);
-							claimStakedRow.appendChild(<i-label class="ml-auto" caption={`${formatNumber(new BigNumber(option.stakeQty).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`} />);
-
-							const rowRewards = await Panel.create();
-							if (isClaim) {
-								claimStakedRow.classList.add('mb-1');
-								for (let idx = 0; idx < option.rewardsData.length; idx++) {
-									const reward = option.rewardsData[idx];
-									const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-									const rewardTokenDecimals = rewardToken.decimals || 18;
-									const decimalsOffset = 18 - rewardTokenDecimals;
-									let rewardLockedDecimalsOffset = decimalsOffset;
-									if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-										rewardLockedDecimalsOffset = decimalsOffset * 2;
-									}
-									const rewardSymbol = rewardToken.symbol || '';
-									rowRewards.appendChild(
-										<i-panel margin={{ bottom: 16 }} width="100%" height={2} background={{ color: campaign.customColorCampaign || Theme.divider }} />
-									)
-									rowRewards.appendChild(
-										<i-hstack horizontalAlignment="space-between">
-											<i-label caption={`${rewardSymbol} Locked:`} />
-											<i-label class="bold" caption={`${formatNumber(new BigNumber(reward.vestedReward).shiftedBy(rewardLockedDecimalsOffset))} ${rewardSymbol}`} />
-										</i-hstack>
-									);
-									rowRewards.appendChild(
-										<i-hstack horizontalAlignment="space-between">
-											<i-label caption={`${rewardSymbol} Vesting Start:`} />
-											<i-label class="bold" caption={reward.vestingStart ? reward.vestingStart.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
-										</i-hstack>
-									);
-									rowRewards.appendChild(
-										<i-hstack horizontalAlignment="space-between">
-											<i-label caption={`${rewardSymbol} Vesting End:`} />
-											<i-label class="bold" caption={reward.vestingEnd ? reward.vestingEnd.format('YYYY-MM-DD HH:mm:ss') : 'TBC'} />
-										</i-hstack>
-									);
-									const passClaimStartTime = !(reward.claimStartTime && moment().diff(moment.unix(reward.claimStartTime)) < 0);
-									let rewardClaimable = `0 ${rewardSymbol}`;
-									if (passClaimStartTime) {
-										rewardClaimable = `${formatNumber(new BigNumber(reward.claimable).shiftedBy(decimalsOffset))} ${rewardSymbol}`;
-									}
-									let startClaimingText = '';
-									if (!(!reward.claimStartTime || passClaimStartTime)) {
-										const claimStart = moment.unix(reward.claimStartTime).format('YYYY-MM-DD HH:mm:ss');
-										startClaimingText = `(Claim ${rewardSymbol} after ${claimStart})`;
-									}
-									rowRewards.appendChild(
-										<i-hstack horizontalAlignment="space-between">
-											<i-label caption={`${rewardSymbol} Claimable:`} />
-											<i-label class="bold" caption={rewardClaimable} />
-											{startClaimingText ? <i-label caption={startClaimingText} /> : []}
-										</i-hstack>
-									);
-									if (campaign.showContractLink) {
-										rowRewards.appendChild(
-											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 12, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, reward.address)}>
-												<i-label font={{ bold: true }} caption="View Reward Contract" />
-												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-											</i-hstack>
-										)
-									}
-									const btnClaim = await Button.create({
-										rightIcon: { spin: true, fill: campaign.customColorText || '#fff', visible: false },
-										caption: `Claim ${rewardSymbol}`,
-										background: { color: `${campaign.customColorButton} !important` },
-										font: { color: campaign.customColorText || '#fff' },
-										enabled: !(!passClaimStartTime || new BigNumber(reward.claimable).isZero())
-									})
-									btnClaim.id = `btnClaim-${idx}-${option.address}`;
-									btnClaim.classList.add('btn-os', 'btn-stake', 'mt-1');
-									btnClaim.onClick = () => this.onClaim(btnClaim, { reward, rewardSymbol });
-									rowRewards.appendChild(btnClaim);
-									// if (reward.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
-									// 	rowRewards.appendChild(
-									// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
-									// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-									// 				<i-label caption="Admin Claim:" />
-									// 				<i-label caption={`${formatNumber(1000)} ${rewardSymbol}`} />
-									// 			</i-hstack>
-									// 			<i-hstack horizontalAlignment="center">
-									// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol })} />
-									// 			</i-hstack>
-									// 		</i-vstack>
-									// 	)
-									// }
-								};
-							} else {
-								rowRewards.visible = false;
-							}
-
-							const rowOptionItems = !isClaim ? [
-								{
-									title: 'Max. QTY',
-									value: `${formatNumber(new BigNumber(option.maxTotalLock).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
-									isHidden: isSimplified,
-								},
-								{
-									title: 'Available QTY',
-									value: optionAvailableQtyLabel.caption,
-									isHidden: isSimplified,
-									elm: optionAvailableQtyLabel,
-								},
-								{
-									title: 'Individual Cap',
-									value: `${formatNumber(new BigNumber(option.perAddressCap).shiftedBy(defaultDecimalsOffset))} ${lockedTokenSymbol}`,
-								},
-								{
-									title: 'Campaign Start Date',
-									value: formatDate(option.startOfEntryPeriod, 'DD MMM YYYY'),
-									isHidden: !isSimplified,
-								},
-							] : [];
-
-							const getAprValue = (rewardOption: any) => {
-								if (rewardOption && aprInfo && aprInfo[rewardOption.rewardTokenAddress]) {
-									const apr = new BigNumber(aprInfo[rewardOption.rewardTokenAddress]).times(100).toFormat(2, BigNumber.ROUND_DOWN);
-									return `${apr}%`;
-								}
-								return '';
-							}
-
-							const durationDays = option.minLockTime / (60 * 60 * 24);
-
-							const imgTokensElm = await HStack.create({ width: '100%', verticalAlignment: 'center', horizontalAlignment: 'center' })
-							const rewardLenght = option.rewardsData.length;
-							for (const reward of option.rewardsData) {
-								const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
-								const imgUrl = getTokenIconPath(rewardToken, chainId);
-								const size = 100 / rewardLenght;
-								imgTokensElm.appendChild(
-									<i-image width={`${size}%`} height="100%" maxWidth={75} maxHeight={75} url={Assets.fullPath(imgUrl)} fallbackUrl={fallBackUrl} />
-								)
-							}
-
-							const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
-							const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
-
-							return <i-vstack class="column-custom">
-								<i-panel class="bg-color" background={{ color: campaign.customColorStakingBackground || '#ffffff07' }}>
-									{stickerOptionSection}
-									<i-panel class="header-info">
-										<i-hstack verticalAlignment="center" horizontalAlignment="center">
-											{
-												_lockedTokenIconPaths.map((v: any) => {
-													return <i-image width={25} height={25} url={Assets.fullPath(v)} fallbackUrl={fallBackUrl} />
-												})
-											}
-											<i-label class="bold duration" font={{ color: campaign.customColorCampaign || '#f15e61' }} caption={durationDays < 1 ? '< 1 Day' : `${durationDays} Days`} />
-										</i-hstack >
-										<i-label width="100%" class="staking-description" minHeight={20} caption={option.customDesc || ''} />
-									</i-panel>
-									<i-panel class="img-custom">
-										{imgTokensElm}
-									</i-panel>
-									<i-panel class="info-stake">
-										{btnStake}
-										{btnUnstake}
-										{
-											rowOptionItems.filter(f => !f.isHidden).map((v: any) => {
-												return <i-hstack horizontalAlignment="space-between">
-													<i-label class="mr-025" caption={v.title} />
-													{v.elm ? v.elm : <i-label caption={v.value} />}
-												</i-hstack>
-											})
-										}
-										{claimStakedRow}
-										{
-											!isClaim && !!campaign.showContractLink ?
-											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-													<i-label font={{ bold: true }} caption="View Staking Contract" />
-													<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-											</i-hstack> : []
-										}
-										{ isClaim ? [] : <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> }
-										{
-											await Promise.all(rewardOptions.map(async (rewardOption: any, idx: number) => {
-												const labelApr = await Label.create();
-												labelApr.classList.add('ml-auto');
-												const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
-												const rewardTokenDecimals = rewardToken.decimals || 18;
-												const decimalsOffset = 18 - rewardTokenDecimals;
-												const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
-												const updateApr = async () => {
-													if (option.lockTokenType === LockTokenType.ERC20_Token) {
-														const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
-														if (!isNaN(parseFloat(apr))) {
-															aprInfo[rewardOption.rewardTokenAddress] = apr;
-														}
-													} else if (option.lockTokenType === LockTokenType.LP_Token) {
-														if (rewardOption.referencePair) {
-															aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpTokenData?.object, durationDays);
-														}
-													} else {
-														aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultTokenData?.object, durationDays);
-													}
-													const aprValue = getAprValue(rewardOption);
-													if (isSimplified) {
-														labelApr.caption = aprValue;
-													} else {
-														labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
-													}
-												}
-												updateApr();
-												this.listAprTimer.push(setInterval(updateApr, 10000));
-												const aprValue = getAprValue(rewardOption);
-												let offset = decimalsOffset;
-												if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-													offset = offset * 2;
-												}
-												const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(new BigNumber(rewardOption.multiplier)).shiftedBy(offset));
-												const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
-												const rewardElm = await VStack.create({ verticalAlignment: 'center' });
-												rewardElm.appendChild(
-													<i-hstack horizontalAlignment="space-between">
-														<i-label class="mr-025" caption="You Earned:" />
-														<i-label caption={`${earnedQty} ${earnedSymbol}`} />
-													</i-hstack>
-												);
-												// if (rewardOption.admin?.toLowerCase() === currentAddress?.toLowerCase()) {
-												// 	rowRewards.appendChild(
-												// 		<i-vstack gap={4} margin={{ top: 2, bottom: 12 }} verticalAlignment="center">
-												// 			<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-												// 				<i-label caption="Admin Claim:" />
-												// 				<i-label caption={`${formatNumber(1000)} ${earnedSymbol}`} />
-												// 			</i-hstack>
-												// 			<i-hstack horizontalAlignment="center">
-												// 				<i-button caption="Admin Claim" class="btn-os btn-stake" margin={{ bottom: 0 }} onClick={(src) => this.onClaim(src as Button, { reward: { address: currentAddress }, rewardSymbol: earnedSymbol })} />
-												// 			</i-hstack>
-												// 		</i-vstack>
-												// 	)
-												// }
-												if (campaign.showContractLink) {
-													rewardElm.appendChild(
-														<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: 8, bottom: -4, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, rewardOption.address)}>
-															<i-label font={{ bold: true }} caption="View Reward Contract" />
-															<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-														</i-hstack>
-													)
-												}
-												if (isSimplified) {
-													labelApr.caption = aprValue;
-													return <i-vstack>
-														{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> : [] }
-														<i-hstack horizontalAlignment="space-between">
-															<i-label class="mr-025" caption="Rate:" />
-															<i-label class="bold" caption={rateDesc} />
-														</i-hstack>
-														<i-hstack>
-															<i-label class="mr-025" caption="APR:" />
-															{labelApr}
-														</i-hstack>
-														{rewardElm}
-													</i-vstack>
-												}
-												labelApr.caption = aprValue ? `(${aprValue} APR) ${rateDesc}` : rateDesc;
-												return <i-vstack verticalAlignment="center">
-													{ idx ? <i-panel width="100%" height={2} margin={{ top: 10, bottom: 8 }} background={{ color: campaign.customColorCampaign || Theme.divider }} /> : [] }
-													<i-hstack horizontalAlignment="space-between">
-														<i-label class="mr-025" caption="Rate:" />
-														{labelApr}
-													</i-hstack>
-													{rewardElm}
-												</i-vstack>
-											}))
-										}
-										{
-											isClaim && !!campaign.showContractLink ?
-											<i-hstack gap={4} class="pointer" width="fit-content" margin={{ top: -12, bottom: 12, left: 'auto', right: 'auto' }} onClick={() => viewOnExplorerByAddress(chainId, option.address)}>
-												<i-label font={{ bold: true }} caption="View Staking Contract" />
-												<i-icon name="external-link-alt" width="14" height="14" fill={campaign.customColorText || '#fff'} class="inline-block" />
-											</i-hstack> : []
-										}
-										{rowRewards}
-									</i-panel>
-								</i-panel>
-							</i-vstack>
-						}))
-					}
+					{ carousel }
 				</i-hstack>
 			)
 		};

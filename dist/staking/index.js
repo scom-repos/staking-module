@@ -5963,7 +5963,6 @@
   // src/staking/staking.css.ts
   var import_components3 = __toModule(__require("@ijstech/components"));
   var import_assets2 = __toModule(__require("@staking/assets"));
-  var Theme = import_components3.Styles.Theme.ThemeVars;
   var colorVar = {
     primaryButton: "transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box",
     primaryGradient: "linear-gradient(255deg,#f15e61,#b52082)",
@@ -6193,7 +6192,8 @@
           },
           ".staking-description": {
             overflow: "hidden",
-            overflowWrap: "break-word"
+            overflowWrap: "break-word",
+            paddingInline: "0.75rem"
           },
           ".row-item": {
             marginBlock: "0.15rem"
@@ -6353,6 +6353,9 @@
                 marginTop: "1rem"
               }
             }
+          },
+          ".slider-arrow": {
+            fill: "#f15e61"
           }
         }
       },
@@ -6446,7 +6449,6 @@
 
   // src/staking/manageStake/manage-stake.css.ts
   var import_components4 = __toModule(__require("@ijstech/components"));
-  var Theme2 = import_components4.Styles.Theme.ThemeVars;
   import_components4.Styles.cssRule(".manage-stake", {
     $nest: {
       "input": {
@@ -6669,7 +6671,6 @@
 
   // src/staking/manageStake/manage-stake.tsx
   var import_moment = __toModule(require_moment());
-  var Theme3 = import_components5.Styles.Theme.ThemeVars;
   var CurrentMode;
   (function(CurrentMode2) {
     CurrentMode2[CurrentMode2["STAKE"] = 0] = "STAKE";
@@ -7253,7 +7254,6 @@
 
   // src/staking/panelConfig/panel-config.css.ts
   var import_components6 = __toModule(__require("@ijstech/components"));
-  var Theme4 = import_components6.Styles.Theme.ThemeVars;
   import_components6.Styles.cssRule(".panel-config", {
     background: "#192046",
     padding: "1rem",
@@ -7281,7 +7281,7 @@
         }
       },
       ".btn-item": {
-        background: `${Theme4.colors.secondary.main} !important`,
+        background: `#f50057 !important`,
         borderRadius: 0,
         color: "#FFFFFF",
         $nest: {
@@ -7363,17 +7363,17 @@
       ".network-selection": {
         $nest: {
           ".btn-select:hover": {
-            background: `${Theme4.action.active} !important`
+            background: `rgba(0, 0, 0, 0.54) !important`
           },
           ".btn-select.disabled": {
-            color: `${Theme4.text.primary} !important`,
+            color: `#fff !important`,
             cursor: "default !important"
           },
           ".modal": {
             padding: "0.75rem 0",
             background: "#0C1234",
             borderRadius: 6,
-            border: `1px solid ${Theme4.colors.primary.dark}`,
+            border: `1px solid #2c387e`,
             $nest: {
               "& > i-vstack": {
                 maxHeight: "40vh",
@@ -7384,7 +7384,7 @@
                 color: "#FFFFFF"
               },
               "i-button:hover": {
-                background: `${Theme4.action.hover} !important`
+                background: `linear-gradient(254.8deg, rgba(231,91,102,.1) -8.08%, rgba(181,32,130,.1) 84.35%) !important`
               }
             }
           }
@@ -7392,7 +7392,7 @@
       },
       "i-checkbox .checkmark": {
         backgroundColor: "#0C1234",
-        border: `1px solid ${Theme4.colors.primary.light}`,
+        border: `1px solid #6573c3`,
         borderRadius: 6,
         width: 20,
         height: 20,
@@ -7404,7 +7404,7 @@
         }
       },
       "i-checkbox.is-checked .checkmark": {
-        backgroundColor: Theme4.colors.secondary.light
+        backgroundColor: "#f73378"
       },
       ".cs-upload": {
         maxWidth: 300,
@@ -7453,7 +7453,7 @@
             color: "#FFFFFF"
           },
           "input::placeholder": {
-            color: Theme4.docs.text
+            color: "#717171"
           },
           ".datepicker-toggle": {
             display: "flex",
@@ -7563,7 +7563,6 @@
 
   // src/token-selection/tokenSelection.css.ts
   var import_components7 = __toModule(__require("@ijstech/components"));
-  var Theme5 = import_components7.Styles.Theme.ThemeVars;
   import_components7.Styles.cssRule(".token-selection", {
     $nest: {
       "#tokenSearch": {
@@ -7580,10 +7579,10 @@
             height: "30px",
             width: "30px",
             background: "none",
-            border: `3px solid ${Theme5.colors.primary.light}`
+            border: `3px solid #6573c3`
           },
           ".checkmark:after": {
-            border: `3px solid ${Theme5.colors.primary.light}`,
+            border: `3px solid #6573c3`,
             height: "16px",
             left: "7.5px",
             top: "0px",
@@ -7596,7 +7595,7 @@
       ".btn-source-panel": {
         padding: "5px",
         display: "inline-block",
-        background: Theme5.background.gradient,
+        background: "linear-gradient(90deg, #a8327f 0%, #d4626a 100%)",
         borderRadius: "5px"
       },
       ".token-import-input": {
@@ -7613,7 +7612,7 @@
         }
       },
       ".pnl-token-import": {
-        border: `2px solid ${Theme5.colors.primary.light}`,
+        border: `2px solid #6573c3`,
         borderRadius: "0.75rem",
         margin: "1rem 0",
         padding: "1.25rem 1rem 1rem"
@@ -7625,7 +7624,7 @@
         display: "inline-block"
       },
       ".btn-import": {
-        background: Theme5.background.gradient,
+        background: "linear-gradient(90deg, #a8327f 0%, #d4626a 100%)",
         borderRadius: "5px",
         color: "#fff",
         fontSize: "1rem",
@@ -7647,10 +7646,10 @@
         width: "max-content",
         padding: "0.25rem 0.5rem",
         boxShadow: "none",
-        background: Theme5.background.gradient,
+        background: "linear-gradient(90deg, #a8327f 0%, #d4626a 100%)",
         $nest: {
           "&:hover": {
-            background: Theme5.background.gradient,
+            background: "linear-gradient(90deg, #a8327f 0%, #d4626a 100%)",
             opacity: 0.9
           },
           "&.disabled": {
@@ -7704,7 +7703,7 @@
             maxWidth: "100%",
             padding: "0.75rem 1rem",
             borderRadius: "1rem",
-            color: Theme5.text.primary,
+            color: "#fff",
             marginTop: 40
           }
         }
@@ -7846,7 +7845,7 @@
               ".token-name i-label > *": {
                 fontSize: "0.75rem",
                 marginRight: "0.5rem",
-                color: Theme5.colors.secondary.main
+                color: "#f50057"
               }
             }
           }
@@ -7863,7 +7862,6 @@
   });
 
   // src/token-selection/tokenSelection.tsx
-  var Theme6 = import_components8.Styles.Theme.ThemeVars;
   var TokenSelection = class extends import_components8.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -8553,7 +8551,6 @@
   var import_global5 = __toModule(__require("@staking/global"));
   var import_store6 = __toModule(__require("@staking/store"));
   var import_moment2 = __toModule(require_moment());
-  var Theme7 = import_components10.Styles.Theme.ThemeVars;
   var RewardConfig = class extends import_components10.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -8676,9 +8673,9 @@
             height: 36
           });
           dropdownItem.onClick = () => {
+            dropdownModal.visible = false;
             if (this.unit === unit.value)
               return;
-            dropdownModal.visible = false;
             this.btnTime.caption = unit.name;
             this.unit = unit.value;
           };
@@ -9157,7 +9154,6 @@
   ], RewardConfig);
 
   // src/staking/panelConfig/staking.tsx
-  var Theme8 = import_components11.Styles.Theme.ThemeVars;
   var StakingConfig = class extends import_components11.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -9267,9 +9263,9 @@
             height: 36
           });
           dropdownItem.onClick = () => {
+            dropdownModal.visible = false;
             if (this.unit === unit.value)
               return;
-            dropdownModal.visible = false;
             this.btnTime.caption = unit.name;
             this.unit = unit.value;
             this.updateCampaignEndLockTime();
@@ -9316,9 +9312,9 @@
             height: 36
           });
           dropdownItem.onClick = () => {
+            dropdownModal.visible = false;
             if (this.lockType === type2.value)
               return;
-            dropdownModal.visible = false;
             this.btnType.caption = `${type2.name} (${type2.value})`;
             this.lockType = type2.value;
           };
@@ -9382,7 +9378,7 @@
         const idx = Number(this.rewardConfig.length);
         const pnl = await import_components11.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components11.Icon.create({ name: "times", fill: Theme8.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components11.Icon.create({ name: "times", fill: "#181e3e", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeReward(idx);
         const button = await import_components11.Button.create({ caption: `Reward ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item");
@@ -9701,7 +9697,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme8.colors.primary.light }
+        background: { color: "#6573c3" }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       })));
@@ -9712,7 +9708,6 @@
   ], StakingConfig);
 
   // src/staking/panelConfig/campaign.tsx
-  var Theme9 = import_components12.Styles.Theme.ThemeVars;
   var CampaignConfig = class extends import_components12.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -9942,7 +9937,7 @@
         const idx = Number(this.stakingConfig.length);
         const pnl = await import_components12.Panel.create({ position: "relative" });
         pnl.classList.add("pnl-label");
-        const icon = await import_components12.Icon.create({ name: "times", fill: Theme9.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+        const icon = await import_components12.Icon.create({ name: "times", fill: "#181e3e", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
         icon.onClick = () => this.removeStaking(idx);
         const button = await import_components12.Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
         button.classList.add("btn-item");
@@ -10367,13 +10362,13 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme9.colors.primary.light }
+        background: { color: "#6573C3" }
       }), /* @__PURE__ */ this.$render("i-panel", {
         id: "pnlInfoElm"
       }), /* @__PURE__ */ this.$render("i-label", {
         id: "lbErrBalance",
         visible: false,
-        font: { size: "14px", color: Theme9.colors.secondary.main, bold: true },
+        font: { size: "14px", color: "#f50057", bold: true },
         display: "flex",
         margin: { top: 10 }
       })));
@@ -10387,7 +10382,6 @@
   var import_store9 = __toModule(__require("@staking/store"));
   var import_staking_utils2 = __toModule(__require("@staking/staking-utils"));
   var import_eth_wallet6 = __toModule(__require("@ijstech/eth-wallet"));
-  var Theme10 = import_components13.Styles.Theme.ThemeVars;
   var PanelConfig = class extends import_components13.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -10497,7 +10491,7 @@
           this.btnAdd.enabled = false;
           const pnl = await import_components13.Panel.create({ position: "relative" });
           pnl.classList.add("pnl-label");
-          const icon = await import_components13.Icon.create({ name: "times", fill: Theme10.background.main, height: 12, width: 12, position: "absolute", top: 1, right: 1 });
+          const icon = await import_components13.Icon.create({ name: "times", fill: "#181e3e", height: 12, width: 12, position: "absolute", top: 1, right: 1 });
           icon.onClick = () => this.removeCampaign(idx);
           const button = await import_components13.Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
           button.classList.add("btn-item");
@@ -10779,7 +10773,7 @@
         horizontalAlignment: "center"
       }, /* @__PURE__ */ this.$render("i-label", {
         id: "importFileErr",
-        font: { size: "16px", color: Theme10.text.primary }
+        font: { size: "16px", color: "#fff" }
       }), /* @__PURE__ */ this.$render("i-button", {
         caption: "Close",
         class: "btn-os btn-stake",
@@ -10789,7 +10783,7 @@
         width: "100%",
         height: 2,
         margin: { bottom: 10 },
-        background: { color: Theme10.colors.primary.light }
+        background: { color: "#6573c3" }
       })), /* @__PURE__ */ this.$render("i-hstack", {
         id: "wrapperNetworkElm",
         width: "100%",
@@ -10844,10 +10838,10 @@
         horizontalAlignment: "start"
       }, /* @__PURE__ */ this.$render("i-label", {
         caption: "Only the admin can deploy the campaign!",
-        font: { size: "12px", color: Theme10.colors.secondary.main }
+        font: { size: "12px", color: "#f50057" }
       }), /* @__PURE__ */ this.$render("i-label", {
         caption: "You need to confirm on your wallet for each staking/reward!",
-        font: { size: "12px", color: Theme10.colors.secondary.main }
+        font: { size: "12px", color: "#f50057" }
       })), /* @__PURE__ */ this.$render("i-button", {
         id: "btnExport",
         caption: "Export JSON",
@@ -10874,7 +10868,6 @@
 
   // src/staking/index.tsx
   var import_time_is_money_sdk = __toModule(require_lib());
-  var Theme11 = import_components14.Styles.Theme.ThemeVars;
   var StakingBlock = class extends import_components14.Module {
     constructor(parent, options) {
       super(parent, options);
@@ -11107,6 +11100,17 @@
         if (!this.data) {
           await this.renderEmpty();
         }
+        window.addEventListener("resize", () => {
+          const isDesktop = innerWidth >= 1240;
+          if (this.stakingElm) {
+            const carousels = this.stakingElm.querySelectorAll("i-carousel-slider");
+            for (const _carousel of carousels) {
+              const carousel = _carousel;
+              carousel.width = isDesktop ? "75%" : "100%";
+              carousel.slidesToShow = isDesktop ? 3 : 1;
+            }
+          }
+        });
       };
       this.updateButtonStatus = async (data) => {
         var _a;
@@ -11192,7 +11196,7 @@
           horizontalAlignment: "center"
         }, /* @__PURE__ */ this.$render("i-label", {
           id: "importFileErr",
-          font: { size: "16px", color: Theme11.text.primary }
+          font: { size: "16px", color: "#fff" }
         }), /* @__PURE__ */ this.$render("i-button", {
           caption: "Close",
           class: "btn-os btn-stake",
@@ -11231,6 +11235,16 @@
         this.removeTimer();
         for (let idx = 0; idx < this.campaigns.length; idx++) {
           const campaign = this.campaigns[idx];
+          const isDesktop = innerWidth >= 1240;
+          let items = [];
+          let carousel = await import_components14.CarouselSlider.create({
+            width: isDesktop ? "75%" : "100%",
+            minHeight: 200,
+            slidesToShow: isDesktop ? 3 : 1,
+            transitionSpeed: 600,
+            items,
+            type: "arrow"
+          });
           const containerSection = await import_components14.Panel.create();
           containerSection.id = `campaign-${idx}`;
           containerSection.classList.add("container-custom");
@@ -11452,71 +11466,7 @@
               img: import_assets5.default.fullPath("img/staking/stopwatch.svg")
             }
           ];
-          nodeItems.push(containerSection);
-          containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
-            class: "row-custom",
-            background: { color: campaign.customColorBackground || "#ffffff26" },
-            width: "100%",
-            wrap: "wrap"
-          }, /* @__PURE__ */ this.$render("i-vstack", {
-            class: "column-custom"
-          }, /* @__PURE__ */ this.$render("i-vstack", {
-            class: "banner",
-            background: { color: campaign.customColorCampaign || "#f15e61" },
-            verticalAlignment: "space-between"
-          }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
-            verticalAlignment: "center",
-            class: "campaign-name"
-          }, !campaign.customLogo ? [] : /* @__PURE__ */ this.$render("i-image", {
-            width: "25px",
-            height: "25px",
-            url: campaign.customLogo,
-            fallbackUrl: import_store10.fallBackUrl
-          }), /* @__PURE__ */ this.$render("i-label", {
-            caption: campaign.campaignName
-          })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
-            class: "campaign-description",
-            caption: campaign.campaignDesc || ""
-          })), /* @__PURE__ */ this.$render("i-panel", null, rowItems.filter((f) => !f.isHidden).map((v) => {
-            return /* @__PURE__ */ this.$render("i-hstack", {
-              verticalAlignment: "start",
-              horizontalAlignment: "space-between",
-              class: "row-item"
-            }, /* @__PURE__ */ this.$render("i-hstack", {
-              class: "col-item"
-            }, /* @__PURE__ */ this.$render("i-image", {
-              class: "custom-icon",
-              url: v.img
-            }), /* @__PURE__ */ this.$render("i-label", {
-              class: "no-wrap",
-              caption: v.title
-            })), /* @__PURE__ */ this.$render("i-vstack", {
-              width: "auto",
-              horizontalAlignment: "end"
-            }, v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
-              class: "bold text-right",
-              caption: v.value
-            })));
-          })), simplifiedRow, /* @__PURE__ */ this.$render("i-hstack", {
-            verticalAlignment: "center",
-            class: "get-token",
-            onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId)
-          }, /* @__PURE__ */ this.$render("i-label", {
-            class: "bold",
-            caption: `Get ${lockedTokenSymbol}`
-          }), lockedTokenIconPaths.map((v) => {
-            return /* @__PURE__ */ this.$render("i-image", {
-              width: 25,
-              height: 25,
-              url: import_assets5.default.fullPath(v),
-              fallbackUrl: import_store10.fallBackUrl
-            });
-          }), /* @__PURE__ */ this.$render("i-icon", {
-            name: "external-link-alt",
-            width: "14",
-            height: "14",
-            fill: campaign.customColorText || "#fff"
-          })), activeTimerRow)), await Promise.all(options.map(async (option) => {
+          const _items = await Promise.all(options.map(async (option) => {
             const stickerOptionSection = await import_components14.Panel.create();
             stickerOptionSection.classList.add("sticker", "sold-out", "hidden", "sticker-text");
             stickerOptionSection.id = `sticker-${option.address}`;
@@ -11585,7 +11535,7 @@
                   margin: { bottom: 16 },
                   width: "100%",
                   height: 2,
-                  background: { color: campaign.customColorCampaign || Theme11.divider }
+                  background: { color: campaign.customColorCampaign || "#0000001f" }
                 }));
                 rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
@@ -11713,7 +11663,9 @@
             const _lockedTokenObject = getLockedTokenObject(option, option.tokenInfo, this.tokenMap);
             const _lockedTokenIconPaths = getLockedTokenIconPaths(option, _lockedTokenObject, chainId, this.tokenMap);
             return /* @__PURE__ */ this.$render("i-vstack", {
-              class: "column-custom"
+              class: "column-custom",
+              width: "100%",
+              padding: { left: 5, right: 5 }
             }, /* @__PURE__ */ this.$render("i-panel", {
               class: "bg-color",
               background: { color: campaign.customColorStakingBackground || "#ffffff07" }
@@ -11770,7 +11722,7 @@
               width: "100%",
               height: 2,
               margin: { top: 10, bottom: 8 },
-              background: { color: campaign.customColorCampaign || Theme11.divider }
+              background: { color: campaign.customColorCampaign || "#0000001f" }
             }), await Promise.all(rewardOptions.map(async (rewardOption, idx2) => {
               const labelApr = await import_components14.Label.create();
               labelApr.classList.add("ml-auto");
@@ -11841,7 +11793,7 @@
                   width: "100%",
                   height: 2,
                   margin: { top: 10, bottom: 8 },
-                  background: { color: campaign.customColorCampaign || Theme11.divider }
+                  background: { color: campaign.customColorCampaign || "#0000001f" }
                 }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
@@ -11862,7 +11814,7 @@
                 width: "100%",
                 height: 2,
                 margin: { top: 10, bottom: 8 },
-                background: { color: campaign.customColorCampaign || Theme11.divider }
+                background: { color: campaign.customColorCampaign || "#0000001f" }
               }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
               }, /* @__PURE__ */ this.$render("i-label", {
@@ -11885,7 +11837,79 @@
               fill: campaign.customColorText || "#fff",
               class: "inline-block"
             })) : [], rowRewards)));
-          }))));
+          }));
+          items = _items.map((item, idx2) => {
+            return {
+              name: `Staking ${idx2}`,
+              controls: [item]
+            };
+          });
+          carousel.items = items;
+          nodeItems.push(containerSection);
+          containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
+            class: "row-custom",
+            background: { color: campaign.customColorBackground || "#ffffff26" },
+            width: "100%",
+            wrap: "wrap"
+          }, /* @__PURE__ */ this.$render("i-vstack", {
+            class: "column-custom"
+          }, /* @__PURE__ */ this.$render("i-vstack", {
+            class: "banner",
+            background: { color: campaign.customColorCampaign || "#f15e61" },
+            verticalAlignment: "space-between"
+          }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
+            verticalAlignment: "center",
+            class: "campaign-name"
+          }, !campaign.customLogo ? [] : /* @__PURE__ */ this.$render("i-image", {
+            width: "25px",
+            height: "25px",
+            url: campaign.customLogo,
+            fallbackUrl: import_store10.fallBackUrl
+          }), /* @__PURE__ */ this.$render("i-label", {
+            caption: campaign.campaignName
+          })), /* @__PURE__ */ this.$render("i-hstack", null, /* @__PURE__ */ this.$render("i-label", {
+            class: "campaign-description",
+            caption: campaign.campaignDesc || ""
+          })), /* @__PURE__ */ this.$render("i-panel", null, rowItems.filter((f) => !f.isHidden).map((v) => {
+            return /* @__PURE__ */ this.$render("i-hstack", {
+              verticalAlignment: "start",
+              horizontalAlignment: "space-between",
+              class: "row-item"
+            }, /* @__PURE__ */ this.$render("i-hstack", {
+              class: "col-item"
+            }, /* @__PURE__ */ this.$render("i-image", {
+              class: "custom-icon",
+              url: v.img
+            }), /* @__PURE__ */ this.$render("i-label", {
+              class: "no-wrap",
+              caption: v.title
+            })), /* @__PURE__ */ this.$render("i-vstack", {
+              width: "auto",
+              horizontalAlignment: "end"
+            }, v.elm ? v.elm : /* @__PURE__ */ this.$render("i-label", {
+              class: "bold text-right",
+              caption: v.value
+            })));
+          })), simplifiedRow, /* @__PURE__ */ this.$render("i-hstack", {
+            verticalAlignment: "center",
+            class: "get-token",
+            onClick: () => this.getLPToken(campaign, lockedTokenSymbol, chainId)
+          }, /* @__PURE__ */ this.$render("i-label", {
+            class: "bold",
+            caption: `Get ${lockedTokenSymbol}`
+          }), lockedTokenIconPaths.map((v) => {
+            return /* @__PURE__ */ this.$render("i-image", {
+              width: 25,
+              height: 25,
+              url: import_assets5.default.fullPath(v),
+              fallbackUrl: import_store10.fallBackUrl
+            });
+          }), /* @__PURE__ */ this.$render("i-icon", {
+            name: "external-link-alt",
+            width: "14",
+            height: "14",
+            fill: campaign.customColorText || "#fff"
+          })), activeTimerRow)), carousel));
         }
         ;
         this.stakingElm.clearInnerHTML();

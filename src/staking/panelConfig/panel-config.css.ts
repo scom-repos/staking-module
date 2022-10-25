@@ -1,5 +1,4 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.panel-config', {
   background: "#192046",
@@ -28,7 +27,7 @@ Styles.cssRule('.panel-config', {
       }
     },
     '.btn-item': {
-      background: `${Theme.colors.secondary.main} !important`,
+      background: `#f50057 !important`,
       borderRadius: 0,
       color: '#FFFFFF',
       $nest: {
@@ -110,17 +109,17 @@ Styles.cssRule('.panel-config', {
     '.network-selection': {
       $nest: {
         '.btn-select:hover': {
-          background: `${Theme.action.active} !important`,
+          background: `rgba(0, 0, 0, 0.54) !important`,
         },
         '.btn-select.disabled': {
-          color: `${Theme.text.primary} !important`,
+          color: `#fff !important`,
           cursor: 'default !important',
         },
         '.modal': {
           padding: '0.75rem 0',
           background: '#0C1234',
           borderRadius: 6,
-          border: `1px solid ${Theme.colors.primary.dark}`,
+          border: `1px solid #2c387e`,
           $nest: {
             '& > i-vstack': {
               maxHeight: '40vh',
@@ -131,7 +130,7 @@ Styles.cssRule('.panel-config', {
               color: '#FFFFFF'
             },
             'i-button:hover': {
-              background: `${Theme.action.hover} !important`,
+              background: `linear-gradient(254.8deg, rgba(231,91,102,.1) -8.08%, rgba(181,32,130,.1) 84.35%) !important`,
             },
           },
         },
@@ -139,7 +138,7 @@ Styles.cssRule('.panel-config', {
     },
     'i-checkbox .checkmark': {
       backgroundColor: "#0C1234",
-      border: `1px solid ${Theme.colors.primary.light}`,
+      border: `1px solid #6573c3`,
       borderRadius: 6,
       width: 20,
       height: 20,
@@ -151,7 +150,7 @@ Styles.cssRule('.panel-config', {
       }
     },
     'i-checkbox.is-checked .checkmark': {
-      backgroundColor: Theme.colors.secondary.light
+      backgroundColor: '#f73378'
     },
     '.cs-upload': {
       maxWidth: 300,
@@ -200,8 +199,7 @@ Styles.cssRule('.panel-config', {
           color: '#FFFFFF',
         },
         'input::placeholder': {
-          //@ts-ignore
-          color: Theme.docs.text,
+          color: '#717171',
         },
         '.datepicker-toggle': {
           display: 'flex',

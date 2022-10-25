@@ -20,7 +20,6 @@ import { ITokenObject, formatNumber, EventId } from '@staking/global';
 import Assets from '@staking/assets';
 import './tokenSelection.css';
 import { ImportToken } from '.';
-const Theme = Styles.Theme.ThemeVars;
 
 interface TokenSelectionElement extends ControlElement{
   disableSelect?: boolean,

@@ -1,8 +1,6 @@
 import { Styles } from '@ijstech/components';
 import Assets from '@staking/assets';
 
-const Theme = Styles.Theme.ThemeVars;
-
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
@@ -241,7 +239,8 @@ Styles.cssRule('.staking-component', {
         },
         '.staking-description': {
           overflow: 'hidden',
-          overflowWrap: 'break-word'
+          overflowWrap: 'break-word',
+          paddingInline: '0.75rem',
         },
         '.row-item': {
           marginBlock: '0.15rem',
@@ -401,6 +400,9 @@ Styles.cssRule('.staking-component', {
               marginTop: '1rem',
             }
           }
+        },
+        '.slider-arrow': {
+          fill: '#f15e61',
         }
       },
     },

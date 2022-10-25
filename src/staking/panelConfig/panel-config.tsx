@@ -6,7 +6,6 @@ import { CampaignConfig } from './campaign';
 import { getChainId, getNetworkInfo, isWalletConnected, StakingCampaign } from '@staking/store';
 import { deployCampaign } from '@staking/staking-utils';
 import { Wallet } from '@ijstech/eth-wallet';
-const Theme = Styles.Theme.ThemeVars;
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -163,7 +162,7 @@ export class PanelConfig extends Module {
       this.btnAdd.enabled = false;
       const pnl = await Panel.create({ position: 'relative' });
       pnl.classList.add('pnl-label');
-      const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+      const icon = await Icon.create({ name: 'times', fill: '#181e3e', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
       icon.onClick = () => this.removeCampaign(idx);
       const button = await Button.create({ caption: `Campaign ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 }});
       button.classList.add('btn-item');
@@ -401,12 +400,12 @@ export class PanelConfig extends Module {
                 <i-label id="importFileElm" visible={false} />
                 <i-modal id="importFileErrModal" maxWidth="100%" width={420} title="Import Campaign Error" closeIcon={{ name: 'times' }}>
 									<i-vstack gap={20} margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
-										<i-label id="importFileErr" font={{ size: '16px', color: Theme.text.primary }} />
+										<i-label id="importFileErr" font={{ size: '16px', color: '#fff' }} />
 										<i-button caption="Close" class="btn-os btn-stake" width={120} onClick={this.onClose} />
 									</i-vstack>
 								</i-modal>
               </i-hstack>
-              <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
+              <i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6573c3' }} />
             </i-vstack>
             <i-hstack id="wrapperNetworkElm" width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="center">
               <i-label id="lbNetworkName" font={{ color: '#F15E61', size: '20px', bold: true }} />
@@ -436,8 +435,8 @@ export class PanelConfig extends Module {
                 </i-hstack>
                 <i-hstack id="groupBtnDeployElm" gap={10} margin={{ top: 10 }} verticalAlignment="center" horizontalAlignment="center" wrap="wrap">
                   <i-vstack width="100%" margin={{ bottom: 10 }} verticalAlignment="center" horizontalAlignment="start">
-                    <i-label caption="Only the admin can deploy the campaign!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
-                    <i-label caption="You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: Theme.colors.secondary.main }} />
+                    <i-label caption="Only the admin can deploy the campaign!" font={{ size: '12px', color: '#f50057' }} />
+                    <i-label caption="You need to confirm on your wallet for each staking/reward!" font={{ size: '12px', color: '#f50057' }} />
                   </i-vstack>
                   <i-button
                     id="btnExport"

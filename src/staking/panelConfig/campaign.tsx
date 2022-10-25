@@ -4,7 +4,6 @@ import { DefaultDateTimeFormat, EventId, isAddressValid } from '@staking/global'
 import { getChainId, getDefaultChainId, getTokenBalance, getTokenMap, Networks, Staking, StakingCampaign } from '@staking/store';
 import moment from 'moment';
 import { StakingConfig } from './staking';
-const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -324,7 +323,7 @@ export class CampaignConfig extends Module {
 		const idx = Number(this.stakingConfig.length);
 		const pnl = await Panel.create({ position: 'relative' });
 		pnl.classList.add('pnl-label');
-		const icon = await Icon.create({ name: 'times', fill: Theme.background.main, height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
+		const icon = await Icon.create({ name: 'times', fill: '#181e3e', height: 12, width: 12, position: 'absolute', top: 1, right: 1 });
 		icon.onClick = () => this.removeStaking(idx);
 		const button = await Button.create({ caption: `Staking ${idx + 1}`, padding: { top: 6, bottom: 6, left: 16, right: 16 } });
 		button.classList.add('btn-item');
@@ -578,9 +577,9 @@ export class CampaignConfig extends Module {
 						<i-hstack id="listStakingButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={() => this.onAddStaking()} />
 					</i-hstack>
-					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: Theme.colors.primary.light }} />
+					<i-panel width="100%" height={2} margin={{ bottom: 10 }} background={{ color: '#6573C3' }} />
 					<i-panel id="pnlInfoElm" />
-					<i-label id="lbErrBalance" visible={false} font={{ size: '14px', color: Theme.colors.secondary.main, bold: true }} display="flex" margin={{ top: 10 }} />
+					<i-label id="lbErrBalance" visible={false} font={{ size: '14px', color: '#f50057', bold: true }} display="flex" margin={{ top: 10 }} />
 				</i-vstack>
 			</i-panel>
 		)

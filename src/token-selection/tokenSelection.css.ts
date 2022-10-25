@@ -1,5 +1,4 @@
 import { Styles } from '@ijstech/components';
-const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.token-selection', {
   $nest: {
@@ -17,10 +16,10 @@ Styles.cssRule('.token-selection', {
           height: '30px',
           width: '30px',
           background: 'none',
-          border: `3px solid ${Theme.colors.primary.light}`,
+          border: `3px solid #6573c3`,
         },
         '.checkmark:after': {
-          border: `3px solid ${Theme.colors.primary.light}`,
+          border: `3px solid #6573c3`,
           height: '16px',
           left: '7.5px',
           top: '0px',
@@ -33,7 +32,7 @@ Styles.cssRule('.token-selection', {
     '.btn-source-panel': {
       padding: '5px',
       display: 'inline-block',
-      background: Theme.background.gradient,
+      background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
       borderRadius: '5px',
     },
     '.token-import-input': {
@@ -50,7 +49,7 @@ Styles.cssRule('.token-selection', {
       }
     },
     '.pnl-token-import': {
-      border: `2px solid ${Theme.colors.primary.light}`,
+      border: `2px solid #6573c3`,
       borderRadius: '0.75rem',
       margin: '1rem 0',
       padding: '1.25rem 1rem 1rem'
@@ -62,7 +61,7 @@ Styles.cssRule('.token-selection', {
       display: 'inline-block'
     },
     '.btn-import': {
-      background: Theme.background.gradient,
+      background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
       borderRadius: '5px',
       color: '#fff',
       fontSize: '1rem',
@@ -84,10 +83,10 @@ Styles.cssRule('.token-selection', {
       width: 'max-content',
       padding: '0.25rem 0.5rem',
       boxShadow: 'none',
-      background: Theme.background.gradient,
+      background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
       $nest: {
         '&:hover': {
-          background: Theme.background.gradient,
+          background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
           opacity: .9
         },
         '&.disabled': {
@@ -141,7 +140,7 @@ Styles.cssRule('.token-selection', {
           maxWidth: '100%',
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
-          color: Theme.text.primary,
+          color: '#fff',
           marginTop: 40
         },
       }
@@ -283,7 +282,7 @@ Styles.cssRule('.token-selection', {
             '.token-name i-label > *': {
               fontSize: '0.75rem',
               marginRight: '0.5rem',
-              color: Theme.colors.secondary.main
+              color: '#f50057'
             }
           }
         }
