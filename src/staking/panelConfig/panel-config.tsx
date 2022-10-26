@@ -375,6 +375,14 @@ export class PanelConfig extends Module {
     }
   }
 
+  onConfirm() {
+    if (this.isNew) {
+      this.onDeployCampaign();
+    } else {
+      this.onSave();
+    }
+  }
+
   init() {
     super.init();
     this.stakingResult = new Result();

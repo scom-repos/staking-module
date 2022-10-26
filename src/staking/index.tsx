@@ -90,7 +90,9 @@ export class StakingBlock extends Module implements PageBlock {
 	}
 
 	async confirm() {
-		this.setData(this.data);
+		if (this.pnlConfig) {
+			this.pnlConfig.onConfirm();
+		}
 	}
 
 	async discard() {

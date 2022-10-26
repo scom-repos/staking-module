@@ -10701,6 +10701,13 @@
       this.importFileErrModal.visible = true;
       this.importFileErr.caption = message;
     }
+    onConfirm() {
+      if (this.isNew) {
+        this.onDeployCampaign();
+      } else {
+        this.onSave();
+      }
+    }
     init() {
       super.init();
       this.stakingResult = new Result();
@@ -11954,7 +11961,9 @@
       this.pnlConfig.visible = true;
     }
     async confirm() {
-      this.setData(this.data);
+      if (this.pnlConfig) {
+        this.pnlConfig.onConfirm();
+      }
     }
     async discard() {
       this.pnlConfig.visible = false;
