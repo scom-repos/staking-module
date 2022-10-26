@@ -5959,6 +5959,7 @@
   // src/config.ts
   var baseUrl = "https://openswap.xyz/#";
   var getTokenUrl = `${baseUrl}/swap`;
+  var isThemeApplied = false;
 
   // src/staking/staking.css.ts
   var import_components3 = __toModule(__require("@ijstech/components"));
@@ -10031,12 +10032,12 @@
           campaignEnd: new import_eth_wallet5.BigNumber(this.campaignEnd),
           showContractLink: this.checkboxContract.checked || void 0,
           admin: `${this.inputAdmin.value}`,
-          customColorCampaign: this.inputMainColor.value || void 0,
-          customColorBackground: this.inputBg.value || void 0,
-          customColorStakingBackground: this.inputStakingBg.value || void 0,
-          customColorButton: this.inputStakingBtn.value || void 0,
-          customColorText: this.inputColorText.value || void 0,
-          customColorTimeBackground: this.inputCountdownBg.value || void 0,
+          customColorCampaign: isThemeApplied ? void 0 : this.inputMainColor.value || void 0,
+          customColorBackground: isThemeApplied ? void 0 : this.inputBg.value || void 0,
+          customColorStakingBackground: isThemeApplied ? void 0 : this.inputStakingBg.value || void 0,
+          customColorButton: isThemeApplied ? void 0 : this.inputStakingBtn.value || void 0,
+          customColorText: isThemeApplied ? void 0 : this.inputColorText.value || void 0,
+          customColorTimeBackground: isThemeApplied ? void 0 : this.inputCountdownBg.value || void 0,
           stakings: this.getStakingData()
         };
         return campaign;
@@ -10270,7 +10271,12 @@
         visible: false,
         caption: "The address is invalid!",
         font: { color: "#F15E61", size: "12px" }
-      }))), /* @__PURE__ */ this.$render("i-hstack", {
+      }))), /* @__PURE__ */ this.$render("i-vstack", {
+        visible: isThemeApplied,
+        gap: 10,
+        width: "100%",
+        verticalAlignment: "center"
+      }, /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         verticalAlignment: "center",
         horizontalAlignment: "space-between"
@@ -10342,7 +10348,7 @@
         placeholder: "linear-gradient(90deg, #AC1D78 0%, #E04862 100%)",
         class: "input-text w-input",
         onChanged: this.onInputText
-      })), /* @__PURE__ */ this.$render("i-hstack", {
+      }))), /* @__PURE__ */ this.$render("i-hstack", {
         gap: 10,
         margin: { top: 10, bottom: 5 },
         width: "100%",
@@ -11235,6 +11241,13 @@
         this.removeTimer();
         for (let idx = 0; idx < this.campaigns.length; idx++) {
           const campaign = this.campaigns[idx];
+          const colorCampaignLine = isThemeApplied ? campaign.customColorCampaign || "#0000001f" : "#0000001f";
+          const colorCampaignText = isThemeApplied ? campaign.customColorCampaign || "#f15e61" : "#f15e61";
+          const colorCampaignBackground = isThemeApplied ? campaign.customColorBackground || "#ffffff26" : "#ffffff26";
+          const colorStakingBackground = isThemeApplied ? campaign.customColorStakingBackground || "#ffffff07" : "#ffffff07";
+          const colorButton = isThemeApplied ? campaign.customColorButton : void 0;
+          const colorText = isThemeApplied ? campaign.customColorText || "#fff" : "#fff";
+          const colorTimeBackground = isThemeApplied ? campaign.customColorTimeBackground || "#b14781" : "#b14781";
           const isDesktop = innerWidth >= 1240;
           let items = [];
           let carousel = await import_components14.CarouselSlider.create({
@@ -11248,7 +11261,7 @@
           const containerSection = await import_components14.Panel.create();
           containerSection.id = `campaign-${idx}`;
           containerSection.classList.add("container-custom");
-          if (campaign.customColorText) {
+          if (isThemeApplied && campaign.customColorText) {
             const style = document.createElement("style");
             style.innerHTML = `
 					.wrapper i-label:not(.duration) > * {
@@ -11299,7 +11312,7 @@
           const totalTokensLabel = await import_components14.Label.create();
           const availableQtyLabel = await import_components14.Label.create();
           const activeTimerRow = await import_components14.VStack.create();
-          const bg = { color: campaign.customColorTimeBackground || "#b14781" };
+          const bg = { color: colorTimeBackground };
           const endHours = await import_components14.Label.create({ background: bg });
           const endDays = await import_components14.Label.create({ background: bg });
           const endMins = await import_components14.Label.create({ background: bg });
@@ -11480,15 +11493,15 @@
             const key = `btn-${option.address}`;
             const btnStake = await import_components14.Button.create({
               caption: this.getBtnText(key, "Stake"),
-              background: { color: `${campaign.customColorButton} !important` },
-              font: { color: campaign.customColorText || "#fff" },
-              rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: (0, import_store10.getStakingStatus)(key).value }
+              background: { color: `${colorButton} !important` },
+              font: { color: colorText },
+              rightIcon: { spin: true, fill: colorText, visible: (0, import_store10.getStakingStatus)(key).value }
             });
             const btnUnstake = await import_components14.Button.create({
               caption: this.getBtnText(key, "Unstake"),
-              background: { color: `${campaign.customColorButton} !important` },
-              font: { color: campaign.customColorText || "#fff" },
-              rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: (0, import_store10.getStakingStatus)(key).value }
+              background: { color: `${colorButton} !important` },
+              font: { color: colorText },
+              rightIcon: { spin: true, fill: colorText, visible: (0, import_store10.getStakingStatus)(key).value }
             });
             if (option.mode === "Stake") {
               btnUnstake.visible = false;
@@ -11535,7 +11548,7 @@
                   margin: { bottom: 16 },
                   width: "100%",
                   height: 2,
-                  background: { color: campaign.customColorCampaign || "#0000001f" }
+                  background: { color: colorCampaignLine }
                 }));
                 rowRewards.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
@@ -11595,15 +11608,15 @@
                     name: "external-link-alt",
                     width: "14",
                     height: "14",
-                    fill: campaign.customColorText || "#fff",
+                    fill: colorText,
                     class: "inline-block"
                   })));
                 }
                 const btnClaim = await import_components14.Button.create({
-                  rightIcon: { spin: true, fill: campaign.customColorText || "#fff", visible: false },
+                  rightIcon: { spin: true, fill: colorText, visible: false },
                   caption: `Claim ${rewardSymbol}`,
-                  background: { color: `${campaign.customColorButton} !important` },
-                  font: { color: campaign.customColorText || "#fff" },
+                  background: { color: `${colorButton} !important` },
+                  font: { color: colorText },
                   enabled: !(!passClaimStartTime || new import_eth_wallet7.BigNumber(reward.claimable).isZero())
                 });
                 btnClaim.id = `btnClaim-${idx2}-${option.address}`;
@@ -11668,7 +11681,7 @@
               padding: { left: 5, right: 5 }
             }, /* @__PURE__ */ this.$render("i-panel", {
               class: "bg-color",
-              background: { color: campaign.customColorStakingBackground || "#ffffff07" }
+              background: { color: colorStakingBackground }
             }, stickerOptionSection, /* @__PURE__ */ this.$render("i-panel", {
               class: "header-info"
             }, /* @__PURE__ */ this.$render("i-hstack", {
@@ -11683,7 +11696,7 @@
               });
             }), /* @__PURE__ */ this.$render("i-label", {
               class: "bold duration",
-              font: { color: campaign.customColorCampaign || "#f15e61" },
+              font: { color: colorCampaignText },
               caption: durationDays < 1 ? "< 1 Day" : `${durationDays} Days`
             })), /* @__PURE__ */ this.$render("i-label", {
               width: "100%",
@@ -11716,13 +11729,13 @@
               name: "external-link-alt",
               width: "14",
               height: "14",
-              fill: campaign.customColorText || "#fff",
+              fill: colorText,
               class: "inline-block"
             })) : [], isClaim ? [] : /* @__PURE__ */ this.$render("i-panel", {
               width: "100%",
               height: 2,
               margin: { top: 10, bottom: 8 },
-              background: { color: campaign.customColorCampaign || "#0000001f" }
+              background: { color: colorCampaignLine }
             }), await Promise.all(rewardOptions.map(async (rewardOption, idx2) => {
               const labelApr = await import_components14.Label.create();
               labelApr.classList.add("ml-auto");
@@ -11783,7 +11796,7 @@
                   name: "external-link-alt",
                   width: "14",
                   height: "14",
-                  fill: campaign.customColorText || "#fff",
+                  fill: colorText,
                   class: "inline-block"
                 })));
               }
@@ -11793,7 +11806,7 @@
                   width: "100%",
                   height: 2,
                   margin: { top: 10, bottom: 8 },
-                  background: { color: campaign.customColorCampaign || "#0000001f" }
+                  background: { color: colorCampaignLine }
                 }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                   horizontalAlignment: "space-between"
                 }, /* @__PURE__ */ this.$render("i-label", {
@@ -11814,7 +11827,7 @@
                 width: "100%",
                 height: 2,
                 margin: { top: 10, bottom: 8 },
-                background: { color: campaign.customColorCampaign || "#0000001f" }
+                background: { color: colorCampaignLine }
               }) : [], /* @__PURE__ */ this.$render("i-hstack", {
                 horizontalAlignment: "space-between"
               }, /* @__PURE__ */ this.$render("i-label", {
@@ -11834,7 +11847,7 @@
               name: "external-link-alt",
               width: "14",
               height: "14",
-              fill: campaign.customColorText || "#fff",
+              fill: colorText,
               class: "inline-block"
             })) : [], rowRewards)));
           }));
@@ -11848,14 +11861,14 @@
           nodeItems.push(containerSection);
           containerSection.appendChild(/* @__PURE__ */ this.$render("i-hstack", {
             class: "row-custom",
-            background: { color: campaign.customColorBackground || "#ffffff26" },
+            background: { color: colorCampaignBackground },
             width: "100%",
             wrap: "wrap"
           }, /* @__PURE__ */ this.$render("i-vstack", {
             class: "column-custom"
           }, /* @__PURE__ */ this.$render("i-vstack", {
             class: "banner",
-            background: { color: campaign.customColorCampaign || "#f15e61" },
+            background: { color: colorCampaignText },
             verticalAlignment: "space-between"
           }, stickerSection, /* @__PURE__ */ this.$render("i-hstack", {
             verticalAlignment: "center",
@@ -11908,7 +11921,7 @@
             name: "external-link-alt",
             width: "14",
             height: "14",
-            fill: campaign.customColorText || "#fff"
+            fill: colorText
           })), activeTimerRow)), carousel));
         }
         ;

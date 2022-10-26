@@ -4,6 +4,7 @@ import { DefaultDateTimeFormat, EventId, isAddressValid } from '@staking/global'
 import { getChainId, getDefaultChainId, getTokenBalance, getTokenMap, Networks, Staking, StakingCampaign } from '@staking/store';
 import moment from 'moment';
 import { StakingConfig } from './staking';
+import { isThemeApplied } from '../../config';
 
 declare global {
 	namespace JSX {
@@ -450,12 +451,12 @@ export class CampaignConfig extends Module {
 			campaignEnd: new BigNumber(this.campaignEnd),
 			showContractLink: this.checkboxContract.checked || undefined,
 			admin: `${this.inputAdmin.value}`,
-			customColorCampaign: this.inputMainColor.value || undefined,
-			customColorBackground: this.inputBg.value || undefined,
-			customColorStakingBackground: this.inputStakingBg.value || undefined,
-			customColorButton: this.inputStakingBtn.value || undefined,
-			customColorText: this.inputColorText.value || undefined,
-			customColorTimeBackground: this.inputCountdownBg.value || undefined,
+			customColorCampaign: isThemeApplied ? undefined : this.inputMainColor.value || undefined,
+			customColorBackground: isThemeApplied ? undefined : this.inputBg.value || undefined,
+			customColorStakingBackground: isThemeApplied ? undefined : this.inputStakingBg.value || undefined,
+			customColorButton: isThemeApplied ? undefined : this.inputStakingBtn.value || undefined,
+			customColorText: isThemeApplied ? undefined : this.inputColorText.value || undefined,
+			customColorTimeBackground: isThemeApplied ? undefined : this.inputCountdownBg.value || undefined,
 			stakings: this.getStakingData(),
 		}
 		return campaign;
@@ -549,30 +550,32 @@ export class CampaignConfig extends Module {
 							<i-label id="lbErrAdmin" visible={false} caption="The address is invalid!" font={{ color: '#F15E61', size: '12px' }} />
 						</i-vstack>
 					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Campaign Main Color" />
-						<i-input id="inputMainColor" placeholder="#f15e61" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Campaign Background" />
-						<i-input id="inputBg" placeholder="#ffffff26" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Color Text" />
-						<i-input id="inputColorText" placeholder="#ffffff" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Countdown Background" />
-						<i-input id="inputCountdownBg" placeholder="#b14781" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Staking Background" />
-						<i-input id="inputStakingBg" placeholder="#ffffff07" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
-					<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
-						<i-label class="lb-title" caption="Staking Button" />
-						<i-input id="inputStakingBtn" placeholder="linear-gradient(90deg, #AC1D78 0%, #E04862 100%)" class="input-text w-input" onChanged={this.onInputText} />
-					</i-hstack>
+					<i-vstack visible={isThemeApplied} gap={10} width="100%" verticalAlignment="center">
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Campaign Main Color" />
+							<i-input id="inputMainColor" placeholder="#f15e61" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Campaign Background" />
+							<i-input id="inputBg" placeholder="#ffffff26" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Color Text" />
+							<i-input id="inputColorText" placeholder="#ffffff" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Countdown Background" />
+							<i-input id="inputCountdownBg" placeholder="#b14781" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Staking Background" />
+							<i-input id="inputStakingBg" placeholder="#ffffff07" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+						<i-hstack gap={10} verticalAlignment="center" horizontalAlignment="space-between">
+							<i-label class="lb-title" caption="Staking Button" />
+							<i-input id="inputStakingBtn" placeholder="linear-gradient(90deg, #AC1D78 0%, #E04862 100%)" class="input-text w-input" onChanged={this.onInputText} />
+						</i-hstack>
+					</i-vstack>
 					<i-hstack gap={10} margin={{ top: 10, bottom: 5 }} width="100%" verticalAlignment="center" horizontalAlignment="space-between" wrap="wrap-reverse">
 						<i-hstack id="listStakingButton" verticalAlignment="center" />
 						<i-button id="btnAdd" class="btn-os" margin={{ left: 'auto' }} caption="Add Staking" onClick={() => this.onAddStaking()} />
