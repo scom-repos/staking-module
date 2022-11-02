@@ -154,6 +154,7 @@ const getStakingRewardInfoByAddresses = async (option: Reward, providerAddress: 
 const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
   try {
     let wallet = Wallet.getInstance();
+    let chainId = wallet.chainId;
     let stakingAddress = option.address;
     let rewardOptions = option.rewards;
     let currentAddress = wallet.address;
@@ -220,6 +221,10 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
       let promises = rewardOptions.map(async (option, index) => {
         return new Promise<void>(async (resolve, reject) => {
           try {
+            let referencePair = '';
+            if (option.rewardTokenAddress && tokenPriceAMMReference[chainId]) {
+              referencePair = tokenPriceAMMReference[chainId][option.rewardTokenAddress.toLowerCase()];
+            }
             if (mode === 'Claim') {
               let stakingRewardInfo = await getStakingRewardInfoByAddresses(option, currentAddress, releaseTime.toNumber());
               if (stakingRewardInfo) {
@@ -227,6 +232,7 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
                 rewardsData.push({
                   ...option,
                   ...stakingRewardInfo,
+                  referencePair,
                   vestedReward,
                   index
                 });
@@ -243,6 +249,7 @@ const getStakingOptionExtendedInfoByAddress = async (option: Staking) => {
               let multiplier = Utils.fromDecimals(multiplierWei).toFixed();
               rewardsData.push({
                 ...option,
+                referencePair,
                 multiplier,
                 admin,
                 index

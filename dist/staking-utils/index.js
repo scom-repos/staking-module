@@ -19151,6 +19151,7 @@ var getStakingRewardInfoByAddresses = async (option, providerAddress, releaseTim
 var getStakingOptionExtendedInfoByAddress = async (option) => {
   try {
     let wallet = import_eth_wallet4.Wallet.getInstance();
+    let chainId = wallet.chainId;
     let stakingAddress = option.address;
     let rewardOptions = option.rewards;
     let currentAddress = wallet.address;
@@ -19207,11 +19208,16 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
       let promises = rewardOptions.map(async (option2, index) => {
         return new Promise(async (resolve, reject) => {
           try {
+            let referencePair = "";
+            if (option2.rewardTokenAddress && import_store.tokenPriceAMMReference[chainId]) {
+              referencePair = import_store.tokenPriceAMMReference[chainId][option2.rewardTokenAddress.toLowerCase()];
+            }
             if (mode === "Claim") {
               let stakingRewardInfo = await getStakingRewardInfoByAddresses(option2, currentAddress, releaseTime.toNumber());
               if (stakingRewardInfo) {
                 let vestedReward = new import_eth_wallet4.BigNumber(totalCredit).times(stakingRewardInfo.multiplier).minus(stakingRewardInfo.claimSoFar).toFixed();
                 rewardsData.push(__spreadProps(__spreadValues(__spreadValues({}, option2), stakingRewardInfo), {
+                  referencePair,
                   vestedReward,
                   index
                 }));
@@ -19227,6 +19233,7 @@ var getStakingOptionExtendedInfoByAddress = async (option) => {
               let multiplierWei = await rewardsContract.multiplier();
               let multiplier = import_eth_wallet4.Utils.fromDecimals(multiplierWei).toFixed();
               rewardsData.push(__spreadProps(__spreadValues({}, option2), {
+                referencePair,
                 multiplier,
                 admin,
                 index

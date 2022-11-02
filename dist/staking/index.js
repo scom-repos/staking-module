@@ -11545,10 +11545,13 @@
                 const reward = option.rewardsData[idx2];
                 const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
                 const rewardTokenDecimals = rewardToken.decimals || 18;
-                const decimalsOffset = 18 - rewardTokenDecimals;
+                let decimalsOffset = 18 - rewardTokenDecimals;
                 let rewardLockedDecimalsOffset = decimalsOffset;
                 if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
                   rewardLockedDecimalsOffset = decimalsOffset * 2;
+                } else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+                  rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+                  decimalsOffset = 18 - lockedTokenDecimals;
                 }
                 const rewardSymbol = rewardToken.symbol || "";
                 rowRewards.appendChild(/* @__PURE__ */ this.$render("i-panel", {
@@ -11748,21 +11751,28 @@
               labelApr.classList.add("ml-auto");
               const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
               const rewardTokenDecimals = rewardToken.decimals || 18;
-              const decimalsOffset = 18 - rewardTokenDecimals;
-              const rateDesc = `1 ${(0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet7.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
+              let decimalsOffset = 18 - rewardTokenDecimals;
+              let offset = decimalsOffset;
+              if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+                offset = offset * 2;
+              } else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+                offset = rewardTokenDecimals - lockedTokenDecimals;
+              }
+              const lockTokenType = option.lockTokenType;
+              const rateDesc = `1 ${lockTokenType === import_store10.LockTokenType.LP_Token ? "LP" : (0, import_store10.tokenSymbol)(option.lockTokenAddress)} : ${new import_eth_wallet7.BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${(0, import_store10.tokenSymbol)(rewardOption.rewardTokenAddress)}`;
               const updateApr = async () => {
                 var _a, _b, _c, _d;
-                if (option.lockTokenType === import_store10.LockTokenType.ERC20_Token) {
+                if (lockTokenType === import_store10.LockTokenType.ERC20_Token) {
                   const apr = await (0, import_staking_utils3.getERC20RewardCurrentAPR)(rewardOption, lockedTokenObject, durationDays);
                   if (!isNaN(parseFloat(apr))) {
                     aprInfo[rewardOption.rewardTokenAddress] = apr;
                   }
-                } else if (option.lockTokenType === import_store10.LockTokenType.LP_Token) {
+                } else if (lockTokenType === import_store10.LockTokenType.LP_Token) {
                   if (rewardOption.referencePair) {
-                    aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getLPRewardCurrentAPR)(rewardOption, (_b = (_a = option.tokenInfo) == null ? void 0 : _a.lpTokenData) == null ? void 0 : _b.object, durationDays);
+                    aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getLPRewardCurrentAPR)(rewardOption, (_b = (_a = option.tokenInfo) == null ? void 0 : _a.lpToken) == null ? void 0 : _b.object, durationDays);
                   }
                 } else {
-                  aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getVaultRewardCurrentAPR)(rewardOption, (_d = (_c = option.tokenInfo) == null ? void 0 : _c.vaultTokenData) == null ? void 0 : _d.object, durationDays);
+                  aprInfo[rewardOption.rewardTokenAddress] = await (0, import_staking_utils3.getVaultRewardCurrentAPR)(rewardOption, (_d = (_c = option.tokenInfo) == null ? void 0 : _c.vaultToken) == null ? void 0 : _d.object, durationDays);
                 }
                 const aprValue2 = getAprValue(rewardOption);
                 if (isSimplified) {
@@ -11774,10 +11784,6 @@
               updateApr();
               this.listAprTimer.push(setInterval(updateApr, 1e4));
               const aprValue = getAprValue(rewardOption);
-              let offset = decimalsOffset;
-              if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-                offset = offset * 2;
-              }
               const earnedQty = (0, import_global9.formatNumber)(new import_eth_wallet7.BigNumber(option.totalCredit).times(new import_eth_wallet7.BigNumber(rewardOption.multiplier)).shiftedBy(offset));
               const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || "";
               const rewardElm = await import_components14.VStack.create({ verticalAlignment: "center" });

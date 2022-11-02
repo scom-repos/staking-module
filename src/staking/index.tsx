@@ -794,10 +794,13 @@ export class StakingBlock extends Module implements PageBlock {
 							const reward = option.rewardsData[idx];
 							const rewardToken = this.getRewardToken(reward.rewardTokenAddress);
 							const rewardTokenDecimals = rewardToken.decimals || 18;
-							const decimalsOffset = 18 - rewardTokenDecimals;
+							let decimalsOffset = 18 - rewardTokenDecimals;
 							let rewardLockedDecimalsOffset = decimalsOffset;
 							if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
 								rewardLockedDecimalsOffset = decimalsOffset * 2;
+							} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+								rewardLockedDecimalsOffset = rewardTokenDecimals - lockedTokenDecimals;
+								decimalsOffset = 18 - lockedTokenDecimals;
 							}
 							const rewardSymbol = rewardToken.symbol || '';
 							rowRewards.appendChild(
@@ -965,20 +968,27 @@ export class StakingBlock extends Module implements PageBlock {
 										labelApr.classList.add('ml-auto');
 										const rewardToken = this.getRewardToken(rewardOption.rewardTokenAddress);
 										const rewardTokenDecimals = rewardToken.decimals || 18;
-										const decimalsOffset = 18 - rewardTokenDecimals;
-										const rateDesc = `1 ${tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
+										let decimalsOffset = 18 - rewardTokenDecimals;
+										let offset = decimalsOffset;
+										if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
+											offset = offset * 2;
+										} else if (lockedTokenDecimals !== 18 && rewardTokenDecimals === 18) {
+											offset = rewardTokenDecimals - lockedTokenDecimals;
+										}
+										const lockTokenType = option.lockTokenType;
+										const rateDesc = `1 ${lockTokenType === LockTokenType.LP_Token ? 'LP' : tokenSymbol(option.lockTokenAddress)} : ${new BigNumber(rewardOption.multiplier).shiftedBy(decimalsOffset).toFixed()} ${tokenSymbol(rewardOption.rewardTokenAddress)}`;
 										const updateApr = async () => {
-											if (option.lockTokenType === LockTokenType.ERC20_Token) {
+											if (lockTokenType === LockTokenType.ERC20_Token) {
 												const apr: any = await getERC20RewardCurrentAPR(rewardOption, lockedTokenObject, durationDays);
 												if (!isNaN(parseFloat(apr))) {
 													aprInfo[rewardOption.rewardTokenAddress] = apr;
 												}
-											} else if (option.lockTokenType === LockTokenType.LP_Token) {
+											} else if (lockTokenType === LockTokenType.LP_Token) {
 												if (rewardOption.referencePair) {
-													aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpTokenData?.object, durationDays);
+													aprInfo[rewardOption.rewardTokenAddress] = await getLPRewardCurrentAPR(rewardOption, option.tokenInfo?.lpToken?.object, durationDays);
 												}
 											} else {
-												aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultTokenData?.object, durationDays);
+												aprInfo[rewardOption.rewardTokenAddress] = await getVaultRewardCurrentAPR(rewardOption, option.tokenInfo?.vaultToken?.object, durationDays);
 											}
 											const aprValue = getAprValue(rewardOption);
 											if (isSimplified) {
@@ -990,10 +1000,6 @@ export class StakingBlock extends Module implements PageBlock {
 										updateApr();
 										this.listAprTimer.push(setInterval(updateApr, 10000));
 										const aprValue = getAprValue(rewardOption);
-										let offset = decimalsOffset;
-										if (rewardTokenDecimals !== 18 && lockedTokenDecimals !== 18) {
-											offset = offset * 2;
-										}
 										const earnedQty = formatNumber(new BigNumber(option.totalCredit).times(new BigNumber(rewardOption.multiplier)).shiftedBy(offset));
 										const earnedSymbol = this.getRewardToken(rewardOption.rewardTokenAddress).symbol || '';
 										const rewardElm = await VStack.create({ verticalAlignment: 'center' });
